@@ -32,6 +32,22 @@
 #include "bh/bh.h"
 #include "ra/ralib.h"
 
+
+#define RA_APP_MAJOR_VER 1
+#define RA_APP_MINOR_VER 0
+#define RA_APP_REL_TYPE "a"
+#define RA_APP_REL_TYPE_VER 2 
+#define RA_APP_NAME "rosanne"
+
+#define RA_APP_FULL_VER (wxString::Format ("%d.%d%s%d", \
+	RA_APP_MAJOR_VER, RA_APP_MINOR_VER, \
+	RA_APP_REL_TYPE, RA_APP_REL_TYPE_VER))
+
+#define RA_APP_FULL_NAME (wxString::Format("%s %s", \
+	RA_APP_NAME, RA_APP_FULL_VER.c_str()))
+
+#define ra_APP_URL "http://rosanne.sourceforge.net"
+
 #define raTOTAL_CARDS 32
 #define raTOTAL_PLAYERS 4
 #define raTOTAL_BID_ROUNDS 3

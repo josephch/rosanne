@@ -45,10 +45,12 @@ bool raApp::OnInit()
 	// Randomizing the PRNG
 	srand(time(NULL));
 
-	// Create the main application window
 	//wxImage::AddHandler(new wxXPMHandler);
-	wxImage::AddHandler(new wxPNGHandler);
+	//wxImage::AddHandler(new wxPNGHandler);
+	//For usage of sockets or derived classes such as wxFTP in a secondary thread
+	wxSocketBase::Initialize();
 
+	// Create the main application window
 	raFrame *frame = new raFrame(RA_APP_FULL_NAME);
 	frame->SetSize(
 		wxSystemSettings::GetMetric(wxSYS_SCREEN_X) - 500,
@@ -60,9 +62,32 @@ bool raApp::OnInit()
 	// Start the event loop
 	return true;
 }
+int raApp::OnRun()
+{
+	// Check for updates
+	m_update = NULL;
+	m_update = new raUpdate();
+	if(!m_update)
+	{
+		wxLogError(wxString::Format(wxT("m_update = new raUpdate(); failed. %s:%d"), __FILE__, __LINE__));
+		wxMessageBox(wxT("Failed to create an instance of the thread which checks for updates!"));
+	}
+	if (m_update->Create() != wxTHREAD_NO_ERROR )
+	{
+		wxLogError(wxString::Format(wxT("m_update->Create(). %s:%d"), __FILE__, __LINE__));
+		wxMessageBox(wxT("Failed to create the thread which checks for updates!"));
+	}
+	m_update->Run();
+
+	wxApp::OnRun();
+	return 0;
+}
+
 
 int raApp::OnExit()
 {
+	//if(m_update)
+	//	delete m_update;
 	wxLogDebug("Attempting to stop logger.");
 
 	wxLog::SetActiveTarget(m_old_logger);

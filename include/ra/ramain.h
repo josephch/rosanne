@@ -19,24 +19,18 @@
 #ifndef _RAMAIN_H_
 #define _RAMAIN_H_
 
-#include "wx/wx.h"
+//#include "wx/wx.h"
+#include "ra/racommon.h"
 #include "wx/image.h" 
 #include "wx/splitter.h"
 #include "wx/grid.h"
+#include "wx/socket.h"
 #include "gg/ggpanel.h"
 //#include "gg/ggcard.h"
 //#include "ra/rainfo.h"
 //#include "ra/ragame.h"
 #include "ra/ra.h"
-
-#define RA_APP_MAJOR_VER 1
-#define RA_APP_MINOR_VER 0
-#define RA_APP_REL_TYPE "a"
-#define RA_APP_REL_TYPE_VER 1 
-#define RA_APP_NAME "rosanne"
-#define RA_APP_FULL_NAME (wxString::Format("%s %d.%d%s%d", \
-	RA_APP_NAME, RA_APP_MAJOR_VER, RA_APP_MINOR_VER, \
-	RA_APP_REL_TYPE, RA_APP_REL_TYPE_VER))
+#include "ra/raupdate.h"
 
 // Declare the application class
 class raApp : public wxApp
@@ -45,9 +39,11 @@ private:
 	FILE *m_logfile;
 	wxLogStderr *m_logger;
 	wxLog *m_old_logger;
+	raUpdate *m_update;
 public:
 	// Called on application startup
 	virtual bool OnInit();
+	virtual int OnRun();
 	virtual int OnExit();
 };
 
@@ -67,6 +63,7 @@ private:
 	wxSplitterWindow *m_split_main;//, *m_split_vert;
 	raGame *m_game;
 	raInfo *m_info;
+	//raUpdate *m_update;
 	// This class handles events
 	DECLARE_EVENT_TABLE()
 };
