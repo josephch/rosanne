@@ -163,6 +163,7 @@ int raUpdate::CheckForUpdate(wxString *new_ver)
 			delete str;
 			return 1;
 		}
+		delete str;
 	}
 
 	return 0;

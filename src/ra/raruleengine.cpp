@@ -125,6 +125,173 @@ bool raRuleEngine::Shuffle()
 	int i, j;
 	int t;
 
+	// If required set the shuffled card as per the
+	// deal read from the test data input file
+#ifdef raREAD_DEAL_FROM_FILE 
+
+	if(::wxFileExists(raTEST_DATA_FILE))
+	{
+		wxString str_cards_read;
+		wxString text_round;
+		wxString key;
+		wxString str_card;
+		int idx;
+		wxFFileInputStream in(raTEST_DATA_FILE);
+		wxFileConfig fcfg(in);
+		int k, l;
+		unsigned long cards_read[2][raTOTAL_PLAYERS];
+		unsigned long all_read = 0;
+		unsigned long temp;
+		int count_read = 0;
+
+		wxLogDebug("----------------------------------------------");
+		wxLogDebug("Attempting to read deal information from file");
+
+		for(i = 0; i < 2; i++)
+			for(j = 0; j < raTOTAL_PLAYERS; j++)
+				cards_read[i][j] = 0;
+
+		for(k = 1; k <= 2; k++)
+		{
+			text_round = wxString::Format("%s%d", raTEXT_DEAL_ROUND, k);
+			if(!fcfg.Exists(text_round))
+				continue;
+
+			for(i = 0; i < raTOTAL_PLAYERS; i++)
+			{
+				key = wxString::Format("%s/%s", text_round, raLib::m_short_locs[i].c_str());
+				if(fcfg.Exists(key))
+				{
+					if(!fcfg.Read(key, &str_cards_read))
+					{
+						wxLogError(wxString::Format(
+							wxT("Read failed. %s:%d"), __FILE__, __LINE__));
+
+					}
+					else
+					{
+						wxLogDebug(wxString::Format(
+							"Cards to be dealt to %s are %s", 
+							raLib::m_short_locs[i].c_str(), str_cards_read.c_str()));
+
+						// Get each str_card from the list of str_cards to be 
+						// dealt to the location
+						while(!str_cards_read.IsEmpty())
+						{
+							j = str_cards_read.Find(',');
+							str_card = str_cards_read.Left(j);
+							str_card.UpperCase();
+							str_card.Trim();
+							str_card.Trim(false);
+							wxLogDebug(wxString::Format("Card %s", str_card.c_str()));
+							idx = raLib::GetCardIndex(str_card);
+							if(idx == -1)
+							{
+								wxLogDebug(wxString::Format(
+									wxT("GetCardIndex failed. %s:%d"),
+									__FILE__, __LINE__));
+								break;
+							}
+							else
+							{
+								cards_read[k - 1][i] |= (1 << idx);
+								count_read++;
+							}
+
+							if(j == -1)
+								break;
+							str_cards_read = str_cards_read.Mid(j + 1);
+						}
+						wxASSERT(bhLib::CountBitsSet(cards_read[k - 1][i]) <= 4);
+					}
+				}
+			}
+			wxLogDebug(wxString::Format("For round %d", k));
+			// Print the cards to be dealt for each player
+			for(i = 0; i < raTOTAL_PLAYERS; i++)
+			{
+				wxLogDebug(wxString::Format("Cards for %s - %s", 
+					raLib::m_short_locs[i].c_str(),
+					raLib::PrintLong(cards_read[k - 1][i]).c_str()));
+			}
+		}
+		/*else
+		{
+		wxLogDebug(wxString::Format(
+		wxT("Cards to be dealt for round 1 not read from %s. %s:%d"),
+		raTEST_DATA_FILE, __FILE__, __LINE__));
+		}*/
+		for(i = 0; i < 2; i++)
+			for(j = 0; j < raTOTAL_PLAYERS; j++)
+				all_read |= cards_read[i][j];
+		if(bhLib::CountBitsSet(all_read) != count_read)
+		{
+			wxLogError(wxString::Format(
+				"Duplicate cards. From all read %d count read %d", 
+				bhLib::CountBitsSet(all_read), count_read));
+		}
+		else
+		{
+			int * unassigned = new int[raTOTAL_CARDS - count_read];
+			j = 0;
+			for(i = 0; i < raTOTAL_CARDS; i++)
+			{
+				if(!(all_read & (1 << i)))
+					unassigned[j++] = i;
+			}
+			wxASSERT(j == (raTOTAL_CARDS - count_read));
+			raLib::ShuffleArray(unassigned, (raTOTAL_CARDS - count_read));
+
+			bool flags[raTOTAL_CARDS];
+			for(i = 0; i < raTOTAL_CARDS; i++)
+			{
+				flags[i] = false;
+			}
+			for(k = 0; k < 2; k++)
+			{
+				for(i = 0; i < raTOTAL_PLAYERS; i++)
+				{
+					j = 0;
+					temp = cards_read[k][i];
+					while(temp)
+					{
+						l = (k * (raTOTAL_CARDS / 2)) + (i * (raTOTAL_CARDS / (raTOTAL_PLAYERS * 2))) +  j;
+						j++;
+						m_data.shuffled[l] = bhLib::HighestBitSet(temp);
+						flags[l] = true;
+						temp &= ~(1 << m_data.shuffled[l]);
+						//temp &= ~(1 << bhLib::HighestBitSet(temp));
+					}
+					wxASSERT(j == (bhLib::CountBitsSet(cards_read[k][i])));
+				}
+			}
+			j = 0;
+			for(i = 0; i < raTOTAL_CARDS; i++)
+			{
+				if(!flags[i])
+				{
+					m_data.shuffled[i] = unassigned[j++];
+					flags[i] = true;
+				}
+			}
+			for(i = 0; i < raTOTAL_CARDS; i++)
+			{
+				wxASSERT(flags[i]);
+				//wxLogDebug(wxString::Format("%d - %s%s", 
+				//	i,
+				//	raLib::m_suits[raGetSuit(m_data.shuffled[i])],
+				//	raLib::m_values[raGetValue(m_data.shuffled[i])]
+				//	));
+			}
+
+			delete unassigned;
+			wxLogDebug("-------------Succes---------------------------");
+			return true;
+		}
+		wxLogDebug("----------------------------------------------");
+	}	
+#endif
+
 	// Sorting, for full replication
 	// can be removed, functionality will not be affected.
 	for (i = 0; i < raTOTAL_CARDS; i++) 
@@ -179,7 +346,7 @@ bool raRuleEngine::Continue()
 
 		if(m_data.feedback)
 		{
-			m_data.out_deal_info.round = 0;
+			m_data.out_deal_info.round = raDEAL_ROUND_1;
 			//TODO : Is this memcpy correct?
 			memcpy(&m_data.out_deal_info.hands, &m_data.hands, 
 				sizeof(m_data.hands));
@@ -362,7 +529,7 @@ bool raRuleEngine::Continue()
 
 		if(m_data.feedback)
 		{
-			m_data.out_deal_info.round = 1;
+			m_data.out_deal_info.round = raDEAL_ROUND_2;
 			// TODO : Is this memcpy correct?
 			memcpy(&m_data.out_deal_info.hands, 
 				&m_data.hands, sizeof(m_data.hands));
@@ -687,11 +854,27 @@ int raRuleEngine::PostInputMessage(int input_type, void *input)
 					}
 				}
 				// If the trick is not trumped yet
-				// and the trump has been shown, then the trick is being trumped now
+				// and the trump has been shown, 
 				else if(m_data.trump_shown)
 				{
+					// The trick is being trumped
 					m_data.tricks[m_data.trick_round].trumped = true;
-					m_data.tricks[m_data.trick_round].winner = exist_trick_info->player;
+
+					// If the lead suit is trump
+					// then check whether we have a new winner
+					if(m_data.tricks[m_data.trick_round].lead_suit == m_data.trump_suit)
+					{
+						if(raGetValue(in_trick_info->card) > raGetValue(raWinnerCard))
+						{
+							m_data.tricks[m_data.trick_round].winner = exist_trick_info->player;
+						}
+					}
+					// If the lead suit is not trump
+					// then we have a new winner
+					else
+					{
+						m_data.tricks[m_data.trick_round].winner = exist_trick_info->player;
+					}
 				}
 				// If the trick is not trumped yet
 				// and if the trump has not been shown 
@@ -838,8 +1021,48 @@ int raRuleEngine::GetDealer()
 }
 void raRuleEngine::SetDealer(int dealer)
 {
-	wxASSERT((m_data.dealer >= 0) && (m_data.dealer < raTOTAL_PLAYERS));
+#ifdef raREAD_DEALER_FROM_FILE
+	long dealer_read;
+#endif
+
+	wxASSERT((dealer >= 0) && (dealer < raTOTAL_PLAYERS));
 	m_data.dealer = dealer;
+
+	// If neeeded, for testing purposes, read the dealer location
+	// from the testing data file
+#ifdef raREAD_DEALER_FROM_FILE
+	if(::wxFileExists(raTEST_DATA_FILE))
+	{
+		wxFFileInputStream in(raTEST_DATA_FILE);
+		wxFileConfig fcfg(in);
+		if(fcfg.Exists(raTEXT_DEALER))
+		{
+			wxLogDebug(wxString::Format(
+				wxT("Reading dealer from %s. %s:%d"),
+				raTEST_DATA_FILE, __FILE__, __LINE__));
+
+			dealer_read = -1;
+			if(!fcfg.Read(raTEXT_DEALER, &dealer_read))
+			{
+				wxLogError(wxString::Format(
+					wxT("Read failed. %s:%d"), __FILE__, __LINE__));
+
+			}
+			else
+			{
+				m_data.dealer = (int)dealer_read;
+				wxASSERT((m_data.dealer >= 0) && (m_data.dealer < raTOTAL_PLAYERS));
+			}
+		}
+		else
+		{
+			wxLogError(wxString::Format(
+				wxT("Could not find dealer in %s. %s:%d"),
+				raTEST_DATA_FILE, __FILE__, __LINE__));
+		}
+	}
+#endif
+
 }
 
 void raRuleEngine::ResetTrick(raTrick *trick)
@@ -930,6 +1153,16 @@ bool raRuleEngine::IsTrumpShown()
 {
 	return m_data.trump_shown;
 }
+int raRuleEngine::GetTrickNextToPlay()
+{
+	if(m_data.status != raSTATUS_TRICKS)
+		return raPLAYER_INVALID;
+	if(m_data.tricks[m_data.trick_round].count == raTOTAL_PLAYERS)
+		return raPLAYER_INVALID;
+
+	return raTrickNext;
+}
+
 
 //
 // Private methods
@@ -1017,5 +1250,3 @@ bool raRuleEngine::SetDealEndOutput()
 		SetOutput(raOUTPUT_DEAL_END);
 	return true;
 }
-
-

@@ -34,12 +34,18 @@
 
 #define raBID_MIN_BTN_WIDTH 10
 
+#define raGetBidFromId(X) (X - raBID_BTN_ID_START + 14)
+
+#define raBID_PNL_RELIEF 2
+
 class raGame;
 
 class raBid: public wxPanel
 {
 private:
 	DECLARE_EVENT_TABLE()
+	int m_min_bid;
+
 	wxPanel *m_main_panel;
 	wxGridSizer *m_main_sizer;
 	wxBoxSizer *m_main_panel_sizer;

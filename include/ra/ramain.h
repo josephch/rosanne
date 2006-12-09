@@ -31,6 +31,20 @@
 //#include "ra/ragame.h"
 #include "ra/ra.h"
 #include "ra/raupdate.h"
+#include "ra/raconfig.h"
+#include "ra/radlgabout.h"
+#include "ra/radlgprefs.h"
+
+enum 
+{
+	raID_NEW_GAME = 10000,
+	raID_EXIT,
+	raID_PREFERENCES,
+	raID_HELP,
+	raID_ABOUT
+};
+
+class raFrame;
 
 // Declare the application class
 class raApp : public wxApp
@@ -40,6 +54,7 @@ private:
 	wxLogStderr *m_logger;
 	wxLog *m_old_logger;
 	raUpdate *m_update;
+	raFrame *m_frame;
 public:
 	// Called on application startup
 	virtual bool OnInit();
@@ -58,11 +73,15 @@ public:
 	void OnQuit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
 	void OnGameNew(wxCommandEvent& event);
+	void OnClose(wxCloseEvent& event);
+	void OnPreferences(wxCommandEvent& event);
+	void OnSize(wxSizeEvent& event);
 
 private:
 	wxSplitterWindow *m_split_main;//, *m_split_vert;
 	raGame *m_game;
 	raInfo *m_info;
+	bool ShowPreferences();
 	//raUpdate *m_update;
 	// This class handles events
 	DECLARE_EVENT_TABLE()

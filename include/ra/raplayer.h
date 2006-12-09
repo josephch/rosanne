@@ -47,7 +47,11 @@ public:
 	int GetTrump();
 	int GetPlay();
 	bool PostPlayUpdate(raRuleEngineData *data, int card);
+	bool CheckAssumptions(raRuleEngineData *data);
 	bool Reset();
+	bool SetClockwise(bool flag);
+	bool GetClockwise();
+	bool AbandonGame(bool *flag);
 };
 
 #endif

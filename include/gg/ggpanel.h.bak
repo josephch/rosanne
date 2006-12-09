@@ -1,0 +1,32 @@
+#ifndef _GGPANEL_H_
+#define _GGPANEL_H_
+
+#include "wx/wx.h"
+
+class ggPanel: public wxPanel
+{
+private:
+	wxBitmap *m_back, *m_work;
+	bool m_f_invalid;
+	wxRect m_rect_diff, m_rect_invalid;
+	DECLARE_EVENT_TABLE()
+public:
+	ggPanel(const wxWindow* parent);
+	~ggPanel();
+	bool Size();
+	bool Paint();
+	virtual void OnPaint(wxPaintEvent &event);
+	bool RefreshScreen();
+	bool BlitToBack(wxCoord xdest, wxCoord ydest, 
+		wxCoord width, wxCoord height, wxDC* source, wxCoord xsrc, 
+		wxCoord ysrc, int logicalFunc = wxCOPY, bool useMask = false, 
+		wxCoord xsrcMask = -1, wxCoord ysrcMask = -1);
+	bool BlitToFront(wxCoord xdest, wxCoord ydest, 
+		wxCoord width, wxCoord height, wxDC* source, wxCoord xsrc, 
+		wxCoord ysrc, int logicalFunc = wxCOPY, bool useMask = false, 
+		wxCoord xsrcMask = -1, wxCoord ysrcMask = -1);
+	bool ClearDifference();
+	//bool DrawBack();
+};
+
+#endif

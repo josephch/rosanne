@@ -21,6 +21,14 @@
 
 #include "ra/racommon.h"
 
+#if defined ( raREAD_DEALER_FROM_FILE )
+#include "wx/wfstream.h"
+#include "wx/fileconf.h"
+#elif defined ( raREAD_DEAL_FROM_FILE )
+#include "wx/wfstream.h"
+#include "wx/fileconf.h"
+#endif
+
 enum
 {
 	raSTATUS_NOT_STARTED = 0,
@@ -68,6 +76,9 @@ enum{
 #define	raRULE_2 2
 #define	raRULE_3 4
 #define	raRULE_4 8
+
+#define raDEAL_ROUND_1 0
+#define raDEAL_ROUND_2 1
 
 typedef struct tagRA_RULES
 {
@@ -241,6 +252,7 @@ public:
 	bool GetMaxBid(int *bid, int *loc);
 	wxString GetLoggable();
 	bool IsTrumpShown();
+	int GetTrickNextToPlay();
 };
 
 

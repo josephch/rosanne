@@ -195,6 +195,44 @@ bool ggPanel::BlitToFront(wxCoord xdest, wxCoord ydest,
 
 	return true;
 }
+
+bool ggPanel::DrawTextOnBack(wxString text, wxPoint pt, wxColour colour, wxFont font)
+{
+	int x, y;
+	wxMemoryDC bdc, wdc;
+
+	bdc.SelectObject(*m_back);
+	wdc.SelectObject(*m_work);
+
+	if(!bdc.Ok())
+		return false;
+
+	if(!wdc.Ok())
+		return false;
+
+	// Set the text foreground colour and the font
+	if(colour != wxNullColour)
+	{
+		bdc.SetTextForeground(colour);
+		wdc.SetTextForeground(colour);
+	}
+	if(font != wxNullFont)
+	{
+		bdc.SetFont(font);
+		wdc.SetFont(font);
+	}
+
+	bdc.DrawText(text, pt);
+	wdc.DrawText(text, pt);
+
+	GetClientSize(&x, &y);
+	m_rect_diff = wxRect(0, 0, 0, 0);
+	m_rect_invalid = wxRect(0, 0, x, y);
+	m_f_invalid = true;
+
+	return true;
+}
+
 bool ggPanel::ClearDifference()
 {
 	wxMemoryDC bdc, wdc;

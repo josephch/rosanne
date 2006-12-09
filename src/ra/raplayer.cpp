@@ -64,16 +64,33 @@ int raPlayer::GetTrump()
 }
 int raPlayer::GetPlay()
 {
-	return m_agent.GetPlay(0);
+	return m_agent.GetPlayOld(0);
 }
 
 bool raPlayer::PostPlayUpdate(raRuleEngineData *data, int card)
 {
 	return m_agent.PostPlayUpdate(data, card);
 }
+bool raPlayer::CheckAssumptions(raRuleEngineData *data)
+{
+	return m_agent.CheckAssumptions(data);
+}
 bool raPlayer::Reset()
 {
 	return m_agent.Reset();
 }
+bool raPlayer::SetClockwise(bool flag)
+{
+	return m_agent.SetClockwise(flag);
+}
+bool raPlayer::GetClockwise()
+{
+	return m_agent.GetClockwise();
+}
+bool raPlayer::AbandonGame(bool *flag)
+{
+	return m_agent.AbandonGame(flag);
+}
+
 
 

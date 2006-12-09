@@ -32,6 +32,7 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	int temp_width, temp_height;
 
 	m_game = NULL;
+	m_min_bid = 0;
 
 	// Initilizing buttons to NULL
 	for(i = 0; i < raBID_TOTAL_BTNS; i++)
@@ -58,7 +59,6 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 #ifdef __WXMSW__
 	this->SetWindowStyle(wxRAISED_BORDER);
 #endif
-	
 
 	m_main_panel = new wxPanel(this);
 #ifdef __WXMSW__
@@ -72,8 +72,8 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	m_main_panel_sizer = new wxBoxSizer(wxVERTICAL);
 
 	m_head_panel = new wxPanel(m_main_panel);
-	m_head_panel->SetWindowStyle(wxRAISED_BORDER);
-	m_head_panel->SetBackgroundColour(*wxBLACK);
+	//m_head_panel->SetWindowStyle(wxRAISED_BORDER);
+	m_head_panel->SetBackgroundColour(raCLR_HEAD_DARK);
 	m_head_panel->SetForegroundColour(*wxWHITE);
 
 	m_bold_font = m_head_panel->GetFont();
@@ -133,14 +133,18 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	m_btns_panel->SetSizer(m_btns_panel_sizer);
 	m_btns_panel_sizer->Fit(m_btns_panel);
 
-	m_main_panel_sizer->Add(m_head_panel, 0, wxEXPAND, 0);
+	m_main_panel_sizer->Add(m_head_panel, 0, wxEXPAND | wxALL, raBID_PNL_RELIEF);
 	m_main_panel_sizer->Add(m_bidbtn_panel, 0, wxEXPAND, 0);
+#ifdef __WXMSW__
+	m_main_panel_sizer->Add(m_btns_panel, 0, wxEXPAND | wxBOTTOM, raBID_PNL_RELIEF * 3);
+#else
 	m_main_panel_sizer->Add(m_btns_panel, 0, wxEXPAND, 0);
-
-	m_main_sizer->Add(m_main_panel, 0, wxEXPAND, 0);
+#endif
 
 	m_main_panel->SetSizer(m_main_panel_sizer);
 	m_main_panel_sizer->Fit(m_main_panel);
+
+	m_main_sizer->Add(m_main_panel, 0, wxEXPAND, 0);
 
 	this->SetSizer(m_main_sizer);
 	m_main_sizer->Fit(this);
@@ -176,6 +180,7 @@ bool raBid::SetMinimumBid(int min_bid)
 {
 	int i;
 
+	m_min_bid = min_bid;
 	// Disable all the bid buttons less than the minimum bid
 	// and enable the rest
 
@@ -195,19 +200,46 @@ bool raBid::SetMinimumBid(int min_bid)
 void raBid::OnButtonClick(wxCommandEvent &event)
 {
 	raBidEvent new_event;
+	wxString msg;
+	int id;
 
 	if(m_game)
 	{
-		switch(event.GetId())
+		id = event.GetId();
+		switch(id)
 		{
 		case raBID_BTN_ID_ALL:
+			// Alert the user if the bid is for All Cards
+			msg.Append("You have made a bid for All Cards\n\n");
+			msg.Append("If you want to continue with the bid, click Yes\n");
+			msg.Append("If you want to cancel the bid and make a new one, click No");
+			if(wxMessageBox(msg, wxT("Confirm"), wxYES_NO | wxICON_QUESTION) != wxYES)
+			{
+				event.Skip();
+				return;
+			}
+
 			new_event.SetBid(raBID_ALL);
 			break;
 		case raBID_BTN_ID_PASS:
 			new_event.SetBid(raBID_PASS);
 			break;
 		default:
-			new_event.SetBid(event.GetId() - raBID_BTN_ID_START + 14);
+			// Alert the user if the bid is relatively high
+			// as compared to the minimum possible
+			if((raGetBidFromId(id)) >= (m_min_bid + 3))
+			{
+				msg.Append(wxString::Format("You have bid %d\n\n", raGetBidFromId(id)));
+				msg.Append("If you want to continue with the bid, click Yes\n");
+				msg.Append("If you want to cancel the bid and make a new one, click No");
+
+				if(wxMessageBox(msg, wxT("Confirm"), wxYES_NO | wxICON_QUESTION) != wxYES)
+				{
+					event.Skip();
+					return;
+				}
+			}
+			new_event.SetBid(raGetBidFromId(id));
 			break;
 		}
 		m_game->AddPendingEvent(new_event);

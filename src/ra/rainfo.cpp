@@ -36,10 +36,15 @@ raInfo::raInfo(const wxWindow* parent): wxPanel((wxWindow*)parent)
 
 	ResetDetails();
 
-	colours[0] = new wxColour(200, 200, 255);
-	colours[1] = new wxColour(200, 200, 245);
-	colours[2] = new wxColour(200, 200, 235);
-	colours[3] = new wxColour(200, 200, 225);
+	//colours[0] = new wxColour(74, 201, 255);
+	//colours[1] = new wxColour(180, 233, 255);
+	//colours[2] = new wxColour(125, 173, 193);
+	//colours[3] = new wxColour(187, 210, 220);
+
+	colours[0] = new raCLR_BLUE_DARK;
+	colours[1] = new raCLR_BLUE_LITE;
+	colours[2] = new raCLR_PURP_DARK;
+	colours[3] = new raCLR_PURP_LITE;
 
 	// Set the background white
 	if(!SetBackgroundColour(*wxWHITE))
@@ -56,9 +61,9 @@ raInfo::raInfo(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	m_deal_head_panel = new wxPanel(this);
 	wxASSERT(m_deal_head_panel);
 
-	m_deal_head_panel->SetWindowStyle(wxRAISED_BORDER);
+	//m_deal_head_panel->SetWindowStyle(wxRAISED_BORDER);
 	// Set the background colour for the header panel
-	if(!m_deal_head_panel->SetBackgroundColour(*wxBLACK))
+	if(!m_deal_head_panel->SetBackgroundColour(raCLR_HEAD_DARK))
 	{
 		wxLogError(wxString::Format(wxT("Attempt to set the background colour failed. %s:%d"), __FILE__, __LINE__));
 		return;
@@ -96,7 +101,7 @@ raInfo::raInfo(const wxWindow* parent): wxPanel((wxWindow*)parent)
 
 	// Set the sizer for the header panel
 	m_deal_head_panel->SetSizer(m_deal_head_panel_sizer);
-	if(!m_main_sizer->Add(m_deal_head_panel, 0, wxEXPAND, 0))
+	if(!m_main_sizer->Add(m_deal_head_panel, 0, wxEXPAND|wxALL, raINFO_PNL_BORDER))
 	{
 		wxLogError(wxString::Format(wxT("Addition of panel to sizer failed. %s:%d"), __FILE__, __LINE__));
 		return;
@@ -120,7 +125,7 @@ raInfo::raInfo(const wxWindow* parent): wxPanel((wxWindow*)parent)
 				wxLogError(wxString::Format(wxT("Attempt to set the background colour failed. %s:%d"), __FILE__, __LINE__));
 				return;
 			}
-			if(!m_deal_info_sizers[i]->Add(m_deal_info_panels[j][i], wxEXPAND, 0, 0))
+			if(!m_deal_info_sizers[i]->Add(m_deal_info_panels[j][i], wxEXPAND, wxALL, raINFO_PNL_BORDER))
 			{
 				wxLogError(wxString::Format(wxT("Attempt to add panel to sizer failed. %s:%d"), __FILE__, __LINE__));
 				return;
@@ -162,9 +167,9 @@ raInfo::raInfo(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	m_point_head_panel = new wxPanel(this);
 	wxASSERT(m_point_head_panel);
 
-	m_point_head_panel->SetWindowStyle(wxRAISED_BORDER);
+	//m_point_head_panel->SetWindowStyle(wxRAISED_BORDER);
 	// Set the background colour for the header panel
-	if(!m_point_head_panel->SetBackgroundColour(*wxBLACK))
+	if(!m_point_head_panel->SetBackgroundColour(raCLR_HEAD_DARK))
 	{
 		wxLogError(wxString::Format(wxT("Attempt to set the background colour failed. %s:%d"), __FILE__, __LINE__));
 		return;
@@ -195,7 +200,7 @@ raInfo::raInfo(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	// Set the sizer for the header panel
 	m_point_head_panel->SetSizer(m_point_head_panel_sizer);
 	// Add panel to sizer
-	if(!m_main_sizer->Add(m_point_head_panel, 0, wxEXPAND, 0))
+	if(!m_main_sizer->Add(m_point_head_panel, 0, wxEXPAND | wxALL, raINFO_PNL_BORDER))
 	{
 		wxLogError(wxString::Format(wxT("Addition of panel to sizer failed. %s:%d"), __FILE__, __LINE__));
 		return;
@@ -214,12 +219,12 @@ raInfo::raInfo(const wxWindow* parent): wxPanel((wxWindow*)parent)
 			wxASSERT(m_point_info_panels[j][i]);
 
 			if(!m_point_info_panels[j][i]->SetBackgroundColour(
-				*colours[((i * raINFO_TWO) + j) % raINFO_POINT_COUNT]))
+				*colours[((i * raINFO_TWO) + j) % raINFO_DEAL_COUNT]))
 			{
 				wxLogError(wxString::Format(wxT("Attempt to set the background colour failed. %s:%d"), __FILE__, __LINE__));
 				return;
 			}
-			if(!m_point_info_sizers[i]->Add(m_point_info_panels[j][i], wxEXPAND, 0, 0))
+			if(!m_point_info_sizers[i]->Add(m_point_info_panels[j][i], wxEXPAND, wxALL, raINFO_PNL_BORDER))
 			{
 				wxLogError(wxString::Format(wxT("Attempt to add panel to sizer failed. %s:%d"), __FILE__, __LINE__));
 				return;
@@ -259,9 +264,9 @@ raInfo::raInfo(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	m_pnlty_head_panel = new wxPanel(this);
 	wxASSERT(m_pnlty_head_panel);
 
-	m_pnlty_head_panel->SetWindowStyle(wxRAISED_BORDER);
+	//m_pnlty_head_panel->SetWindowStyle(wxRAISED_BORDER);
 	// Set the background colour for the header panel
-	if(!m_pnlty_head_panel->SetBackgroundColour(*wxBLACK))
+	if(!m_pnlty_head_panel->SetBackgroundColour(raCLR_HEAD_DARK))
 	{
 		wxLogError(wxString::Format(wxT("Attempt to set the background colour failed. %s:%d"), __FILE__, __LINE__));
 		return;
@@ -292,7 +297,7 @@ raInfo::raInfo(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	// Set the sizer for the header panel
 	m_pnlty_head_panel->SetSizer(m_pnlty_head_panel_sizer);
 	// Add panel to sizer
-	if(!m_main_sizer->Add(m_pnlty_head_panel, 0, wxEXPAND, 0))
+	if(!m_main_sizer->Add(m_pnlty_head_panel, 0, wxEXPAND | wxALL, raINFO_PNL_BORDER))
 	{
 		wxLogError(wxString::Format(wxT("Addition of panel to sizer failed. %s:%d"), __FILE__, __LINE__));
 		return;
@@ -311,12 +316,12 @@ raInfo::raInfo(const wxWindow* parent): wxPanel((wxWindow*)parent)
 			wxASSERT(m_pnlty_info_panels[j][i]);
 
 			if(!m_pnlty_info_panels[j][i]->SetBackgroundColour(
-				*colours[((i * raINFO_TWO) + j) % raINFO_PNLTY_COUNT]))
+				*colours[((i * raINFO_TWO) + j) % raINFO_DEAL_COUNT]))
 			{
 				wxLogError(wxString::Format(wxT("Attempt to set the background colour failed. %s:%d"), __FILE__, __LINE__));
 				return;
 			}
-			if(!m_pnlty_info_sizers[i]->Add(m_pnlty_info_panels[j][i], wxEXPAND, 0, 0))
+			if(!m_pnlty_info_sizers[i]->Add(m_pnlty_info_panels[j][i], wxEXPAND, wxALL, raINFO_PNL_BORDER))
 			{
 				wxLogError(wxString::Format(wxT("Attempt to add panel to sizer failed. %s:%d"), __FILE__, __LINE__));
 				return;
@@ -356,9 +361,9 @@ raInfo::raInfo(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	m_instr_head_panel = new wxPanel(this);
 	wxASSERT(m_instr_head_panel);
 
-	m_instr_head_panel->SetWindowStyle(wxRAISED_BORDER);
+	//m_instr_head_panel->SetWindowStyle(wxRAISED_BORDER);
 	// Set the background colour for the header panel
-	if(!m_instr_head_panel->SetBackgroundColour(*wxBLACK))
+	if(!m_instr_head_panel->SetBackgroundColour(raCLR_HEAD_DARK))
 	{
 		wxLogError(wxString::Format(wxT("Attempt to set the background colour failed. %s:%d"), __FILE__, __LINE__));
 		return;
@@ -389,7 +394,7 @@ raInfo::raInfo(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	// Set the sizer for the header panel
 	m_instr_head_panel->SetSizer(m_instr_head_panel_sizer);
 	// Add panel to sizer
-	if(!m_main_sizer->Add(m_instr_head_panel, 0, wxEXPAND, 0))
+	if(!m_main_sizer->Add(m_instr_head_panel, 0, wxEXPAND | wxALL, raINFO_PNL_BORDER))
 	{
 		wxLogError(wxString::Format(wxT("Addition of panel to sizer failed. %s:%d"), __FILE__, __LINE__));
 		return;
@@ -407,7 +412,7 @@ raInfo::raInfo(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	}
 
 	// Set the foreground colour for the text panel
-	if(!m_instr_text_panel->SetForegroundColour(*wxRED))
+	if(!m_instr_text_panel->SetForegroundColour(raCLR_INSTR))
 	{
 		wxLogError(wxString::Format(wxT("Attempt to set the foreground colour failed. %s:%d"), __FILE__, __LINE__));
 		return;
@@ -550,6 +555,9 @@ void raInfo::GetDetails(raInfoDetails *details)
 bool raInfo::SetInstruction(wxString instruction, int cmd)
 {
 	unsigned int rand_seed;
+#ifdef raREAD_SEED_FROM_FILE
+	long seed_read;
+#endif
 	if((cmd != m_curr_cmd) || (cmd == raINFO_CMD_NONE))
 	{
 		m_instruction = instruction;
@@ -573,8 +581,40 @@ bool raInfo::SetInstruction(wxString instruction, int cmd)
 			// Also print the same so that games can be replicated
 
 			rand_seed = rand();
-			wxLogDebug(wxString::Format("Random seed - %u", rand_seed));
 			srand(rand_seed);
+#ifdef raREAD_SEED_FROM_FILE
+			if(::wxFileExists(raTEST_DATA_FILE))
+			{
+				wxFFileInputStream in(raTEST_DATA_FILE);
+				wxFileConfig fcfg(in);
+				if(fcfg.Exists(raTEXT_SEED))
+				{
+					wxLogDebug(wxString::Format(
+						wxT("Reading seed from %s. %s:%d"),
+						raTEST_DATA_FILE, __FILE__, __LINE__));
+
+					seed_read = -1;
+					if(!fcfg.Read(raTEXT_SEED, &seed_read))
+					{
+						wxLogError(wxString::Format(
+							wxT("Read failed. %s:%d"), __FILE__, __LINE__));
+
+					}
+					else
+					{
+						rand_seed = (unsigned int)seed_read;
+						srand(rand_seed);
+					}
+				}
+				else
+				{
+					wxLogError(wxString::Format(
+						wxT("Could not find seed in %s. %s:%d"),
+						raTEST_DATA_FILE, __FILE__, __LINE__));
+				}
+			}
+#endif
+			wxLogMessage(wxString::Format("Deal ID - %u", rand_seed));
 			//srand(11428);
 
 			break;

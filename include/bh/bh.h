@@ -24,8 +24,8 @@
 class bhLib
 {
 public:
-	static unsigned char BitsSetTable256[];
-	static char LogTable256[];
+	static unsigned int BitsSetTable256[];
+	static int LogTable256[];
 	static unsigned long CountBitsSet(unsigned long v);
 	static unsigned long HighestBitSet(unsigned long v);
 };

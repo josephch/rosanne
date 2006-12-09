@@ -20,7 +20,7 @@
 
 #include "bh/bh.h"
 
-unsigned char bhLib::BitsSetTable256[] = 
+unsigned int bhLib::BitsSetTable256[] = 
 {
 	0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 
 		1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 
@@ -40,7 +40,7 @@ unsigned char bhLib::BitsSetTable256[] =
 		4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
 };
 
-char bhLib::LogTable256[] = 
+int bhLib::LogTable256[] = 
 {
 	0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3,
 		4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
@@ -67,6 +67,10 @@ unsigned long bhLib::CountBitsSet(unsigned long v)
 		BitsSetTable256[(v >> 8) & 0xff] + 
 		BitsSetTable256[(v >> 16) & 0xff] + 
 		BitsSetTable256[v >> 24]; 
+	//unsigned int const w = v - ((v >> 1) & 0x55555555);                    // temp
+	//unsigned int const x = (w & 0x33333333) + ((w >> 2) & 0x33333333);     // temp
+	//unsigned int const c = ((x + (x >> 4) & 0xF0F0F0F) * 0x1010101) >> 24; // count
+	//return c;
 }
 
 unsigned long bhLib::HighestBitSet(unsigned long v)

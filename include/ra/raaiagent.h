@@ -21,6 +21,7 @@
 
 #include "ra/racommon.h"
 #include "ra/raruleengine.h"
+#include "sl/slsolver.h"
 
 //#define AI_LOG 1
 //#define raAI_LOG_AT_LEAF 1
@@ -61,7 +62,10 @@ class raAIAgent
 private:
 	raRuleEngine m_engine;
 	int m_loc;
-	unsigned long m_trump_cands;
+	unsigned long m_trump_cards;
+	unsigned long m_notrump_suspects;
+	unsigned long m_nulls[raTOTAL_PLAYERS];
+	unsigned long m_mb_null_susp;
 	bool EstimateTricks(unsigned long *p_hands, int trump, int *eval);
 	bool EstimatePoints(unsigned long *hands, int trump, int trick_count, int *eval);
 	bool GenerateMoves(raRuleEngine *node, raAIMove *moves, int *count, int type = raAI_GENMV_ALL);
@@ -78,10 +82,18 @@ public:
 	bool GetBid(int *bid, int *trump, int min, bool force_bid);
 	bool SetRuleEngineData(raRuleEngineData *data);
 	int GetTrump();
+	int GetPlayOld(unsigned long mask);
 	int GetPlay(unsigned long mask);
+	bool GenerateSLProblem(raRuleEngineData *data, slProblem *problem, int trump = raSUIT_INVALID);
+	bool GenerateSLSolution(slProblem *problem, slSolution *solution);
+	bool GenerateDeals(raRuleEngineData *data, unsigned long **deals, int count, int trump = raSUIT_INVALID);
 	static wxString PrintMoves(raAIMove *moves, int move_count);
-	bool PostPlayUpdate(raRuleEngineData *data, int card);
+	bool PostPlayUpdate(raRuleEngineData *data, int card = raCARD_INVALID);
+	bool CheckAssumptions(raRuleEngineData *data);
 	bool Reset();
+	bool SetClockwise(bool flag);
+	bool GetClockwise();
+	bool AbandonGame(bool *flag);
 
 };
 

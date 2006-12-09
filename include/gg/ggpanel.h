@@ -43,6 +43,7 @@ public:
 		wxCoord width, wxCoord height, wxDC* source, wxCoord xsrc, 
 		wxCoord ysrc, int logicalFunc = wxCOPY, bool useMask = false, 
 		wxCoord xsrcMask = -1, wxCoord ysrcMask = -1);
+	bool DrawTextOnBack(wxString text, wxPoint pt, wxColour colour = wxNullColour, wxFont font = wxNullFont);
 	bool ClearDifference();
 	//bool DrawBack();
 };

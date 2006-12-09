@@ -26,6 +26,7 @@
 #include "ra/raevents.h"
 #include "ra/rabid.h"
 #include "ra/raplayer.h"
+#include "ra/raconfig.h"
 #include "gg/ggpanel.h"
 #include "gg/ggcard.h"
 
@@ -33,14 +34,28 @@
 
 #define raTOTAL_CARD_BACKS 2
 #define raMAX_CARDS_PER_HAND 8
-#define raCARD_VERT_RELIEF (10)
+#define raCARD_VERT_RELIEF (12)
 #define raCARD_HORZ_RELIEF (GG_CARD_WIDTH / 4)
 #define raCARD_PANEL_RELIEF 20
-#define raGAME_HIDE_AI_HANDS 1
+//#define raGAME_HIDE_AI_HANDS 1
+
+#define raGAME_CARD_BACK_SEL 0
+
+#define raGAME_ARROW_RELIEF 8
+
+#define raGAME_FOUR_JACKS (0x80808080)
+#define raGAME_ALL_LOW_CARDS (0x0F0F0F0F)
+#define raGAME_ALL_HIGH_CARDS (0xF0F0F0F0)
+
 
 enum{
 	raHAND_VERTICAL = 0,
 	raHAND_HORIZONTAL
+};
+
+enum{
+	raGAME_ORIENT_ALL_HORZ = 0,
+	raGAME_ORIENT_MIXED
 };
 
 // TODO : If raHandCard is no longer used, remove
@@ -62,6 +77,13 @@ typedef struct tagRA_HAND
 	//raHandCard card_info[raMAX_CARDS_PER_HAND];
 	int card_indexes[raMAX_CARDS_PER_HAND];
 }raHand, *praHand;
+
+typedef struct tagRA_BACK_DRAW_INFO
+{
+	bool draw_bid;
+	int bid_loc;
+	int bid;
+}raBackDrawInfo;
 
 class raGame: public ggPanel
 {
@@ -97,10 +119,56 @@ private:
 	int m_game_pts[raTOTAL_TEAMS];
 	int m_pnlties[raTOTAL_PLAYERS];
 
+	// Direction of play
+	bool m_clockwise;
+
+	// Font used to write text
+	wxFont m_font_bold;
+
+	// Hand orientation
+	int m_orientation;
+
+	// Prefereed card back
+	int m_pref_card_back;
+
+	// Play card on single click
+	int m_play_card_on;
+
+	// Auto play single choice
+	bool m_auto_play;
+
+	// Bitmaps to be loaded from xpms
+
+	wxBitmap *m_bmp_green_arrow_bottom;
+	wxBitmap *m_bmp_green_arrow_top;
+	wxBitmap *m_bmp_green_arrow_right;
+	wxBitmap *m_bmp_green_arrow_left;
+
+	wxBitmap *m_bmp_red_arrow_bottom;
+	wxBitmap *m_bmp_red_arrow_top;
+	wxBitmap *m_bmp_red_arrow_right;
+	wxBitmap *m_bmp_red_arrow_left;
+
+	wxBitmap *m_bmp_bubble_arrow_bottom;
+	wxBitmap *m_bmp_bubble_arrow_left;
+	wxBitmap *m_bmp_bubble_arrow_right;
+	wxBitmap *m_bmp_bubble_arrow_top;
+
+	wxBitmap *m_bmp_bubble_corner_ne;
+	wxBitmap *m_bmp_bubble_corner_nw;
+	wxBitmap *m_bmp_bubble_corner_se;
+	wxBitmap *m_bmp_bubble_corner_sw;
+
+	wxBitmap *m_bmp_bubble_edge_bottom;
+	wxBitmap *m_bmp_bubble_edge_left;
+	wxBitmap *m_bmp_bubble_edge_right;
+	wxBitmap *m_bmp_bubble_edge_top;
+
 	void OnSize(wxSizeEvent& event);
-	bool RedrawBack();
+	bool RedrawBack(raBackDrawInfo *info = NULL);
 	bool DrawHand(int loc, int x, int y, int orientation = raHAND_HORIZONTAL);
 	bool DrawTrick();
+	bool DrawTrump();
 	void OnInfo(raInfoEvent& event);
 	void OnBid(raBidEvent& event);
 	void OnLeftDClick(wxMouseEvent &event);
@@ -115,16 +183,23 @@ private:
 	int SetTrump(int card, int loc = raPLAYER_INVALID);
 	int ShowTrump(int loc = raPLAYER_INVALID);
 	int MakeBid(int bid, int loc = raPLAYER_INVALID);
-	bool UpdateDrawAndRefresh();
+	bool UpdateDrawAndRefresh(bool udpate = true, raBackDrawInfo *info = NULL);
 	//bool UpdateTrick(raTrick *trick);
 	bool HideInfo(raRuleEngineData *data, int player);
 	bool HasDealEnded(int *winner = NULL);
-	bool EndDeal();
+	bool EndDeal(bool abandon = false);
+	bool BeginBusyState();
+	bool EndBusyState();
+	int CheckOppTrumps();
+	bool OnCardClick(wxPoint pt);
 public:
 	raGame(const wxWindow* parent);
 	virtual ~raGame();
 	bool SetTile(wxBitmap *tile);
 	bool SetInfoPanel(raInfo *info_panel);
 	bool NewGame(int dealer = raPLAYER_INVALID);
+	bool SetClockwise(bool flag);
+	bool GetClockwise();
+	bool ReloadFromConfig();
 };
 #endif

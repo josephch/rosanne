@@ -23,12 +23,18 @@
 #include "ra/raevents.h"
 //#include "ra/ragame.h"
 
+#ifdef raREAD_SEED_FROM_FILE
+#include "wx/wfstream.h"
+#include "wx/fileconf.h"
+#endif
+
 #define raINFO_DEAL_COUNT 4
 #define raINFO_POINT_COUNT 2
 #define raINFO_PNLTY_COUNT 2
 #define raINFO_TWO 2
 #define raINFO_TEXT_RELIEF 2
 #define raINFO_INSTR_RELIEF 10
+#define raINFO_PNL_BORDER 1
 
 #define raINFO_TEXT_SHOW_TRUMP wxT("Show Trump")
 
@@ -44,6 +50,8 @@
 
 #define raINFO_PTS_TEXT wxT("Game Points")
 #define raINFO_PEN_TEXT wxT("Penalties")
+
+
 
 enum
 {
