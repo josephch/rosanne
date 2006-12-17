@@ -37,7 +37,6 @@
 #define raCARD_VERT_RELIEF (12)
 #define raCARD_HORZ_RELIEF (GG_CARD_WIDTH / 4)
 #define raCARD_PANEL_RELIEF 20
-//#define raGAME_HIDE_AI_HANDS 1
 
 #define raGAME_CARD_BACK_SEL 0
 

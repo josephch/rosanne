@@ -44,6 +44,7 @@
 #include "bubble_edge_top.xpm"
 
 //#define raGAME_SHOW_BID_BUBBLES 0
+//#define raGAME_HIDE_AI_HANDS 1
 
 BEGIN_EVENT_TABLE(raGame, ggPanel)
 	EVT_SIZE(raGame::OnSize)
@@ -1297,7 +1298,7 @@ bool raGame::Continue()
 				m_info->SetInstruction(wxT("Cards dealt."), raINFO_CMD_NONE);
 
 				m_engine.GetHands(hands);
-				wxLogDebug(raLib::PrintHands(hands));
+				//wxLogDebug(raLib::PrintHands(hands));
 
 				// Update hands, redraw back buffer and refresh the screen
 				if(!UpdateDrawAndRefresh())
@@ -2116,7 +2117,7 @@ bool raGame::UpdateDrawAndRefresh(bool update, raBackDrawInfo *info)
 	if(update)
 	{
 		m_engine.GetHands(hands);
-		wxLogDebug(wxString::Format("%s\n %s:%d", raLib::PrintHands(hands).c_str(), __FILE__, __LINE__));
+		//wxLogDebug(wxString::Format("%s\n %s:%d", raLib::PrintHands(hands).c_str(), __FILE__, __LINE__));
 		// Update hand/card positions and dimensions
 		if(!UpdateHands(hands))
 		{
@@ -2443,16 +2444,16 @@ bool raGame::OnCardClick(wxPoint pt)
 			// Check whether the double-click was received inside a hand
 			if(loc == raPLAYER_INVALID)
 			{
-				wxLogDebug(wxString::Format(wxT("Double click received, but not inside a hand. %s:%d"), 
-					__FILE__, __LINE__));
+				//wxLogDebug(wxString::Format(wxT("Double click received, but not inside a hand. %s:%d"), 
+				//	__FILE__, __LINE__));
 				return true;
 			}
 
 			// Check whether the double-click was received at the correct hand
 			if(trumpsel_info.player != loc)
 			{
-				wxLogDebug(wxString::Format(wxT("Double click received, but at the wrong hand. %s:%d"), 
-					__FILE__, __LINE__));
+				//wxLogDebug(wxString::Format(wxT("Double click received, but at the wrong hand. %s:%d"), 
+				//	__FILE__, __LINE__));
 				return true;
 			}
 

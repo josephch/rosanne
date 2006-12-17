@@ -29,10 +29,13 @@
 //#define raAI_LOG_ESTIMATE_POINTS 1
 //#define raAI_LOG_GETBID 1
 //#define raAI_LOG_GETTRUMP 1
+//#define raAI_LOG_GET_PLAY_OLD 1
 //#define raAI_LOG_GET_PLAY 1
 //#define raAI_LOG_GENERATEMOVES 1
 //#define raAI_LOG_EVALUATE 1
 //#define raAI_LOG_MAKEMOVE 1
+//#define raAI_LOG_GENERATESLPROBLEM
+//#define raAI_LOG_CHECKASSUMPTIONS
 
 #define raBID_SAMPLE 100
 #define raAI_PLAY_SAMPLES 30
@@ -72,6 +75,7 @@ private:
 	int Evaluate(raRuleEngine *node, int alpha, int beta, int depth, bool *ret_val);
 	int raAIAgent::EstimateHeuristic(raRuleEngine *state);
 	bool MakeMove(raRuleEngine *node, raAIMove *move);
+	bool MakeMoveAndEval(raRuleEngine *node, raAIMove *move, int depth, int *eval);
 	const static int s_depths[];
 public:
 	raAIAgent();
@@ -82,10 +86,10 @@ public:
 	bool GetBid(int *bid, int *trump, int min, bool force_bid);
 	bool SetRuleEngineData(raRuleEngineData *data);
 	int GetTrump();
-	int GetPlayOld(unsigned long mask);
+	static int GetTrump(unsigned long hand, int suit);
 	int GetPlay(unsigned long mask);
 	bool GenerateSLProblem(raRuleEngineData *data, slProblem *problem, int trump = raSUIT_INVALID);
-	bool GenerateSLSolution(slProblem *problem, slSolution *solution);
+	//bool GenerateSLSolution(slProblem *problem, slSolution *solution);
 	bool GenerateDeals(raRuleEngineData *data, unsigned long **deals, int count, int trump = raSUIT_INVALID);
 	static wxString PrintMoves(raAIMove *moves, int move_count);
 	bool PostPlayUpdate(raRuleEngineData *data, int card = raCARD_INVALID);

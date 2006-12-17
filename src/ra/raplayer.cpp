@@ -64,7 +64,7 @@ int raPlayer::GetTrump()
 }
 int raPlayer::GetPlay()
 {
-	return m_agent.GetPlayOld(0);
+	return m_agent.GetPlay(0);
 }
 
 bool raPlayer::PostPlayUpdate(raRuleEngineData *data, int card)

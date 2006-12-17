@@ -102,8 +102,8 @@
 #define raBUBB_ARROW_PROTUN (raBUBB_ARROW_WIDTH - raBUBB_ARROW_OVERLAP)
 
 // For testing purposes
-#define raREAD_SEED_FROM_FILE 0
-#define raREAD_DEALER_FROM_FILE 0
+//#define raREAD_SEED_FROM_FILE 0
+//#define raREAD_DEALER_FROM_FILE 0
 //#define raREAD_DEAL_FROM_FILE 0
 #define raTEST_DATA_FILE "ra_test_data.ini"
 #define raTEXT_SEED "rand/seed"
