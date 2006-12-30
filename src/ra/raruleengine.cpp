@@ -32,6 +32,8 @@ raRuleEngine::raRuleEngine()
 	m_data.rules.min_bid_1 = 14;
 	m_data.rules.min_bid_2 = 20;
 	m_data.rules.min_bid_3 = 23;
+	m_data.rules.waive_rule_4 = false;
+	m_data.rules.sluff_jacks = true;
 }
 
 //
@@ -1100,7 +1102,8 @@ bool raRuleEngine::GetMaxBid(int *bid, int *loc)
 }
 wxString raRuleEngine::GetLoggable()
 {
-	wxString out;//, temp;
+	return PrintRuleEngineData(&m_data);
+	/*wxString out;//, temp;
 	int i, j;
 	out.Append("\n");
 	if(m_data.trump_shown)
@@ -1147,6 +1150,60 @@ wxString raRuleEngine::GetLoggable()
 	}
 	out.Append("\n");
 	out.Append(raLib::PrintHands(m_data.hands));
+	return out;*/
+}
+wxString raRuleEngine::PrintRuleEngineData(raRuleEngineData *data)
+{
+	wxString out;//, temp;
+	int i, j;
+
+	wxASSERT(data);
+
+	out.Append("\n");
+	if(data->trump_shown)
+	{
+		out.Append(wxString::Format("Trump - %s(%s)\n", 
+			raLib::m_suits[raGetSuit(data->trump_card)].c_str(),
+			raLib::m_values[raGetValue(data->trump_card)].c_str()
+			));
+	}
+	for(i = 0; i < data->trick_round; i++)
+	{
+		out.Append(wxString::Format("Trick %d - ", i));
+
+		for(j = 0; j < raTOTAL_PLAYERS; j++)
+		{
+
+			if(data->tricks[i].lead_loc == j)
+				out.Append("+");
+			if(data->tricks[i].winner == j)
+				out.Append("*");
+			out.Append(wxString::Format("%s%s ", 
+				raLib::m_suits[raGetSuit(data->tricks[i].cards[j])].c_str(),
+				raLib::m_values[raGetValue(data->tricks[i].cards[j])].c_str()
+				));
+		}
+		out.Append("\n");
+	}
+	out.Append("\n");
+	i = data->trick_round;
+	for(j = 0; j < raTOTAL_PLAYERS; j++)
+	{
+		if(data->tricks[i].cards[j] == raCARD_INVALID)
+			continue;
+		out.Append(wxString::Format("%s - ", raLib::m_short_locs[j].c_str()));
+		if(data->tricks[i].lead_loc == j)
+			out.Append("+");
+		if(data->tricks[i].winner == j)
+			out.Append("*");
+		out.Append(wxString::Format("%s%s ", 
+			raLib::m_suits[raGetSuit(data->tricks[i].cards[j])].c_str(),
+			raLib::m_values[raGetValue(data->tricks[i].cards[j])].c_str()
+			));
+		out.Append("\n");
+	}
+	out.Append("\n");
+	out.Append(raLib::PrintHands(data->hands));
 	return out;
 }
 bool raRuleEngine::IsTrumpShown()
@@ -1163,6 +1220,20 @@ int raRuleEngine::GetTrickNextToPlay()
 	return raTrickNext;
 }
 
+void raRuleEngine::SetMinBid(int round, int bid)
+{
+	wxASSERT(round == raBID_ROUND_3);
+	wxASSERT((bid == 23) || (bid == 24));
+	m_data.rules.min_bid_3 = bid;
+}
+void raRuleEngine::SetWaiveRuleFour(bool flag)
+{
+	m_data.rules.waive_rule_4 = flag;
+}
+void raRuleEngine::SetSluffJacks(bool flag)
+{
+	m_data.rules.sluff_jacks = flag;
+}
 
 //
 // Private methods
@@ -1203,7 +1274,7 @@ unsigned long raRuleEngine::GenerateMask(unsigned long *rules)
 	// Rule 4 :
 	// If the max bidder asked for trump to be shown
 	// he/she must play the very same card
-	else if(m_data.should_play_trump_card)
+	else if(m_data.should_play_trump_card && (!m_data.rules.waive_rule_4))
 	{
 		wxASSERT(m_data.trump_card != raCARD_INVALID);
 		mask  = 1 << m_data.trump_card;
@@ -1226,6 +1297,14 @@ unsigned long raRuleEngine::GenerateMask(unsigned long *rules)
 		temp |= raRULE_3;
 	}
 	wxASSERT(mask);
+
+	// Rule 5 :
+	// Cannot sluff jacks
+	if(!m_data.rules.sluff_jacks)
+	{
+		unsigned long jacks = raFOUR_JACKS;
+
+	}
 
 	// Set the rules which were considered
 	if(rules)

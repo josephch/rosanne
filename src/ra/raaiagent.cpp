@@ -18,8 +18,11 @@
 
 #include "ra/raaiagent.h"
 
+#define raAI_ORDERMOVES  
+
 //const int raAIAgent::s_depths[] = {2, 3, 5, 7, 8, 8, 8, 8};
 const int raAIAgent::s_depths[] = {2, 3, 4, 6, 7, 8, 8, 8};
+//const int raAIAgent::s_depths[] = {2, 3, 4, 5, 6, 8, 8, 8};
 
 raAIAgent::raAIAgent()
 {
@@ -168,7 +171,7 @@ bool raAIAgent::GetBid(unsigned long cards, int *bid, int *trump, int min, bool 
 		{
 			sample += data[i][k];
 			// TODO : 70 might be an aggressive value fix it accordingly
-			if((((double)(sample) / raBID_SAMPLE) >= 0.70) && (k > *bid))
+			if((((double)(sample) / raBID_SAMPLE) >= 0.67) && (k > *bid))
 			{
 				*bid = k;
 				*trump = i;
@@ -265,7 +268,7 @@ int raAIAgent::GetTrump()
 	int bid;
 	int trump;
 	unsigned long hands[raTOTAL_PLAYERS];
-	int ret_val = raCARD_INVALID;
+	//int ret_val = raCARD_INVALID;
 
 	m_engine.GetHands(hands);
 	//wxLogDebug(wxString::Format("Estimated bid for %d", m_loc));
@@ -537,7 +540,16 @@ int raAIAgent::GetPlay(unsigned long mask)
 				wxLogDebug(wxString::Format("avg_eval_trump.eval - %d",avg_eval_trump.eval));
 #endif
 			}
+			
+			// Update the statusbar
+			raLib::SetStatusText(wxString::Format(
+				"%s is thinking - %d%%", raLib::m_long_locs[m_loc].c_str(), 
+				(i * 100) / 30 ), raSBARPOS_GEN);
+
 		}
+
+		raLib::SetStatusText("", raSBARPOS_GEN);
+
 		best_eval = (double)raAI_NEG_INFTY;
 		best_eval_trump = (double)raAI_NEG_INFTY;
 		best_play = raCARD_INVALID;
@@ -768,8 +780,16 @@ int raAIAgent::GetPlay(unsigned long mask)
 					wxLogDebug(wxString::Format("avg_eval_trump.eval - %d",avg_eval_trump.eval));
 #endif
 				}
+
+				// Update the statusbar
+				raLib::SetStatusText(wxString::Format(
+					"%s is thinking - %d%%", raLib::m_long_locs[m_loc].c_str(), 
+					(((k * 30) + i) * 100) / (raTOTAL_SUITS * 30) ), raSBARPOS_GEN);
+
 			}
 		}
+
+		raLib::SetStatusText("", raSBARPOS_GEN);
 
 		best_eval = (double)raAI_NEG_INFTY;
 		best_eval_trump = (double)raAI_NEG_INFTY;
@@ -1026,6 +1046,12 @@ bool raAIAgent::GenerateDeals(raRuleEngineData *data, unsigned long **deals, int
 			__FILE__, __LINE__));
 		return false;
 	}
+	
+#ifdef raAI_LOG_GENERATEDEALS
+	wxLogError(wxString::Format(wxT("Logged from. %s:%d"), 
+		__FILE__, __LINE__));
+	wxLogDebug(slSolver::PrintProblem(&problem));
+#endif
 
 	// 
 	// Generate random deals
@@ -1082,16 +1108,18 @@ wxString raAIAgent::PrintMoves(raAIMove *moves, int move_count)
 	{
 		if(moves[i].ask_trump)
 		{
-			out.Append(wxString::Format("?%s%s,",
+			out.Append(wxString::Format("?%s%s(%d),",
 				raLib::m_suits[raGetSuit(moves[i].card)].c_str(),
-				raLib::m_values[raGetValue(moves[i].card)].c_str()
+				raLib::m_values[raGetValue(moves[i].card)].c_str(),
+				moves[i].rank
 				));
 		}
 		else
 		{
-			out.Append(wxString::Format("%s%s,",
+			out.Append(wxString::Format("%s%s(%d),",
 				raLib::m_suits[raGetSuit(moves[i].card)].c_str(),
-				raLib::m_values[raGetValue(moves[i].card)].c_str()
+				raLib::m_values[raGetValue(moves[i].card)].c_str(),
+				moves[i].rank
 				));
 		}
 	}
@@ -1592,6 +1620,7 @@ bool raAIAgent::GenerateMoves(raRuleEngine *node, raAIMove *moves, int *count, i
 		{
 			moves[i].ask_trump = false;
 			moves[i].card = bhLib::HighestBitSet(cards_left);
+			moves[i].rank = -100;
 			cards_left &= ~(1 << moves[i].card);
 			i++;
 		}
@@ -1642,6 +1671,7 @@ bool raAIAgent::GenerateMoves(raRuleEngine *node, raAIMove *moves, int *count, i
 			{
 				moves[i].ask_trump = true;
 				moves[i].card = bhLib::HighestBitSet(cards_left);
+				moves[i].rank = -100;
 				cards_left &= ~(1 << moves[i].card);
 				i++;
 			}
@@ -1677,6 +1707,361 @@ bool raAIAgent::GenerateMoves(raRuleEngine *node, raAIMove *moves, int *count, i
 
 	return true;
 }
+bool raAIAgent::OrderMoves(raRuleEngine *node, raAIMove *moves, int count)
+{
+	int i;
+	raRuleEngineData data;
+
+	node->GetData(&data);
+
+	// Rank each move
+	for(i = 0; i < count; i++)
+		RankMove(&data, &moves[i]);
+
+	qsort(moves, count, sizeof(raAIMove), CompareMoves);
+
+	//wxLogDebug("***************From OrderMoves********************");
+	//wxLogDebug(node->GetLoggable());
+	//wxLogDebug(PrintMoves(moves, *count));
+	//for(i = 0; i < *count; i++)
+	//{
+	//	wxLogDebug(wxString::Format("Rank - %d", moves[i].rank));
+	//}
+	return true;
+}
+bool raAIAgent::RankMove(raRuleEngineData *data, raAIMove *move)
+{
+	//raRuleEngineData data;
+	int next_to_play = raPLAYER_INVALID;
+	unsigned long trick_cards = 0;
+	int i;
+	raTrick *trick;
+	int suit;
+	int value;
+	int lead_suit;
+
+	//int opp_one = raPLAYER_INVALID, opp_two = raPLAYER_INVALID;
+	unsigned long opp1_cards_suit = 0, opp2_cards_suit = 0, partner_cards_suit = 0;
+	unsigned long opp1_cards_trump = 0, opp2_cards_trump = 0, partner_cards_trump = 0;
+	unsigned long ucard;
+	unsigned long trick_cards_suit = 0, trick_cards_trump = 0;
+	bool opp1_played = false, opp2_played = false, partner_played = false;
+
+	wxASSERT(data);
+	wxASSERT(move);
+
+	//node->GetData(&data);
+
+
+	wxASSERT(data->status == raSTATUS_TRICKS);
+	next_to_play = data->in_trick_info.player;
+	wxASSERT((next_to_play > raPLAYER_INVALID) && (next_to_play < raTOTAL_PLAYERS));
+	trick = &data->tricks[data->trick_round];
+	wxASSERT(trick);
+	suit = raGetSuit(move->card);
+	wxASSERT((suit > raSUIT_INVALID) && (suit < raTOTAL_SUITS));
+	value = raGetValue(move->card);
+	ucard = (unsigned long)(1 << move->card);
+	wxASSERT(ucard);
+
+	if(!trick->count)
+		lead_suit = suit;
+	else
+		lead_suit = trick->lead_suit;
+
+	opp1_cards_suit = data->hands[raGetOpponentOne(next_to_play)] &
+		raLib::m_suit_mask[lead_suit];
+	opp2_cards_suit = data->hands[raGetOpponentTwo(next_to_play)] &
+		raLib::m_suit_mask[lead_suit];
+	opp1_cards_trump = data->hands[raGetOpponentOne(next_to_play)] &
+		raLib::m_suit_mask[data->trump_suit];
+	opp2_cards_trump = data->hands[raGetOpponentTwo(next_to_play)] &
+		raLib::m_suit_mask[data->trump_suit];
+
+	partner_cards_suit = data->hands[raGetPartner(next_to_play)] &
+		raLib::m_suit_mask[lead_suit];
+	partner_cards_trump = data->hands[raGetPartner(next_to_play)] &
+		raLib::m_suit_mask[data->trump_suit];
+
+	// Combine all the cards played so far in the trick
+	for(i = 0; i < raTOTAL_PLAYERS; i++)
+	{
+		if(trick->cards[i] != raCARD_INVALID)
+		{
+			trick_cards |= (1 << trick->cards[i]);
+		}
+	}
+
+	trick_cards_suit = trick_cards & raLib::m_suit_mask[lead_suit];
+	trick_cards_trump = trick_cards & raLib::m_suit_mask[data->trump_suit];
+
+	if(trick->cards[raGetPartner(next_to_play)] != raCARD_INVALID)
+		partner_played = true;
+	if(trick->cards[raGetOpponentOne(next_to_play)] != raCARD_INVALID)
+		opp1_played = true;
+	if(trick->cards[raGetOpponentTwo(next_to_play)] != raCARD_INVALID)
+		opp2_played = true;
+
+	// Is the move the highest card possible for the suit
+	// and can it take the trick?
+	// Or can the partner do the same?
+	if(
+		// If the trick is not already trumped
+		(!trick->trumped || (trick->lead_suit == data->trump_suit)) //&&
+		// And if the card is the first to be played in the trick
+		// or if the card played has the same suit as the lead suit
+		//((!trick->count) || ((trick->count > 0) && (trick->lead_suit == suit)))
+		)
+	{
+		// Can the move take the trick by playing
+		// the highest card of the lead suit?
+		if(
+			// And if the card played is higher than the cards played
+			// in the trick belonging to the same suit
+			(ucard > trick_cards_suit) &&
+			// And if the card is the first to be played in the trick
+			// or if the card played has the same suit as the lead suit
+			(suit == lead_suit) &&
+			//((!trick->count) || ((trick->count > 0) && (trick->lead_suit == suit))) &&
+			// And if opponent has not played yet and the opponent has the suit but no higher cards
+			// or if opponent one has no cards belonging to the suit but no trumps
+			(opp1_played || (!opp1_played && ((opp1_cards_suit && (opp1_cards_suit < ucard)) || (!opp1_cards_suit && !opp1_cards_trump)))) &&
+			(opp2_played || (!opp2_played && ((opp2_cards_suit && (opp2_cards_suit < ucard)) || (!opp2_cards_suit && !opp2_cards_trump))))
+			)
+		{
+			move->rank = 400 + raLib::m_points[value];
+			/*
+			wxLogDebug("***************From RankMove********************");
+			wxLogDebug(raRuleEngine::PrintRuleEngineData(data));
+			wxLogDebug(PrintMoves(move, 1));
+
+			wxLogDebug(wxString::Format("suit - %d", suit));
+			if(trick->trumped)
+				wxLogDebug("trick->trumped - true");
+			else
+				wxLogDebug("trick->trumped - false");
+			wxLogDebug(wxString::Format("trick->lead_suit %d, data->trump_suit %d", trick->lead_suit, data->trump_suit));
+			wxLogDebug(wxString::Format("trick->count %d, trick->lead_suit %d", trick->count, trick->lead_suit));
+			wxLogDebug(wxString::Format("ucard %08X, trick_cards_suit %08X", ucard, trick_cards_suit));
+			wxLogDebug(wxString::Format("ucard %08X, trick_cards_suit %08X", ucard, trick_cards_suit));
+
+			if(opp1_played)
+				wxLogDebug("opp1_played - true");
+			else
+				wxLogDebug("opp1_played - false");
+
+			if(opp2_played)
+				wxLogDebug("opp2_played - true");
+			else
+				wxLogDebug("opp2_played - false");
+
+			wxLogDebug(wxString::Format("opp1_cards_suit %08X, opp1_cards_trump %08X", opp1_cards_suit, opp1_cards_trump));
+			wxLogDebug(wxString::Format("opp2_cards_suit %08X, opp2_cards_trump %08X", opp2_cards_suit, opp2_cards_trump));
+
+			wxLogDebug(wxString("ucard - ") + raLib::PrintLong(ucard));
+			wxLogDebug(wxString("opp1_cards_suit - ") + raLib::PrintLong(opp1_cards_suit));
+			wxLogDebug(wxString("opp2_cards_suit - ") + raLib::PrintLong(opp2_cards_suit));
+			wxLogDebug(wxString("opp1_cards_trump - ") + raLib::PrintLong(opp1_cards_trump));
+			wxLogDebug(wxString("opp2_cards_trump - ") + raLib::PrintLong(opp2_cards_trump));
+
+			wxLogDebug(wxString::Format("Rank - %d", move->rank));
+			wxLogDebug("************************************************");
+			*/
+			return true;
+		}
+		// Can the partner take the trick by playing the highest
+		// card in the lead suit
+		else if (
+			// And if the card played is higher than the cards played
+			// in the trick belonging to the same suit
+			((trick->winner == raGetPartner(next_to_play)) || (!partner_played && (partner_cards_suit > trick_cards_suit))) &&
+			// And if the move is not the trump card 
+			// TODO : Implement - wisely!
+			// And if opponent has not played yet and the opponent has the suit but no higher cards
+			// or if opponent one has no cards belonging to the suit but no trumps
+			(opp1_played || (!opp1_played && ((opp1_cards_suit && (opp1_cards_suit < partner_cards_suit)) || (!opp1_cards_suit && !opp1_cards_trump)))) &&
+			(opp2_played || (!opp2_played && ((opp2_cards_suit && (opp2_cards_suit < partner_cards_suit)) || (!opp2_cards_suit && !opp2_cards_trump))))
+			) 
+		{
+			move->rank = 300 + raLib::m_points[value];
+			/*
+			wxLogDebug("***************From RankMove********************");
+			wxLogDebug(raRuleEngine::PrintRuleEngineData(data));
+			wxLogDebug(PrintMoves(move, 1));
+
+			wxLogDebug(wxString::Format("suit - %d", suit));
+			if(trick->trumped)
+				wxLogDebug("trick->trumped - true");
+			else
+				wxLogDebug("trick->trumped - false");
+			wxLogDebug(wxString::Format("trick->lead_suit %d, data->trump_suit %d", trick->lead_suit, data->trump_suit));
+			wxLogDebug(wxString::Format("trick->count %d, trick->lead_suit %d", trick->count, trick->lead_suit));
+			wxLogDebug(wxString::Format("ucard %08X, trick_cards_suit %08X", ucard, trick_cards_suit));
+			wxLogDebug(wxString::Format("ucard %08X, trick_cards_suit %08X", ucard, trick_cards_suit));
+
+			if(opp1_played)
+				wxLogDebug("opp1_played - true");
+			else
+				wxLogDebug("opp1_played - false");
+
+			if(opp2_played)
+				wxLogDebug("opp2_played - true");
+			else
+				wxLogDebug("opp2_played - false");
+
+			wxLogDebug(wxString::Format("opp1_cards_suit %08X, opp1_cards_trump %08X", opp1_cards_suit, opp1_cards_trump));
+			wxLogDebug(wxString::Format("opp2_cards_suit %08X, opp2_cards_trump %08X", opp2_cards_suit, opp2_cards_trump));
+			wxLogDebug(wxString::Format("partner_cards_suit %08X, opp1_cards_trump %08X", partner_cards_suit, 0));
+
+			wxLogDebug(wxString("ucard - ") + raLib::PrintLong(ucard));
+			wxLogDebug(wxString("opp1_cards_suit - ") + raLib::PrintLong(opp1_cards_suit));
+			wxLogDebug(wxString("opp2_cards_suit - ") + raLib::PrintLong(opp2_cards_suit));
+			wxLogDebug(wxString("opp1_cards_trump - ") + raLib::PrintLong(opp1_cards_trump));
+			wxLogDebug(wxString("opp2_cards_trump - ") + raLib::PrintLong(opp2_cards_trump));
+
+			wxLogDebug(wxString::Format("Rank - %d", move->rank));
+			wxLogDebug("************************************************");
+			*/
+			return true;
+		}
+	}
+
+	// Can the move trump the trick and win it?
+	if(
+		trick->count && move->ask_trump && (suit == data->trump_suit) &&
+		// The trick is not already trumped or you can over-trump
+		(!trick->trumped || (ucard > trick_cards_trump)) &&
+		// Opponent has not played or opponent has the lead suit or opponent does not have
+		// the lead suit but cannot over-trump
+		(opp1_played || (!opp1_played && (opp1_cards_suit || (!opp1_cards_suit && (opp1_cards_trump < ucard))))) &&
+		(opp2_played || (!opp2_played && (opp2_cards_suit || (!opp2_cards_suit && (opp2_cards_trump < ucard)))))
+		)
+	{
+		move->rank = 200 - raLib::m_points[value];
+		/*
+		wxLogDebug("***************From RankMove********************");
+		wxLogDebug(wxT("Trump - ") + raLib::m_suits[data->trump_suit]);
+		wxLogDebug(raRuleEngine::PrintRuleEngineData(data));
+		wxLogDebug(PrintMoves(move, 1));
+
+		wxLogDebug(wxString::Format("suit - %d", suit));
+		if(trick->trumped)
+			wxLogDebug("trick->trumped - true");
+		else
+			wxLogDebug("trick->trumped - false");
+		wxLogDebug(wxString::Format("trick->lead_suit %d, data->trump_suit %d", trick->lead_suit, data->trump_suit));
+		wxLogDebug(wxString::Format("trick->count %d, trick->lead_suit %d", trick->count, trick->lead_suit));
+		wxLogDebug(wxString::Format("ucard %08X, trick_cards_suit %08X", ucard, trick_cards_suit));
+		wxLogDebug(wxString::Format("ucard %08X, trick_cards_trump %08X", ucard, trick_cards_trump));
+
+		if(opp1_played)
+			wxLogDebug("opp1_played - true");
+		else
+			wxLogDebug("opp1_played - false");
+
+		if(opp2_played)
+			wxLogDebug("opp2_played - true");
+		else
+			wxLogDebug("opp2_played - false");
+
+		wxLogDebug(wxString::Format("opp1_cards_suit %08X, opp1_cards_trump %08X", opp1_cards_suit, opp1_cards_trump));
+		wxLogDebug(wxString::Format("opp2_cards_suit %08X, opp2_cards_trump %08X", opp2_cards_suit, opp2_cards_trump));
+		wxLogDebug(wxString::Format("partner_cards_suit %08X, opp1_cards_trump %08X", partner_cards_suit, 0));
+
+		wxLogDebug(wxString("ucard - ") + raLib::PrintLong(ucard));
+		wxLogDebug(wxString("opp1_cards_suit - ") + raLib::PrintLong(opp1_cards_suit));
+		wxLogDebug(wxString("opp2_cards_suit - ") + raLib::PrintLong(opp2_cards_suit));
+		wxLogDebug(wxString("opp1_cards_trump - ") + raLib::PrintLong(opp1_cards_trump));
+		wxLogDebug(wxString("opp2_cards_trump - ") + raLib::PrintLong(opp2_cards_trump));
+
+		wxLogDebug(wxString::Format("Rank - %d", move->rank));
+		wxLogDebug("************************************************");
+		*/
+		return true;
+	}
+
+	bool partner_trumps = false;
+	// If partner has already trumped and the opponents cannot over-trump
+	if(
+		trick->trumped && (trick->winner == raGetPartner(next_to_play))
+		)
+	{
+		if(
+			(opp1_played || (!opp1_played && (opp1_cards_suit || (!opp1_cards_suit && (opp1_cards_trump < (unsigned long)(1 << trick->cards[trick->winner])))))) &&
+			(opp2_played || (!opp2_played && (opp2_cards_suit || (!opp2_cards_suit && (opp2_cards_trump < (unsigned long)(1 << trick->cards[trick->winner])))))) 
+			)
+		{
+			partner_trumps = true;
+		}
+	}
+
+	// If partner has not played yet
+	if(!partner_played)
+	{
+		// If trick is already trumped, and if partner has a bigger trump
+		// and if opponents cannot over-trump
+		if(
+			(
+				(trick->trumped && (partner_cards_trump > (unsigned long)(1 << trick->cards[trick->winner]))) ||
+				(!trick->trumped && partner_cards_trump && !partner_cards_suit)
+			)&&
+			(opp1_played || (!opp1_played && (opp1_cards_suit || (!opp1_cards_suit && (opp1_cards_trump < partner_cards_trump))))) &&
+			(opp2_played || (!opp2_played && (opp2_cards_suit || (!opp2_cards_suit && (opp2_cards_trump < partner_cards_trump)))))
+			)
+		{
+			partner_trumps = true;
+		}
+	}
+
+	if(partner_trumps)
+	{
+		move->rank = 100 + raLib::m_points[value];
+		/*
+		wxLogDebug("***************From RankMove********************");
+		wxLogDebug(wxT("Trump - ") + raLib::m_suits[data->trump_suit]);
+		wxLogDebug(raRuleEngine::PrintRuleEngineData(data));
+		wxLogDebug(PrintMoves(move, 1));
+
+		wxLogDebug(wxString::Format("suit - %d", suit));
+		if(trick->trumped)
+			wxLogDebug("trick->trumped - true");
+		else
+			wxLogDebug("trick->trumped - false");
+		wxLogDebug(wxString::Format("trick->lead_suit %d, data->trump_suit %d", trick->lead_suit, data->trump_suit));
+		wxLogDebug(wxString::Format("trick->count %d, trick->lead_suit %d", trick->count, trick->lead_suit));
+		wxLogDebug(wxString::Format("ucard %08X, trick_cards_suit %08X", ucard, trick_cards_suit));
+		wxLogDebug(wxString::Format("ucard %08X, trick_cards_trump %08X", ucard, trick_cards_trump));
+
+		if(opp1_played)
+			wxLogDebug("opp1_played - true");
+		else
+			wxLogDebug("opp1_played - false");
+
+		if(opp2_played)
+			wxLogDebug("opp2_played - true");
+		else
+			wxLogDebug("opp2_played - false");
+
+		wxLogDebug(wxString::Format("opp1_cards_suit %08X, opp1_cards_trump %08X", opp1_cards_suit, opp1_cards_trump));
+		wxLogDebug(wxString::Format("opp2_cards_suit %08X, opp2_cards_trump %08X", opp2_cards_suit, opp2_cards_trump));
+		wxLogDebug(wxString::Format("partner_cards_suit %08X, opp1_cards_trump %08X", partner_cards_suit, 0));
+
+		wxLogDebug(wxString("ucard - ") + raLib::PrintLong(ucard));
+		wxLogDebug(wxString("opp1_cards_suit - ") + raLib::PrintLong(opp1_cards_suit));
+		wxLogDebug(wxString("opp2_cards_suit - ") + raLib::PrintLong(opp2_cards_suit));
+		wxLogDebug(wxString("opp1_cards_trump - ") + raLib::PrintLong(opp1_cards_trump));
+		wxLogDebug(wxString("opp2_cards_trump - ") + raLib::PrintLong(opp2_cards_trump));
+
+		wxLogDebug(wxString::Format("Rank - %d", move->rank));
+		wxLogDebug("************************************************");
+		*/
+		return true;
+	}
+
+	move->rank = 0 - raLib::m_points[value];
+	return true;
+}
+
 
 /*
 * Alpha-Beta search...
@@ -1758,6 +2143,14 @@ int raAIAgent::Evaluate(raRuleEngine *node, int alpha, int beta, int depth, bool
 	{
 		GenerateMoves(node, moves, &move_count);
 		wxASSERT(move_count);
+		//wxLogDebug("Before ordering");
+		//wxLogDebug(PrintMoves(moves, move_count));
+#ifdef raAI_ORDERMOVES
+		if(move_count > 1)
+			OrderMoves(node, moves, move_count);
+#endif
+		//wxLogDebug("After ordering");
+		//wxLogDebug(PrintMoves(moves, move_count));
 		if(move_count <= 0)
 		{
 			wxLogError(node->GetLoggable());
@@ -1799,6 +2192,14 @@ int raAIAgent::Evaluate(raRuleEngine *node, int alpha, int beta, int depth, bool
 	{
 		GenerateMoves(node, moves, &move_count);
 		wxASSERT(move_count);
+		//wxLogDebug("Before ordering");
+		//wxLogDebug(PrintMoves(moves, move_count));
+#ifdef  raAI_ORDERMOVES
+		if(move_count > 1)
+			OrderMoves(node, moves, move_count);
+#endif
+		//wxLogDebug("After ordering");
+		//wxLogDebug(PrintMoves(moves, move_count));
 		if(move_count <= 0)
 		{
 			wxLogError(node->GetLoggable());
@@ -2008,3 +2409,15 @@ bool raAIAgent::MakeMoveAndEval(raRuleEngine *node, raAIMove *move, int depth, i
 	return true;
 }
 
+int raAIAgent::CompareMoves(const void *elem1, const void *elem2)
+{
+	raAIMove *move1, *move2;
+	move1 = (raAIMove *)elem1;
+	move2 = (raAIMove *)elem2;
+	if(move1->rank > move2->rank)
+		return -1;
+	else if(move1->rank == move2->rank)
+		return 0;
+	else
+		return 1;
+}

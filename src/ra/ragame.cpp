@@ -44,7 +44,7 @@
 #include "bubble_edge_top.xpm"
 
 //#define raGAME_SHOW_BID_BUBBLES 0
-//#define raGAME_HIDE_AI_HANDS 1
+#define raGAME_HIDE_AI_HANDS 1
 
 BEGIN_EVENT_TABLE(raGame, ggPanel)
 	EVT_SIZE(raGame::OnSize)
@@ -1770,12 +1770,28 @@ bool raGame::ResetDeal()
 bool raGame::ResetGame()
 {
 	int i;
+	raConfData data;
+
+	raConfig::GetInstance()->GetData(&data);
+
 	//m_orientation = raGAME_ORIENT_ALL_HORZ;
 	m_orientation = raGAME_ORIENT_MIXED;
 
 	ResetDeal();
-	SetClockwise(true);
+
+	SetClockwise(data.game_data.clockwise);
+
+	// Update status bar with details
+	if(data.game_data.clockwise)
+		raLib::SetStatusText(raTEXT_CLOCKWISE, raSBARPOS_CLOCK);
+	else
+		raLib::SetStatusText(raTEXT_ANTICLOCKWISE, raSBARPOS_CLOCK);
+
 	m_engine.SetDealer(0);
+	m_engine.SetMinBid(raBID_ROUND_3, data.game_data.min_bid3);
+	m_engine.SetWaiveRuleFour(data.game_data.waive_rule4);
+	m_engine.SetSluffJacks(data.game_data.sluff_jacks);
+
 	for(i = 0; i < raTOTAL_TEAMS; i++)
 		m_game_pts[i] = 5;
 	for(i = 0; i < raTOTAL_PLAYERS; i++)
@@ -2319,7 +2335,10 @@ bool raGame::EndDeal(bool abandon)
 
 	// Set the dealer for the next deal
 	// TODO : +1 is hardcoded. 
-	m_engine.SetDealer((m_engine.GetDealer() + 1) % raTOTAL_PLAYERS);
+	if(m_clockwise)
+		m_engine.SetDealer((m_engine.GetDealer() + 1) % raTOTAL_PLAYERS);
+	else
+		m_engine.SetDealer((m_engine.GetDealer() + 3) % raTOTAL_PLAYERS);
 
 	// Set the detail in the info panel
 	old_deal_no = info_dtls.deal_no;

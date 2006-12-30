@@ -34,15 +34,19 @@
 #include "ra/raconfig.h"
 #include "ra/radlgabout.h"
 #include "ra/radlgprefs.h"
+#include "ra/radlgrules.h"
 
 enum 
 {
 	raID_NEW_GAME = 10000,
 	raID_EXIT,
 	raID_PREFERENCES,
+	raID_RULES,
 	raID_HELP,
 	raID_ABOUT
 };
+
+#define raSBAR_FIELDS 2
 
 class raFrame;
 
@@ -75,6 +79,7 @@ public:
 	void OnGameNew(wxCommandEvent& event);
 	void OnClose(wxCloseEvent& event);
 	void OnPreferences(wxCommandEvent& event);
+	void OnRules(wxCommandEvent& event);
 	void OnSize(wxSizeEvent& event);
 
 private:
@@ -82,6 +87,7 @@ private:
 	raGame *m_game;
 	raInfo *m_info;
 	bool ShowPreferences();
+	bool ShowRules();
 	//raUpdate *m_update;
 	// This class handles events
 	DECLARE_EVENT_TABLE()

@@ -35,6 +35,7 @@
 //#define raAI_LOG_EVALUATE 1
 //#define raAI_LOG_MAKEMOVE 1
 //#define raAI_LOG_GENERATESLPROBLEM
+//#define raAI_LOG_GENERATEDEALS
 //#define raAI_LOG_CHECKASSUMPTIONS
 
 #define raBID_SAMPLE 100
@@ -51,6 +52,7 @@ typedef struct RA_AI_MOVE
 {
 	int card;
 	bool ask_trump;
+	int rank;
 }raAIMove;
 
 typedef struct RA_AI_EVAL
@@ -72,11 +74,14 @@ private:
 	bool EstimateTricks(unsigned long *p_hands, int trump, int *eval);
 	bool EstimatePoints(unsigned long *hands, int trump, int trick_count, int *eval);
 	bool GenerateMoves(raRuleEngine *node, raAIMove *moves, int *count, int type = raAI_GENMV_ALL);
+	bool OrderMoves(raRuleEngine *node, raAIMove *moves, int count);
+	bool RankMove(raRuleEngineData *data, raAIMove *move);
 	int Evaluate(raRuleEngine *node, int alpha, int beta, int depth, bool *ret_val);
 	int raAIAgent::EstimateHeuristic(raRuleEngine *state);
 	bool MakeMove(raRuleEngine *node, raAIMove *move);
 	bool MakeMoveAndEval(raRuleEngine *node, raAIMove *move, int depth, int *eval);
 	const static int s_depths[];
+	static int CompareMoves(const void *elem1, const void *elem2);
 public:
 	raAIAgent();
 	~raAIAgent();

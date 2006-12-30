@@ -107,7 +107,7 @@ wxString raLib::PrintHands(unsigned long *hands)
 	unsigned long temp;
 	int i, j;
 
-	ret_val.Printf("");
+	ret_val.Clear();
 
 	// Print North first
 	//wxLogMessage(SPACES20 + m_long_locs[2]);
@@ -229,4 +229,24 @@ int raLib::GetCardIndex(wxString text)
 
 	return (x * 8) + y;
 }
+bool raLib::SetStatusText(const wxString& text, int i)
+{
+	wxFrame *main_frame;
+	wxStatusBar *status_bar;
+
+	main_frame = NULL;
+	main_frame = (wxFrame *)wxTheApp->GetTopWindow();
+	if(!main_frame)
+		return false;
+
+	status_bar = NULL;
+	status_bar = main_frame->GetStatusBar();
+	if(!status_bar)
+		return false;
+
+	status_bar->SetStatusText(text, i);
+	status_bar->Update();
+	return true;
+}
+
 

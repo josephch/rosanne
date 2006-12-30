@@ -22,6 +22,7 @@
 #include "new_game.xpm"
 #include "exit.xpm"
 #include "options.xpm"
+#include "rules.xpm"
 #include "help.xpm"
 #include "about.xpm"
 #include "tile.xpm"
@@ -30,12 +31,13 @@
 
 // Event table for raFrame
 BEGIN_EVENT_TABLE(raFrame, wxFrame)
-EVT_MENU(raID_ABOUT, raFrame::OnAbout)
-EVT_MENU(raID_EXIT,  raFrame::OnQuit)
-EVT_MENU(raID_NEW_GAME,  raFrame::OnGameNew)
-EVT_MENU(raID_PREFERENCES,  raFrame::OnPreferences)
-EVT_CLOSE(raFrame::OnClose)
-EVT_SIZE(raFrame::OnSize)
+	EVT_MENU(raID_ABOUT, raFrame::OnAbout)
+	EVT_MENU(raID_EXIT,  raFrame::OnQuit)
+	EVT_MENU(raID_NEW_GAME,  raFrame::OnGameNew)
+	EVT_MENU(raID_PREFERENCES,  raFrame::OnPreferences)
+	EVT_MENU(raID_RULES,  raFrame::OnRules)
+	EVT_CLOSE(raFrame::OnClose)
+	EVT_SIZE(raFrame::OnSize)
 END_EVENT_TABLE()
 
 // Give wxWidgets the means to create a raApp object
@@ -98,6 +100,7 @@ bool raApp::OnInit()
 	if(conf_data.app_data.maximized)
 		m_frame->Maximize();
 
+	SetTopWindow(m_frame);
 	// Show it
 	m_frame->Show(true);
 
@@ -237,6 +240,16 @@ void raFrame::OnPreferences(wxCommandEvent& event)
 	}
 	event.Skip();
 }
+
+void raFrame::OnRules(wxCommandEvent& event)
+{
+	if(!ShowRules())
+	{
+		wxLogError(wxString::Format(wxT("ShowRules() failed. %s:%d"), __FILE__, __LINE__));
+	}
+	event.Skip();
+}
+
 void raFrame::OnSize(wxSizeEvent& event)
 {
 	if(m_split_main)
@@ -265,6 +278,24 @@ bool raFrame::ShowPreferences()
 	return true;
 }
 
+bool raFrame::ShowRules()
+{
+	raDlgRules dlg_rules;
+
+	if(!wxXmlResource::Get()->LoadDialog(&dlg_rules, this, "ID_RADLGRULES"))
+	{
+		wxLogError(wxString::Format(wxT("Attempt to save settings failed. %s:%d"), __FILE__, __LINE__));
+		return false;
+	}
+	dlg_rules.ShowModal();
+
+	if(!m_game->ReloadFromConfig())
+	{
+		wxLogError(wxString::Format(wxT("ReloadFromConfig failed. %s:%d"), __FILE__, __LINE__));
+		return false;
+	}
+	return true;
+}
 
 
 //#include "mondrian.xpm"
@@ -275,6 +306,7 @@ raFrame::raFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title)
 	wxBitmap bmp_new_game(new_game_xpm);
 	wxBitmap bmp_exit(exit_xpm);
 	wxBitmap bmp_options(options_xpm);
+	wxBitmap bmp_rules(rules_xpm);
 	wxBitmap bmp_help(help_xpm);
 	wxBitmap bmp_about(about_xpm);
 
@@ -292,11 +324,14 @@ raFrame::raFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title)
 	wxMenuItem *game_exit = NULL;
 
 	wxMenuItem *opt_prefs = NULL;
+	wxMenuItem *opt_rules = NULL;
 
 	wxMenuItem *help_conts = NULL;
 	wxMenuItem *help_about = NULL;
 
 	wxToolBar *tool_bar;
+
+	wxStatusBar *status_bar;
 
 	m_split_main = NULL;
 
@@ -321,6 +356,9 @@ raFrame::raFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title)
 	opt_prefs = new wxMenuItem(opt_menu, raID_PREFERENCES, wxT("&Preferences"));
 	opt_prefs->SetBitmap(bmp_options);
 	opt_menu->Append(opt_prefs);
+	opt_rules = new wxMenuItem(opt_menu, raID_RULES, wxT("&Rules"));
+	opt_rules->SetBitmap(bmp_rules);
+	opt_menu->Append(opt_rules);
 
 	help_conts = new wxMenuItem(help_menu, wxID_HELP_CONTENTS, wxT("&Contents"));
 	help_conts->SetBitmap(bmp_help);
@@ -352,6 +390,7 @@ raFrame::raFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title)
 	tool_bar->AddTool(raID_EXIT, bmp_exit, wxT("Exit"));
 	tool_bar->AddSeparator();
 	tool_bar->AddTool(raID_PREFERENCES, bmp_options, wxT("Preferences"));
+	tool_bar->AddTool(raID_RULES, bmp_rules, wxT("Rules"));
 	tool_bar->AddSeparator();
 	//tool_bar->AddTool(wxID_ANY, wxT("Clockwise play"), bmp_clockwise, wxNullBitmap, 
 	//	wxITEM_CHECK, wxT("Clockwise play"));
@@ -381,9 +420,11 @@ raFrame::raFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title)
 
 	m_split_main->SplitVertically(m_info, m_game, 160);
 
-	m_game->NewGame();
-
 	// Create a status bar
-	CreateStatusBar();
-	//SetStatusText(wxT("Welcome to wxWidgets!"));
+	status_bar = CreateStatusBar();
+	status_bar->SetFieldsCount(raSBAR_FIELDS);
+	int status_widths[raSBAR_FIELDS] = {-1, 200};
+	status_bar->SetStatusWidths(raSBAR_FIELDS, status_widths);
+
+	m_game->NewGame();
 }

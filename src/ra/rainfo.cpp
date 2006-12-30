@@ -635,6 +635,9 @@ bool raInfo::SetInstruction(wxString instruction, int cmd)
 		(this->GetClientSize().GetWidth() - (2 * raINFO_INSTR_RELIEF));
 	m_instr_text_panel_sizer->Fit(m_instr_text_panel);
 
+	m_instr_text_panel_text->Update();
+	//m_instr_text_panel_text->Refresh();
+
 	return true;
 }
 bool raInfo::SetGamePanel(raGame *game_panel)

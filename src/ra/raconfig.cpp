@@ -80,6 +80,25 @@ bool raConfig::Save()
 		wxLogError(wxString::Format(wxT("m_config->Write() failed. %s:%d"), __FILE__, __LINE__));
 		return false;
 	}
+
+	if(!m_config->Write(raCONFPATH_GAME_DATA_MINBID3, m_data.game_data.min_bid3))
+	{
+		wxLogError(wxString::Format(wxT("m_config->Write() failed. %s:%d"), __FILE__, __LINE__));
+		return false;
+	}
+
+	if(!m_config->Write(raCONFPATH_GAME_DATA_WAIVERULE4, m_data.game_data.waive_rule4))
+	{
+		wxLogError(wxString::Format(wxT("m_config->Write() failed. %s:%d"), __FILE__, __LINE__));
+		return false;
+	}
+
+	if(!m_config->Write(raCONFPATH_GAME_DATA_SLUFFJACKS, m_data.game_data.sluff_jacks))
+	{
+		wxLogError(wxString::Format(wxT("m_config->Write() failed. %s:%d"), __FILE__, __LINE__));
+		return false;
+	}
+
 	if(!m_config->Write(raCONFPATH_PREFS_PLAYCARDON, m_data.prefs_data.play_card_on))
 	{
 		wxLogError(wxString::Format(wxT("m_config->Write() failed. %s:%d"), __FILE__, __LINE__));
@@ -157,6 +176,9 @@ void raConfig::SetDefaultValues(raConfData *data)
 	data->app_data.maximized = false;
 
 	data->game_data.clockwise = true;
+	data->game_data.min_bid3 = 23;
+	data->game_data.waive_rule4 = false;
+	data->game_data.sluff_jacks = true;
 
 	data->prefs_data.play_card_on = raCONFIG_PREFS_PLAYCARDON_SCLICK;
 	data->prefs_data.card_back = raCONFIG_PREFS_CARDBACK_BLUE;
@@ -198,6 +220,24 @@ bool raConfig::Load()
 	}
 	
 	if(!m_config->Read(raCONFPATH_GAME_DATA_CLOCK, &m_data.game_data.clockwise))
+	{
+		wxLogError(wxString::Format(wxT("m_config->Read failed. %s:%d"), __FILE__, __LINE__));
+		return false;
+	}
+
+	if(!m_config->Read(raCONFPATH_GAME_DATA_MINBID3, &m_data.game_data.min_bid3))
+	{
+		wxLogError(wxString::Format(wxT("m_config->Read failed. %s:%d"), __FILE__, __LINE__));
+		return false;
+	}
+
+	if(!m_config->Read(raCONFPATH_GAME_DATA_WAIVERULE4, &m_data.game_data.waive_rule4))
+	{
+		wxLogError(wxString::Format(wxT("m_config->Read failed. %s:%d"), __FILE__, __LINE__));
+		return false;
+	}
+
+	if(!m_config->Read(raCONFPATH_GAME_DATA_SLUFFJACKS, &m_data.game_data.sluff_jacks))
 	{
 		wxLogError(wxString::Format(wxT("m_config->Read failed. %s:%d"), __FILE__, __LINE__));
 		return false;

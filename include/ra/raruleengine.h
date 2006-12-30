@@ -76,9 +76,16 @@ enum{
 #define	raRULE_2 2
 #define	raRULE_3 4
 #define	raRULE_4 8
+// Sluffing of jacks
+#define	raRULE_5 16 
 
 #define raDEAL_ROUND_1 0
 #define raDEAL_ROUND_2 1
+
+#define raBID_ROUND_3 2
+
+#define raFOUR_JACKS 0x80808080
+#define raJACK 0x80
 
 typedef struct tagRA_RULES
 {
@@ -86,6 +93,8 @@ typedef struct tagRA_RULES
 	int min_bid_1;
 	int min_bid_2;
 	int min_bid_3;
+	bool waive_rule_4;
+	bool sluff_jacks;
 }raRules, *praRules;
 
 typedef struct tag_raTRICK{
@@ -251,8 +260,12 @@ public:
 	bool SetData(raRuleEngineData *data, bool check = true);
 	bool GetMaxBid(int *bid, int *loc);
 	wxString GetLoggable();
+	static wxString PrintRuleEngineData(raRuleEngineData *data);
 	bool IsTrumpShown();
 	int GetTrickNextToPlay();
+	void SetMinBid(int round, int bid);
+	void SetWaiveRuleFour(bool flag);
+	void SetSluffJacks(bool flag);
 };
 
 

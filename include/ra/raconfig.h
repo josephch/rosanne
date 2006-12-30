@@ -29,6 +29,9 @@
 #define raCONFPATH_APP_DATA_MAX "application/maximized"
 
 #define raCONFPATH_GAME_DATA_CLOCK "game/clockwise"
+#define raCONFPATH_GAME_DATA_MINBID3 "game/minbid3"
+#define raCONFPATH_GAME_DATA_WAIVERULE4 "game/waiverule4"
+#define raCONFPATH_GAME_DATA_SLUFFJACKS "game/sluffjacks"
 
 #define raCONFPATH_PREFS_PLAYCARDON "preferences/playcardon"
 #define raCONFPATH_PREFS_CARDBACK "preferences/cardback"
@@ -51,6 +54,9 @@ typedef struct tag_RA_CONF_APP_DATA
 typedef struct tag_RA_CONF_GAME_DATA
 {
 	bool clockwise;
+	int min_bid3;
+	bool waive_rule4;
+	bool sluff_jacks;
 } raConfGameData;
 
 typedef struct tag_RA_CONF_PREFS_DATA

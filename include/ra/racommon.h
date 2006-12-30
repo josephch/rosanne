@@ -75,6 +75,8 @@
 #define raGetTeam(X) (X % raTOTAL_TEAMS)
 #define raGetOpponent(X) ((X + 1) % raTOTAL_TEAMS)
 #define raGetPartner(X) ((X + 2) % raTOTAL_PLAYERS)
+#define raGetOpponentOne(X) ((X + 1) % raTOTAL_PLAYERS)
+#define raGetOpponentTwo(X) ((X + 2) % raTOTAL_PLAYERS)
 
 // Colours
 #define raCLR_HEAD_DARK (wxColour(0, 92, 133))
@@ -102,13 +104,24 @@
 #define raBUBB_ARROW_PROTUN (raBUBB_ARROW_WIDTH - raBUBB_ARROW_OVERLAP)
 
 // For testing purposes
-//#define raREAD_SEED_FROM_FILE 0
+#define raREAD_SEED_FROM_FILE 0
 //#define raREAD_DEALER_FROM_FILE 0
 //#define raREAD_DEAL_FROM_FILE 0
 #define raTEST_DATA_FILE "ra_test_data.ini"
 #define raTEXT_SEED "rand/seed"
 #define raTEXT_DEALER "deal/dealer"
 #define raTEXT_DEAL_ROUND "deal_round"
+
+enum
+{
+	raSBARPOS_GEN = 0,
+	raSBARPOS_CLOCK
+};
+
+#define raStatusBar ((wxFrame *)(wxTheApp->GetTopWindow()))->GetStatusBar()
+
+#define raTEXT_CLOCKWISE wxT("Clockwise")
+#define raTEXT_ANTICLOCKWISE wxT("Anti-lockwise")
 
 #endif
 

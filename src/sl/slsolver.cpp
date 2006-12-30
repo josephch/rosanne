@@ -17,7 +17,7 @@ slSolver::~slSolver()
 bool slSolver::GetRandomSolution(slSolution *solution)
 {
 	int i, j;
-	int hands_count = 0, suits_count = 0;
+	//int hands_count = 0, suits_count = 0;
 	int cum_rel_prob[slTOTAL_SUITS];
 	int weight_cache[slTOTAL_SUITS];
 	int weight_new[slTOTAL_SUITS];
@@ -120,7 +120,12 @@ bool slSolver::GetRandomSolution(slSolution *solution)
 #ifdef slLOG_DEBUG_GETRANDSOLN
 					wxLogDebug(wxString::Format("Temp - %d Adding card to hand suit %d %d", temp, i, j));
 #endif
-					SetCell(&m_working, i, j, (m_working.cells[i][j].min + 1));
+					if(!SetCell(&m_working, i, j, (m_working.cells[i][j].min + 1)))
+					{
+						wxLogError(wxString::Format(wxT("SetCell() failed. %s:%d"), 
+							__FILE__, __LINE__));
+						return false;
+					}
 					break;
 				}
 			}
@@ -211,6 +216,8 @@ bool slSolver::SetProblem(slProblem *problem)
 			{
 				wxLogError(wxString::Format(wxT("SetCell() failed. %s:%d"), 
 					__FILE__, __LINE__));
+				wxLogError(wxString::Format("Setting cell at [%d, %d]. Min - %d Max - %d",
+					i, j, m_problem.cells[i][j].min, m_problem.cells[i][j].max));
 				return false;
 			}
 		}
@@ -459,18 +466,25 @@ bool slSolver::SetCell(slData *data, int i, int j, int min, int max)
 	// Minimum value must not be such that the minimum 
 	// length for the suit or the hand is not overrun
 
-	if((min + m_hand_sum_of_min[i]) > data->hand_total_length[i])
+	//if((min + m_hand_sum_of_min[i]) > data->hand_total_length[i])
+	/*if((min + data->hand_sum_of_mins[i]) > data->hand_total_length[i])
 	{
 		wxLogError(wxString::Format(wxT("Minimum value will cause overrun of hand length. %s:%d"), 
 			__FILE__, __LINE__));
+		wxLogError(wxString::Format("min - %d", min));
+		wxLogError(wxString::Format("data->hand_sum_of_mins[%d] - %d", i, data->hand_sum_of_mins[i]));
+		wxLogError(wxString::Format("data->hand_total_length[%d] - %d", i, data->hand_total_length[i]));
 		return false;
 	}
-	if((min + m_suit_sum_of_min[j]) > data->suit_total_length[j])
+	if((min + data->suit_sum_of_mins[j]) > data->suit_total_length[j])
 	{
 		wxLogError(wxString::Format(wxT("Minimum value will cause overrun of suit length. %s:%d"), 
 			__FILE__, __LINE__));
+		wxLogError(wxString::Format("min - %d", min));
+		wxLogError(wxString::Format("data->suit_sum_of_mins[%d] - %d", i, data->suit_sum_of_mins[i]));
+		wxLogError(wxString::Format("data->suit_total_length[%d] - %d", i, data->suit_total_length[i]));
 		return false;
-	}
+	}*/
 
 	// Since minimum value is going to change, reset the sum of mins
 

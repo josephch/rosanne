@@ -78,6 +78,7 @@ public:
 	static int m_total_points[];
 	static wxString m_short_teams[];
 	static int GetCardIndex(wxString text);
+	static bool SetStatusText(const wxString& text, int i = 0);
 };
 
 #define raGET_CARD_INDEX(crd) ((crd->GetSuit() << 3) + raLib::m_value_trans[crd->GetValue()])
