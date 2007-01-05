@@ -1,5 +1,5 @@
 // rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006 Vipin Cherian
+// Copyright (C) 2006-2007 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -135,6 +135,9 @@ private:
 
 	// Auto play single choice
 	bool m_auto_play;
+
+	// Saved rules
+	raRules m_saved_rules;
 
 	// Bitmaps to be loaded from xpms
 

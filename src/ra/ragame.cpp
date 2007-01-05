@@ -1,5 +1,5 @@
 // rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006 Vipin Cherian
+// Copyright (C) 2006-2007 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@
 #include "bubble_edge_right.xpm"
 #include "bubble_edge_top.xpm"
 
-//#define raGAME_SHOW_BID_BUBBLES 0
+#define raGAME_SHOW_BID_BUBBLES 0
 #define raGAME_HIDE_AI_HANDS 1
 
 BEGIN_EVENT_TABLE(raGame, ggPanel)
@@ -1772,6 +1772,8 @@ bool raGame::ResetGame()
 	int i;
 	raConfData data;
 
+	memset(&m_saved_rules, 0, sizeof(raRules));
+
 	raConfig::GetInstance()->GetData(&data);
 
 	//m_orientation = raGAME_ORIENT_ALL_HORZ;
@@ -1783,19 +1785,38 @@ bool raGame::ResetGame()
 
 	// Update status bar with details
 	if(data.game_data.clockwise)
+	{
 		raLib::SetStatusText(raTEXT_CLOCKWISE, raSBARPOS_CLOCK);
+	}
 	else
+	{
 		raLib::SetStatusText(raTEXT_ANTICLOCKWISE, raSBARPOS_CLOCK);
+	}
 
 	m_engine.SetDealer(0);
+
 	m_engine.SetMinBid(raBID_ROUND_3, data.game_data.min_bid3);
 	m_engine.SetWaiveRuleFour(data.game_data.waive_rule4);
 	m_engine.SetSluffJacks(data.game_data.sluff_jacks);
 
+	// Save the rules
+	m_saved_rules.min_bid_3 = data.game_data.min_bid3;
+	if(data.game_data.clockwise)
+		m_saved_rules.rot_addn = 1;
+	else
+		m_saved_rules.rot_addn = 3;
+	m_saved_rules.sluff_jacks = data.game_data.sluff_jacks;
+	m_saved_rules.waive_rule_4 = data.game_data.waive_rule4;
+
 	for(i = 0; i < raTOTAL_TEAMS; i++)
 		m_game_pts[i] = 5;
 	for(i = 0; i < raTOTAL_PLAYERS; i++)
+	{
 		m_pnlties[i] = 0;
+		m_players[i].Reset();
+		m_players[i].SetRules(&m_saved_rules);
+	}
+
 	return true;
 }
 
@@ -2328,7 +2349,10 @@ bool raGame::EndDeal(bool abandon)
 
 	// Reset all players
 	for(i = 0; i < raTOTAL_PLAYERS; i++)
+	{
 		m_players[i].Reset();
+		m_players[i].SetRules(&m_saved_rules);
+	}
 
 	m_info->SetInstruction(wxT(""),
 		raINFO_CMD_NEW_DEAL);

@@ -1,5 +1,5 @@
 // rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006 Vipin Cherian
+// Copyright (C) 2006-2007 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -49,6 +49,7 @@ public:
 	bool PostPlayUpdate(raRuleEngineData *data, int card);
 	bool CheckAssumptions(raRuleEngineData *data);
 	bool Reset();
+	void SetRules(praRules rules = NULL);
 	bool SetClockwise(bool flag);
 	bool GetClockwise();
 	bool AbandonGame(bool *flag);

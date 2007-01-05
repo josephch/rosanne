@@ -1,5 +1,5 @@
 // rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006 Vipin Cherian
+// Copyright (C) 2006-2007 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -41,9 +41,9 @@
 
 #define RA_APP_MAJOR_VER 1
 #define RA_APP_MINOR_VER 0
-#define RA_APP_REL_TYPE "a"
-#define RA_APP_REL_TYPE_VER 2 
-#define RA_APP_NAME "rosanne"
+#define RA_APP_REL_TYPE "b"
+#define RA_APP_REL_TYPE_VER 1 
+#define RA_APP_NAME "Rosanne"
 #define RA_APP_AUTHOR "Vipin Cherian"
 
 #define RA_APP_FULL_VER (wxString::Format ("%d.%d%s%d", \
@@ -104,7 +104,7 @@
 #define raBUBB_ARROW_PROTUN (raBUBB_ARROW_WIDTH - raBUBB_ARROW_OVERLAP)
 
 // For testing purposes
-#define raREAD_SEED_FROM_FILE 0
+//#define raREAD_SEED_FROM_FILE 0
 //#define raREAD_DEALER_FROM_FILE 0
 //#define raREAD_DEAL_FROM_FILE 0
 #define raTEST_DATA_FILE "ra_test_data.ini"

@@ -34,7 +34,7 @@
                             <label>Rosanne v1.0b1 (Beta)
 A Twenty Eight card game for multiple platforms.
 
-Copyright Vipin Cherian 2006</label>
+Copyright Vipin Cherian 2006-2007</label>
                         </object>
                     </object>
                 </object>
@@ -82,7 +82,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA</
                                     <flag>wxALIGN_LEFT|wxALL|wxADJUST_MINSIZE</flag>
                                     <border>5</border>
                                     <object class="wxStaticText" name="wxID_STATIC">
-                                        <label>Special thanks to 
+                                        <label>Special thanks to, 
 
 SourceForge.
 wxWidgets Team and everone who has contributed to the library.
@@ -91,12 +91,15 @@ Julian Smart and Anthemion Software Ltd.
 Sean Eron Anderson.
 The Open Source community for the development tools.
 
-Vinod Sureshbabu, Gigi Joseph, Kamjith P., 
-Aravind Parameswaran, Jayesh G., Jamsheed Kormath, 
-V. Sridhar, Linov P. Suresh, Gaurav Sharma, 
-Baljinder Singh Sandhu, Rajeev Mittal, Keya Pansare, 
-Manish Gupta, Reynold Johns, Shadaab Syed, 
-Sooraj K. Prabha, DTops DTharas and others...</label>
+Vinod Sureshbabu, David C. Kandathil, Gigi Joseph, Kamjith P., 
+Aravind Parameswaran, Jayesh G., Jamsheed Kormath, V. Sridhar, 
+Feby George, Prashanth Kuttickat, Anoop A., Linov P. Suresh, 
+Gaurav Sharma, Baljinder Singh Sandhu, Rajeev Mittal, Keya Pansare,
+Manish Gupta, Sreepad Ramesan Kutty, Reynold Johns, Shadaab Syed,
+Sankara S. P., Mainak Bose, Sooraj K. Prabha, DTops DTharas,
+Prashanth P, Rupesh R. S., Sajith Bhaskar, Dishkangang, 
+Friends at Malayalavedhi and many others...
+</label>
                                     </object>
                                 </object>
                             </object>

@@ -1,5 +1,5 @@
 // rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006 Vipin Cherian
+// Copyright (C) 2006-2007 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -92,7 +92,7 @@ bool raApp::OnInit()
 	else
 	{
 		m_frame->SetSize(
-			wxSystemSettings::GetMetric(wxSYS_SCREEN_X) * 3 / 4,
+			(wxSystemSettings::GetMetric(wxSYS_SCREEN_Y) * 3 / 4) + 120,
 			wxSystemSettings::GetMetric(wxSYS_SCREEN_Y) * 3 / 4
 			);
 	}
@@ -159,7 +159,7 @@ void raFrame::OnAbout(wxCommandEvent& event)
 	wxString msg;
 	raDlgAbout about;
 	msg.Append(RA_APP_FULL_NAME);
-	msg.Append("\n\n - Copyright, Vipin Cherian 2006");
+	msg.Append("\n\n - Copyright, Vipin Cherian 2006-2007");
 	// TODO : Add thanks in a respectable version
 	//msg.Append(wxT("\n - Special thanks to Gigi, Kamjith,"));
 	//msg.Append(wxT("\n     Aravind, Gaurav, Balji, Rajeev,"));
