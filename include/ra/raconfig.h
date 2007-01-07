@@ -36,6 +36,7 @@
 #define raCONFPATH_PREFS_PLAYCARDON "preferences/playcardon"
 #define raCONFPATH_PREFS_CARDBACK "preferences/cardback"
 #define raCONFPATH_PREFS_AUTOPLAYSINGLE "preferences/autoplaysingle"
+#define raCONFPATH_PREFS_BIDBUBBLES "preferences/bidbubbles"
 
 #define raCONFIG_PREFS_PLAYCARDON_SCLICK 0
 #define raCONFIG_PREFS_PLAYCARDON_DCLICK 1
@@ -64,6 +65,7 @@ typedef struct tag_RA_CONF_PREFS_DATA
 	int play_card_on;
 	int card_back;
 	bool auto_play_single;
+	bool show_bid_bubbles;
 } raConfPrefsData;
 
 typedef struct tag_RA_CONF_DATA

@@ -86,6 +86,7 @@ enum{
 
 #define raFOUR_JACKS 0x80808080
 #define raJACK 0x80
+#define raALL_CARDS 0xFFFFFFFF
 
 typedef struct tagRA_RULES
 {

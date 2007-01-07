@@ -136,8 +136,14 @@ private:
 	// Auto play single choice
 	bool m_auto_play;
 
+	// Show bid bubbles
+	bool m_show_bidbubbles;
+
 	// Saved rules
 	raRules m_saved_rules;
+
+	// Saved auction history
+	wxString m_bid_history;
 
 	// Bitmaps to be loaded from xpms
 
@@ -203,5 +209,7 @@ public:
 	bool SetClockwise(bool flag);
 	bool GetClockwise();
 	bool ReloadFromConfig();
+	bool ShowAuction();
+	bool ShowLastTrick();
 };
 #endif

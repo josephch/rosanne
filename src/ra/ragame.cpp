@@ -43,7 +43,6 @@
 #include "bubble_edge_right.xpm"
 #include "bubble_edge_top.xpm"
 
-#define raGAME_SHOW_BID_BUBBLES 0
 #define raGAME_HIDE_AI_HANDS 1
 
 BEGIN_EVENT_TABLE(raGame, ggPanel)
@@ -55,7 +54,7 @@ BEGIN_EVENT_TABLE(raGame, ggPanel)
 	//EVT_ERASE_BACKGROUND(wxcTable::OnErase)
 END_EVENT_TABLE()
 
-// TODO : For all wxMessageBox-es, provide appropraite heading, icon etc
+// TODO : For all wxMessageBox-es, provide appropriate heading, icon etc
 
 //
 // Constructor/s
@@ -75,6 +74,7 @@ raGame::raGame(const wxWindow* parent): ggPanel((wxWindow*)parent)
 	m_pref_card_back = raCONFIG_PREFS_CARDBACK_BLUE;
 	m_play_card_on = raCONFIG_PREFS_PLAYCARDON_SCLICK;
 	m_auto_play = true;
+	m_show_bidbubbles = true;
 
 
 	// Set the properties of the bold font to be used to write the text
@@ -350,12 +350,68 @@ bool raGame::ReloadFromConfig()
 	m_pref_card_back = conf_data.prefs_data.card_back;
 	m_play_card_on = conf_data.prefs_data.play_card_on;
 	m_auto_play =conf_data.prefs_data.auto_play_single;
+	m_show_bidbubbles = conf_data.prefs_data.show_bid_bubbles;
 
 	UpdateDrawAndRefresh();
 
 	return true;
 }
+bool raGame::ShowAuction()
+{
+	if(m_engine.GetStatus() >= raSTATUS_BID1) 
+	{
+		wxMessageBox(m_bid_history, wxT("Details of the auction"));
+	}
+	else
+	{
+		wxMessageBox(wxT("Data not available"));
+	}
+	return true;
+}
 
+bool raGame::ShowLastTrick()
+{
+	wxString out;
+	int i;
+	raRuleEngineData data;
+	raTrick *trick;
+
+	m_engine.GetData(&data);
+	if((data.status >= raSTATUS_TRICKS) && (data.trick_round > 0))
+	{
+		out.Append(wxT("Round - "));
+		out.Append(wxString::Format("%d", data.trick_round));
+		out.Append("\n\n");
+		trick = &data.tricks[data.trick_round - 1];
+		for(i = 0; i < raTOTAL_PLAYERS; i++)		
+		{
+			out.Append(raLib::m_long_locs[i]);
+			out.Append("\t- ");
+			wxASSERT(trick->cards[i] != raCARD_INVALID);
+			out.Append(raLib::m_suits[raGetSuit(trick->cards[i])]);
+			out.Append(raLib::m_values[raGetValue(trick->cards[i])]);
+			if(trick->lead_loc == i)
+			{
+				out.Append(" (");
+				out.Append(wxT("Lead"));
+				out.Append(")");
+			}
+			if(trick->winner == i)
+			{
+				out.Append(" (");
+				out.Append(wxT("Winner"));
+				out.Append(")");
+			}
+			out.Append("\n");
+		}
+		wxMessageBox(out, wxT("Last Trick"));
+	}
+	else
+	{
+		wxMessageBox(wxT("Data not available"));
+	}
+	return true;
+}
 
 //
 // Private method/s
@@ -649,187 +705,188 @@ bool raGame::RedrawBack(raBackDrawInfo *info)
 	DrawTextOnBack(loc_text, wxPoint(x + 1, y + 1), *wxBLACK, m_font_bold);
 	DrawTextOnBack(loc_text, wxPoint(x, y), *wxWHITE, m_font_bold);
 
-#ifdef raGAME_SHOW_BID_BUBBLES
-	// If required, draw the bubble which has the bid
-	if(info)
+	if(m_show_bidbubbles)
 	{
-		if(info->draw_bid)
+		// If required, draw the bubble which has the bid
+		if(info)
 		{
-			wxMemoryDC temp_dc1, temp_dc2;
-			wxString bubb_text;
-			int u, v;
-
-			if(info->bid == raBID_PASS)
-				bubb_text = wxString::Format("%s passes the bid", raLib::m_long_locs[info->bid_loc].c_str());
-			else
-				bubb_text = wxString::Format("%s bids %d", raLib::m_long_locs[info->bid_loc].c_str(), info->bid);
-
-			u = 0;
-			v = 0;
-			
-			mdc.SetFont(m_font_bold);
-
-			mdc.GetTextExtent(bubb_text, &u, &v);
-
-			// TODO : Remove hard coding of the relief
-
-			x = raMax((u + 8), raBUBB_MIN_WIDTH);
-			y = raMax((v + 8), raBUBB_MIN_HEIGHT);
-
-			// Increment x and y to the equal or higher multiple of raBUBB_UNIT_MIN
-			x = ((x / raBUBB_UNIT_MIN) + (!!(x % raBUBB_UNIT_MIN))) * raBUBB_UNIT_MIN;
-			y = ((y / raBUBB_UNIT_MIN) + (!!(y % raBUBB_UNIT_MIN))) * raBUBB_UNIT_MIN;
-
-			wxBitmap bmp_bubb_rect(x, y);
-
-			mdc.SelectObject(bmp_bubb_rect);
-			mdc.SetTextForeground(*wxBLACK);
-
-			// Fill with the masking colour
-			mdc.SetBrush(wxBrush(*wxRED));
-			mdc.SetPen(wxPen(*wxRED, 0));
-			mdc.DrawRectangle(wxRect(0, 0, x, y));
-
-			// Fill with the background colour for the bubble
-			mdc.SetBrush(wxBrush(raCLR_BUBB_FILL));
-			mdc.SetPen(wxPen(raCLR_BUBB_FILL, 0));
-			mdc.DrawRectangle(wxRect(raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, 
-				x - (2 * raBUBB_UNIT_MIN), y - (2 * raBUBB_UNIT_MIN)));
-
-			// Draw corners
-			temp_dc1.SelectObject(*m_bmp_bubble_corner_nw);
-			mdc.Blit(0, 0, raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, &temp_dc1, 0, 0, wxCOPY, true);
-			temp_dc1.SelectObject(*m_bmp_bubble_corner_ne);
-			mdc.Blit(x - raBUBB_UNIT_MIN, 0, raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, &temp_dc1, 0, 0, wxCOPY, true);
-			temp_dc1.SelectObject(*m_bmp_bubble_corner_sw);
-			mdc.Blit(0, y - raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, &temp_dc1, 0, 0, wxCOPY, true);
-			temp_dc1.SelectObject(*m_bmp_bubble_corner_se);
-			mdc.Blit(x - raBUBB_UNIT_MIN, y - raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, &temp_dc1, 0, 0, wxCOPY, true);
-
-			// Draw the top and bottom edges
-			temp_dc1.SelectObject(*m_bmp_bubble_edge_top);
-			temp_dc2.SelectObject(*m_bmp_bubble_edge_bottom);
-			for(i = 1; i <= ((x / raBUBB_UNIT_MIN) - 2); i++)
+			if(info->draw_bid)
 			{
-				mdc.Blit(i * raBUBB_UNIT_MIN, 0, raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, &temp_dc1, 0, 0, wxCOPY, true);
-				mdc.Blit(i * raBUBB_UNIT_MIN, y - raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, &temp_dc2, 0, 0, wxCOPY, true);
+				wxMemoryDC temp_dc1, temp_dc2;
+				wxString bubb_text;
+				int u, v;
+
+				if(info->bid == raBID_PASS)
+					bubb_text = wxString::Format("%s passes the bid", raLib::m_long_locs[info->bid_loc].c_str());
+				else
+					bubb_text = wxString::Format("%s bids %d", raLib::m_long_locs[info->bid_loc].c_str(), info->bid);
+
+				u = 0;
+				v = 0;
+
+				mdc.SetFont(m_font_bold);
+
+				mdc.GetTextExtent(bubb_text, &u, &v);
+
+				// TODO : Remove hard coding of the relief
+
+				x = raMax((u + 8), raBUBB_MIN_WIDTH);
+				y = raMax((v + 8), raBUBB_MIN_HEIGHT);
+
+				// Increment x and y to the equal or higher multiple of raBUBB_UNIT_MIN
+				x = ((x / raBUBB_UNIT_MIN) + (!!(x % raBUBB_UNIT_MIN))) * raBUBB_UNIT_MIN;
+				y = ((y / raBUBB_UNIT_MIN) + (!!(y % raBUBB_UNIT_MIN))) * raBUBB_UNIT_MIN;
+
+				wxBitmap bmp_bubb_rect(x, y);
+
+				mdc.SelectObject(bmp_bubb_rect);
+				mdc.SetTextForeground(*wxBLACK);
+
+				// Fill with the masking colour
+				mdc.SetBrush(wxBrush(*wxRED));
+				mdc.SetPen(wxPen(*wxRED, 0));
+				mdc.DrawRectangle(wxRect(0, 0, x, y));
+
+				// Fill with the background colour for the bubble
+				mdc.SetBrush(wxBrush(raCLR_BUBB_FILL));
+				mdc.SetPen(wxPen(raCLR_BUBB_FILL, 0));
+				mdc.DrawRectangle(wxRect(raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, 
+					x - (2 * raBUBB_UNIT_MIN), y - (2 * raBUBB_UNIT_MIN)));
+
+				// Draw corners
+				temp_dc1.SelectObject(*m_bmp_bubble_corner_nw);
+				mdc.Blit(0, 0, raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, &temp_dc1, 0, 0, wxCOPY, true);
+				temp_dc1.SelectObject(*m_bmp_bubble_corner_ne);
+				mdc.Blit(x - raBUBB_UNIT_MIN, 0, raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, &temp_dc1, 0, 0, wxCOPY, true);
+				temp_dc1.SelectObject(*m_bmp_bubble_corner_sw);
+				mdc.Blit(0, y - raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, &temp_dc1, 0, 0, wxCOPY, true);
+				temp_dc1.SelectObject(*m_bmp_bubble_corner_se);
+				mdc.Blit(x - raBUBB_UNIT_MIN, y - raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, &temp_dc1, 0, 0, wxCOPY, true);
+
+				// Draw the top and bottom edges
+				temp_dc1.SelectObject(*m_bmp_bubble_edge_top);
+				temp_dc2.SelectObject(*m_bmp_bubble_edge_bottom);
+				for(i = 1; i <= ((x / raBUBB_UNIT_MIN) - 2); i++)
+				{
+					mdc.Blit(i * raBUBB_UNIT_MIN, 0, raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, &temp_dc1, 0, 0, wxCOPY, true);
+					mdc.Blit(i * raBUBB_UNIT_MIN, y - raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, &temp_dc2, 0, 0, wxCOPY, true);
+				}
+
+				// Draw the left and right edges
+				temp_dc1.SelectObject(*m_bmp_bubble_edge_left);
+				temp_dc2.SelectObject(*m_bmp_bubble_edge_right);
+				for(i = 1; i <= ((y / raBUBB_UNIT_MIN) - 2); i++)
+				{
+					mdc.Blit(0, i * raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, &temp_dc1, 0, 0, wxCOPY, true);
+					mdc.Blit(x - raBUBB_UNIT_MIN, i * raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, &temp_dc2, 0, 0, wxCOPY, true);
+				}
+
+				//mdc.Blit(10, 0, raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, &temp_dc1, 0, 0, wxCOPY, true);
+
+				mdc.SelectObject(wxNullBitmap);
+
+				// Create a mask for the bitmap
+				// (There is no need to delete the mask
+				// wxWidgets will take care of it. Koppu!)
+				wxMask *mask_bubb_rect = new wxMask(bmp_bubb_rect, *wxRED);
+				bmp_bubb_rect.SetMask(mask_bubb_rect);
+
+				// Draw the text
+				mdc.SelectObject(bmp_bubb_rect);
+				wxLogDebug(wxString::Format("x - %d u - %d", x, u));
+				mdc.DrawText(bubb_text, wxPoint((x - u) / 2, (y - v) / 2));
+				mdc.SelectObject(wxNullBitmap);
+
+				// Create a new bitmap which will hold the bubble
+				// rectangle as well as the arrow
+
+				// u and v will contain the dimensions of the full bubble
+				// i and j will contain the position of the bubble
+
+				wxBitmap *bmp_bubb_full = NULL;
+				switch(info->bid_loc)
+				{
+				case 0:
+					u = x;
+					v = y + raBUBB_ARROW_PROTUN; 
+					bmp_bubb_full = new wxBitmap(u, v);
+					mdc.SelectObject(*bmp_bubb_full);
+					mdc.SetBrush(wxBrush(*wxRED));
+					mdc.SetPen(wxPen(*wxRED, 0));
+					mdc.DrawRectangle(wxRect(0, 0, u, v));
+					temp_dc1.SelectObject(bmp_bubb_rect);
+					mdc.Blit(0, 0, x, y, &temp_dc1, 0, 0, wxCOPY, true);
+					temp_dc1.SelectObject(*m_bmp_bubble_arrow_bottom);
+					mdc.Blit((x - raBUBB_ARROW_WIDTH) / 2, y - raBUBB_ARROW_OVERLAP, x, y, &temp_dc1, 0, 0, wxCOPY, true);
+
+					i = (wb - u) / 2;
+					j = m_hand_rects[0].GetTop() - v - raGAME_ARROW_RELIEF;
+					break;
+				case 1:
+					u = x + raBUBB_ARROW_PROTUN; 
+					v = y;
+					bmp_bubb_full = new wxBitmap(u, v);
+					mdc.SelectObject(*bmp_bubb_full);
+					mdc.SetBrush(wxBrush(*wxRED));
+					mdc.SetPen(wxPen(*wxRED, 0));
+					mdc.DrawRectangle(wxRect(0, 0, u, v));
+					temp_dc1.SelectObject(bmp_bubb_rect);
+					mdc.Blit(raBUBB_ARROW_PROTUN, 0, x, y, &temp_dc1, 0, 0, wxCOPY, true);
+					temp_dc1.SelectObject(*m_bmp_bubble_arrow_left);
+					mdc.Blit(0, (y - raBUBB_ARROW_WIDTH) / 2, x, y, &temp_dc1, 0, 0, wxCOPY, true);
+
+					i = m_hand_rects[1].GetRight() + raGAME_ARROW_RELIEF;
+					j = (hb - v) / 2;
+					break;
+				case 2:
+					u = x;
+					v = y + raBUBB_ARROW_PROTUN; 
+					bmp_bubb_full = new wxBitmap(u, v);
+					mdc.SelectObject(*bmp_bubb_full);
+					mdc.SetBrush(wxBrush(*wxRED));
+					mdc.SetPen(wxPen(*wxRED, 0));
+					mdc.DrawRectangle(wxRect(0, 0, u, v));
+					temp_dc1.SelectObject(bmp_bubb_rect);
+					mdc.Blit(0, raBUBB_ARROW_PROTUN, x, y, &temp_dc1, 0, 0, wxCOPY, true);
+					temp_dc1.SelectObject(*m_bmp_bubble_arrow_top);
+					mdc.Blit((x - raBUBB_ARROW_WIDTH) / 2, 0, x, y, &temp_dc1, 0, 0, wxCOPY, true);
+
+					i = (wb - u) / 2;
+					j = m_hand_rects[2].GetBottom() + raGAME_ARROW_RELIEF;
+					break;
+				case 3:
+					u = x + raBUBB_ARROW_PROTUN; 
+					v = y;
+					bmp_bubb_full = new wxBitmap(u, v);
+					mdc.SelectObject(*bmp_bubb_full);
+					mdc.SetBrush(wxBrush(*wxRED));
+					mdc.SetPen(wxPen(*wxRED, 0));
+					mdc.DrawRectangle(wxRect(0, 0, u, v));
+					temp_dc1.SelectObject(bmp_bubb_rect);
+					mdc.Blit(0, 0, x, y, &temp_dc1, 0, 0, wxCOPY, true);
+					temp_dc1.SelectObject(*m_bmp_bubble_arrow_right);
+					mdc.Blit(x - raBUBB_ARROW_OVERLAP, (y - raBUBB_ARROW_WIDTH) / 2, x, y, &temp_dc1, 0, 0, wxCOPY, true);
+
+					i = m_hand_rects[3].GetLeft() - u - raGAME_ARROW_RELIEF;
+					j = (hb - v) / 2;
+					break;
+				}
+				mdc.SelectObject(wxNullBitmap);
+
+				wxMask *mask_bubb_full = new wxMask(*bmp_bubb_full, *wxRED);
+				bmp_bubb_full->SetMask(mask_bubb_full);
+
+				mdc.SelectObject(*bmp_bubb_full);
+				BlitToBack(i, j, u, v, &mdc, 0, 0, wxCOPY, true);
+				if(bmp_bubb_full)
+					delete bmp_bubb_full;
+
+				//mdc.SelectObject(bmp_bubb_rect);
+				//BlitToBack(0, 0, x, y, &mdc, 0, 0, wxCOPY, true);
+
 			}
-
-			// Draw the left and right edges
-			temp_dc1.SelectObject(*m_bmp_bubble_edge_left);
-			temp_dc2.SelectObject(*m_bmp_bubble_edge_right);
-			for(i = 1; i <= ((y / raBUBB_UNIT_MIN) - 2); i++)
-			{
-				mdc.Blit(0, i * raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, &temp_dc1, 0, 0, wxCOPY, true);
-				mdc.Blit(x - raBUBB_UNIT_MIN, i * raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, &temp_dc2, 0, 0, wxCOPY, true);
-			}
-
-			//mdc.Blit(10, 0, raBUBB_UNIT_MIN, raBUBB_UNIT_MIN, &temp_dc1, 0, 0, wxCOPY, true);
-
-			mdc.SelectObject(wxNullBitmap);
-
-			// Create a mask for the bitmap
-			// (There is no need to delete the mask
-			// wxWidgets will take care of it. Koppu!)
-			wxMask *mask_bubb_rect = new wxMask(bmp_bubb_rect, *wxRED);
-			bmp_bubb_rect.SetMask(mask_bubb_rect);
-
-			// Draw the text
-			mdc.SelectObject(bmp_bubb_rect);
-			wxLogDebug(wxString::Format("x - %d u - %d", x, u));
-			mdc.DrawText(bubb_text, wxPoint((x - u) / 2, (y - v) / 2));
-			mdc.SelectObject(wxNullBitmap);
-
-			// Create a new bitmap which will hold the bubble
-			// rectangle as well as the arrow
-
-			// u and v will contain the dimensions of the full bubble
-			// i and j will contain the position of the bubble
-
-			wxBitmap *bmp_bubb_full = NULL;
-			switch(info->bid_loc)
-			{
-			case 0:
-				u = x;
-				v = y + raBUBB_ARROW_PROTUN; 
-				bmp_bubb_full = new wxBitmap(u, v);
-				mdc.SelectObject(*bmp_bubb_full);
-				mdc.SetBrush(wxBrush(*wxRED));
-				mdc.SetPen(wxPen(*wxRED, 0));
-				mdc.DrawRectangle(wxRect(0, 0, u, v));
-				temp_dc1.SelectObject(bmp_bubb_rect);
-				mdc.Blit(0, 0, x, y, &temp_dc1, 0, 0, wxCOPY, true);
-				temp_dc1.SelectObject(*m_bmp_bubble_arrow_bottom);
-				mdc.Blit((x - raBUBB_ARROW_WIDTH) / 2, y - raBUBB_ARROW_OVERLAP, x, y, &temp_dc1, 0, 0, wxCOPY, true);
-
-				i = (wb - u) / 2;
-				j = m_hand_rects[0].GetTop() - v - raGAME_ARROW_RELIEF;
-				break;
-			case 1:
-				u = x + raBUBB_ARROW_PROTUN; 
-				v = y;
-				bmp_bubb_full = new wxBitmap(u, v);
-				mdc.SelectObject(*bmp_bubb_full);
-				mdc.SetBrush(wxBrush(*wxRED));
-				mdc.SetPen(wxPen(*wxRED, 0));
-				mdc.DrawRectangle(wxRect(0, 0, u, v));
-				temp_dc1.SelectObject(bmp_bubb_rect);
-				mdc.Blit(raBUBB_ARROW_PROTUN, 0, x, y, &temp_dc1, 0, 0, wxCOPY, true);
-				temp_dc1.SelectObject(*m_bmp_bubble_arrow_left);
-				mdc.Blit(0, (y - raBUBB_ARROW_WIDTH) / 2, x, y, &temp_dc1, 0, 0, wxCOPY, true);
-
-				i = m_hand_rects[1].GetRight() + raGAME_ARROW_RELIEF;
-				j = (hb - v) / 2;
-				break;
-			case 2:
-				u = x;
-				v = y + raBUBB_ARROW_PROTUN; 
-				bmp_bubb_full = new wxBitmap(u, v);
-				mdc.SelectObject(*bmp_bubb_full);
-				mdc.SetBrush(wxBrush(*wxRED));
-				mdc.SetPen(wxPen(*wxRED, 0));
-				mdc.DrawRectangle(wxRect(0, 0, u, v));
-				temp_dc1.SelectObject(bmp_bubb_rect);
-				mdc.Blit(0, raBUBB_ARROW_PROTUN, x, y, &temp_dc1, 0, 0, wxCOPY, true);
-				temp_dc1.SelectObject(*m_bmp_bubble_arrow_top);
-				mdc.Blit((x - raBUBB_ARROW_WIDTH) / 2, 0, x, y, &temp_dc1, 0, 0, wxCOPY, true);
-
-				i = (wb - u) / 2;
-				j = m_hand_rects[2].GetBottom() + raGAME_ARROW_RELIEF;
-				break;
-			case 3:
-				u = x + raBUBB_ARROW_PROTUN; 
-				v = y;
-				bmp_bubb_full = new wxBitmap(u, v);
-				mdc.SelectObject(*bmp_bubb_full);
-				mdc.SetBrush(wxBrush(*wxRED));
-				mdc.SetPen(wxPen(*wxRED, 0));
-				mdc.DrawRectangle(wxRect(0, 0, u, v));
-				temp_dc1.SelectObject(bmp_bubb_rect);
-				mdc.Blit(0, 0, x, y, &temp_dc1, 0, 0, wxCOPY, true);
-				temp_dc1.SelectObject(*m_bmp_bubble_arrow_right);
-				mdc.Blit(x - raBUBB_ARROW_OVERLAP, (y - raBUBB_ARROW_WIDTH) / 2, x, y, &temp_dc1, 0, 0, wxCOPY, true);
-
-				i = m_hand_rects[3].GetLeft() - u - raGAME_ARROW_RELIEF;
-				j = (hb - v) / 2;
-				break;
-			}
-			mdc.SelectObject(wxNullBitmap);
-
-			wxMask *mask_bubb_full = new wxMask(*bmp_bubb_full, *wxRED);
-			bmp_bubb_full->SetMask(mask_bubb_full);
-
-			mdc.SelectObject(*bmp_bubb_full);
-			BlitToBack(i, j, u, v, &mdc, 0, 0, wxCOPY, true);
-			if(bmp_bubb_full)
-				delete bmp_bubb_full;
-
-			//mdc.SelectObject(bmp_bubb_rect);
-			//BlitToBack(0, 0, x, y, &mdc, 0, 0, wxCOPY, true);
-
 		}
 	}
-#endif
 
 	return true;
 }
@@ -1765,6 +1822,8 @@ bool raGame::ResetDeal()
 		for(j = 0; j < raMAX_CARDS_PER_HAND; j++)
 			m_hand_card_rects[i][j] = wxRect(0, 0, 0, 0);
 
+	// Reset bid history
+	m_bid_history.Empty();
 	return true;
 }
 bool raGame::ResetGame()
@@ -2096,6 +2155,22 @@ int raGame::MakeBid(int bid, int loc)
 			return ret_val;
 		}
 
+		if(bid != raBID_PASS)
+		{
+			wxString temp;
+			if(bid == raBID_ALL)
+			{
+				temp.Append(wxT("All Tricks"));
+			}
+			else
+			{
+				temp.Append(wxString::Format("%d", bid_info.bid));
+			}
+			temp.Append(wxT(" by ") + raLib::m_long_locs[bid_info.player] + " (Round " + 
+				wxString::Format("%d)", bid_info.round + 1) + "\n");
+			m_bid_history.Append(temp);
+		}	
+
 	}
 	else
 	{
@@ -2122,21 +2197,23 @@ int raGame::MakeBid(int bid, int loc)
 	back_draw_info.bid = bid_info.bid;
 	back_draw_info.bid_loc = bid_info.player;
 
-#ifdef raGAME_SHOW_BID_BUBBLES
-	// Hide the bid window
-	m_bid->Show(false);
-
-	// Redraw the screen with bid bubble
-	if(!UpdateDrawAndRefresh(false, &back_draw_info))
+	if(m_show_bidbubbles)
 	{
-		wxLogError(wxString::Format(wxT("UpdateDrawAndRefresh failed. %s:%d"), __FILE__, __LINE__));
+		// Hide the bid window
+		m_bid->Show(false);
+
+		// Redraw the screen with bid bubble
+		if(!UpdateDrawAndRefresh(false, &back_draw_info))
+		{
+			wxLogError(wxString::Format(wxT("UpdateDrawAndRefresh failed. %s:%d"), __FILE__, __LINE__));
+		}
+
+		// Sleep for some time so that the user can 
+		// read the information
+		wxThread::Sleep(1000);
+
 	}
 
-	// Sleep for some time so that the user can 
-	// read the information
-	wxThread::Sleep(1000);
-
-#endif
 	// Redraw the screen without bid bubble
 	if(!UpdateDrawAndRefresh())
 	{
@@ -2602,9 +2679,14 @@ bool raGame::OnCardClick(wxPoint pt)
 						wxMessageBox(wxT("Should follow lead suit"));
 						return true;
 					}
-					else if(trick_info.rules & raRULE_3)
+					else if(trick_info.rules & raRULE_4)
 					{
 						wxMessageBox(wxT("After the trump was shown, the same card should be played"));
+						return true;
+					}
+					else if(trick_info.rules & raRULE_5)
+					{
+						wxMessageBox(wxT("Should not sluff a Jack"));
 						return true;
 					}
 

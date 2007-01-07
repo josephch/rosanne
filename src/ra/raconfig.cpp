@@ -114,6 +114,11 @@ bool raConfig::Save()
 		wxLogError(wxString::Format(wxT("m_config->Write() failed. %s:%d"), __FILE__, __LINE__));
 		return false;
 	}
+	if(!m_config->Write(raCONFPATH_PREFS_BIDBUBBLES, m_data.prefs_data.show_bid_bubbles))
+	{
+		wxLogError(wxString::Format(wxT("m_config->Write() failed. %s:%d"), __FILE__, __LINE__));
+		return false;
+	}
 
 	return true;
 }
@@ -183,6 +188,7 @@ void raConfig::SetDefaultValues(raConfData *data)
 	data->prefs_data.play_card_on = raCONFIG_PREFS_PLAYCARDON_SCLICK;
 	data->prefs_data.card_back = raCONFIG_PREFS_CARDBACK_BLUE;
 	data->prefs_data.auto_play_single = true;
+	data->prefs_data.show_bid_bubbles = true;
 
 	return;
 }
@@ -254,6 +260,11 @@ bool raConfig::Load()
 		return false;
 	}
 	if(!m_config->Read(raCONFPATH_PREFS_AUTOPLAYSINGLE, &m_data.prefs_data.auto_play_single))
+	{
+		wxLogError(wxString::Format(wxT("m_config->Read failed. %s:%d"), __FILE__, __LINE__));
+		return false;
+	}
+	if(!m_config->Read(raCONFPATH_PREFS_BIDBUBBLES, &m_data.prefs_data.show_bid_bubbles))
 	{
 		wxLogError(wxString::Format(wxT("m_config->Read failed. %s:%d"), __FILE__, __LINE__));
 		return false;

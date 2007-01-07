@@ -42,6 +42,8 @@ enum
 	raID_EXIT,
 	raID_PREFERENCES,
 	raID_RULES,
+	raID_BID_HISTORY,
+	raID_LAST_TRICK,
 	raID_HELP,
 	raID_ABOUT
 };
@@ -80,6 +82,8 @@ public:
 	void OnClose(wxCloseEvent& event);
 	void OnPreferences(wxCommandEvent& event);
 	void OnRules(wxCommandEvent& event);
+	void OnAuction(wxCommandEvent& event);
+	void OnLastTrick(wxCommandEvent& event);
 	void OnSize(wxSizeEvent& event);
 
 private:

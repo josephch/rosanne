@@ -119,7 +119,7 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	m_button_all = new wxButton(m_btns_panel, raBID_BTN_ID_ALL, wxT("All"));
 	m_button_pass = new wxButton(m_btns_panel, raBID_BTN_ID_PASS, wxT("Pass"));
 
-	m_button_all->Disable();
+	//m_button_all->Disable();
 
 	//m_button_all->SetWindowStyle(wxNO_BORDER);
 	//m_button_pass->SetWindowStyle(wxNO_BORDER);

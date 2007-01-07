@@ -590,7 +590,33 @@ bool raRuleEngine::Continue()
 			// If the player has no card which matches 
 			// the mask, player can play any card
 			if(!(m_data.hands[m_data.in_trick_info.player] & m_data.in_trick_info.mask))
-				m_data.in_trick_info.mask = 0xFFFFFFFF;
+			{
+				// If jacks cannot be sluffed, set the mask appropriately
+				if(!m_data.rules.sluff_jacks)
+				{
+					unsigned long jacks = raFOUR_JACKS;
+					// Rule 5 is applicable only if the player is not leading
+					if(m_data.tricks[m_data.trick_round].count)
+					{
+						// If trump is shown the Jack of trumps can be played
+						if(m_data.trump_shown)
+						{
+							jacks &= ~(raJACK << raLib::m_suit_rs[m_data.trump_suit]);
+						}
+						m_data.in_trick_info.mask = raALL_CARDS & ~(jacks);
+						m_data.in_trick_info.rules = raRULE_5;
+					
+					}
+					// If after applying rule 5, no cards can be played
+					// reset the mask
+					if(!(m_data.hands[m_data.in_trick_info.player] & m_data.in_trick_info.mask))
+						m_data.in_trick_info.mask = raALL_CARDS;
+				}
+				else
+					m_data.in_trick_info.mask = raALL_CARDS;
+			}
+
+			wxASSERT(m_data.in_trick_info.mask);
 
 			SetInput(raINPUT_TRICK);
 			return false;
@@ -1255,7 +1281,7 @@ void raRuleEngine::SetInput(int input_type)
 }
 unsigned long raRuleEngine::GenerateMask(unsigned long *rules)
 {
-	unsigned long mask = 0xFFFFFFFF;
+	unsigned long mask = raALL_CARDS;
 	unsigned long temp = 0;
 
 	// Rule 1 :
@@ -1297,14 +1323,6 @@ unsigned long raRuleEngine::GenerateMask(unsigned long *rules)
 		temp |= raRULE_3;
 	}
 	wxASSERT(mask);
-
-	// Rule 5 :
-	// Cannot sluff jacks
-	if(!m_data.rules.sluff_jacks)
-	{
-		unsigned long jacks = raFOUR_JACKS;
-
-	}
 
 	// Set the rules which were considered
 	if(rules)

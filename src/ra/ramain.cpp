@@ -26,8 +26,8 @@
 #include "help.xpm"
 #include "about.xpm"
 #include "tile.xpm"
-//#include "clockwise.xpm"
-//#include "anticlockwise.xpm"
+#include "bid_history.xpm"
+#include "last_trick.xpm"
 
 // Event table for raFrame
 BEGIN_EVENT_TABLE(raFrame, wxFrame)
@@ -36,6 +36,8 @@ BEGIN_EVENT_TABLE(raFrame, wxFrame)
 	EVT_MENU(raID_NEW_GAME,  raFrame::OnGameNew)
 	EVT_MENU(raID_PREFERENCES,  raFrame::OnPreferences)
 	EVT_MENU(raID_RULES,  raFrame::OnRules)
+	EVT_MENU(raID_BID_HISTORY,  raFrame::OnAuction)
+	EVT_MENU(raID_LAST_TRICK,  raFrame::OnLastTrick)
 	EVT_CLOSE(raFrame::OnClose)
 	EVT_SIZE(raFrame::OnSize)
 END_EVENT_TABLE()
@@ -250,6 +252,24 @@ void raFrame::OnRules(wxCommandEvent& event)
 	event.Skip();
 }
 
+void raFrame::OnAuction(wxCommandEvent& event)
+{
+	if(!m_game->ShowAuction())
+	{
+		wxLogError(wxString::Format(wxT("ShowAuction() failed. %s:%d"), __FILE__, __LINE__));
+	}
+	event.Skip();
+}
+
+void raFrame::OnLastTrick(wxCommandEvent& event)
+{
+	if(!m_game->ShowLastTrick())
+	{
+		wxLogError(wxString::Format(wxT("ShowLastTricks() failed. %s:%d"), __FILE__, __LINE__));
+	}
+	event.Skip();
+}
+
 void raFrame::OnSize(wxSizeEvent& event)
 {
 	if(m_split_main)
@@ -307,16 +327,17 @@ raFrame::raFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title)
 	wxBitmap bmp_exit(exit_xpm);
 	wxBitmap bmp_options(options_xpm);
 	wxBitmap bmp_rules(rules_xpm);
+	wxBitmap bmp_bid_history(bid_history_xpm);
+	wxBitmap bmp_last_trick(last_trick_xpm);
 	wxBitmap bmp_help(help_xpm);
 	wxBitmap bmp_about(about_xpm);
 
-	//wxBitmap bmp_clockwise(clockwise_xpm);
-	//wxBitmap bmp_anticlockwise(anticlockwise_xpm);
 
 	wxMenuBar *menu_bar = NULL;
 	wxMenu *game_menu = NULL;
 	wxMenu *help_menu = NULL;
 	wxMenu *opt_menu = NULL;
+	wxMenu *view_menu = NULL;
 
 	wxMenuItem *game_new = NULL;
 	//wxMenuItem *game_open = NULL;
@@ -325,6 +346,9 @@ raFrame::raFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title)
 
 	wxMenuItem *opt_prefs = NULL;
 	wxMenuItem *opt_rules = NULL;
+	
+	wxMenuItem *view_bid_history = NULL;
+	wxMenuItem *view_last_trick = NULL;
 
 	wxMenuItem *help_conts = NULL;
 	wxMenuItem *help_about = NULL;
@@ -341,6 +365,7 @@ raFrame::raFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title)
 	game_menu = new wxMenu;
 	help_menu = new wxMenu;
 	opt_menu = new wxMenu;
+	view_menu = new wxMenu;
 
 	game_new = new wxMenuItem(game_menu, raID_NEW_GAME, wxT("&New"));
 	game_new->SetBitmap(bmp_new_game);
@@ -360,6 +385,13 @@ raFrame::raFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title)
 	opt_rules->SetBitmap(bmp_rules);
 	opt_menu->Append(opt_rules);
 
+	view_bid_history = new wxMenuItem(view_menu, raID_BID_HISTORY, wxT("&Auction"));
+	view_bid_history->SetBitmap(bmp_bid_history);
+	view_menu->Append(view_bid_history);
+	view_last_trick = new wxMenuItem(view_menu, raID_LAST_TRICK, wxT("&Last Trick"));
+	view_last_trick->SetBitmap(bmp_last_trick);
+	view_menu->Append(view_last_trick);
+
 	help_conts = new wxMenuItem(help_menu, wxID_HELP_CONTENTS, wxT("&Contents"));
 	help_conts->SetBitmap(bmp_help);
 	help_menu->Append(help_conts);
@@ -371,6 +403,7 @@ raFrame::raFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title)
 	menu_bar = new wxMenuBar();
 	menu_bar->Append(game_menu, wxT("&Game"));
 	menu_bar->Append(opt_menu, wxT("&Options"));
+	menu_bar->Append(view_menu, wxT("&View"));
 	menu_bar->Append(help_menu, wxT("&Help"));
 
 	// ... and attach this menu bar to the frame
@@ -392,11 +425,9 @@ raFrame::raFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title)
 	tool_bar->AddTool(raID_PREFERENCES, bmp_options, wxT("Preferences"));
 	tool_bar->AddTool(raID_RULES, bmp_rules, wxT("Rules"));
 	tool_bar->AddSeparator();
-	//tool_bar->AddTool(wxID_ANY, wxT("Clockwise play"), bmp_clockwise, wxNullBitmap, 
-	//	wxITEM_CHECK, wxT("Clockwise play"));
-	//tool_bar->AddTool(wxID_ANY, wxT("Anti-clockwise play"), bmp_anticlockwise, wxNullBitmap,
-	//	wxITEM_CHECK, wxT("Anti-clockwise play"));
-	//tool_bar->AddSeparator();
+	tool_bar->AddTool(raID_BID_HISTORY, bmp_bid_history, wxT("Auction"));
+	tool_bar->AddTool(raID_LAST_TRICK, bmp_last_trick, wxT("Last Trick"));
+	tool_bar->AddSeparator();
 	tool_bar->AddTool(wxID_ANY, bmp_help, wxT("Help"));
 	tool_bar->AddTool(raID_ABOUT, bmp_about, wxT("About"));
 	tool_bar->Realize();

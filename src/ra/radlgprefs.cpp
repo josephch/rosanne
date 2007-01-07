@@ -164,6 +164,7 @@ void raDlgPrefs::OnInitDialog( wxInitDialogEvent& event )
 	wxComboBox *combo_playcardon;
 	wxComboBox *combo_cardback;
 	wxCheckBox *check_autoplay;
+	wxCheckBox *check_bidbubbles;
 	raConfData conf_data;
 
 	raConfig::GetInstance()->GetData(&conf_data);
@@ -198,6 +199,8 @@ void raDlgPrefs::OnInitDialog( wxInitDialogEvent& event )
 
 	check_autoplay = XRCCTRL(*this, "ID_PREFS_CHK_PLAYSINGLEAUTO", wxCheckBox);
 	check_autoplay->SetValue(conf_data.prefs_data.auto_play_single);
+	check_bidbubbles = XRCCTRL(*this, "ID_PREFS_CHK_BIDBUBBLES", wxCheckBox);
+	check_bidbubbles->SetValue(conf_data.prefs_data.show_bid_bubbles);
 
 ////@begin wxEVT_INIT_DIALOG event handler for ID_RADLGPREFS in raDlgPrefs.
     // Before editing this code, remove the block markers.
@@ -215,6 +218,7 @@ void raDlgPrefs::OnPrefsBtnApplyClick( wxCommandEvent& event )
 	wxComboBox *combo_playcardon;
 	wxComboBox *combo_cardback;
 	wxCheckBox *check_autoplay;
+	wxCheckBox *check_bidbubbles;
 	raConfData new_conf;
 	raConfig::GetInstance()->GetData(&new_conf);
 	combo_playcardon = XRCCTRL(*this, "ID_PREFS_CMB_PLAYCARDON", wxComboBox);
@@ -248,12 +252,16 @@ void raDlgPrefs::OnPrefsBtnApplyClick( wxCommandEvent& event )
 
 	check_autoplay = XRCCTRL(*this, "ID_PREFS_CHK_PLAYSINGLEAUTO", wxCheckBox);
 	new_conf.prefs_data.auto_play_single = check_autoplay->GetValue();
+	check_bidbubbles = XRCCTRL(*this, "ID_PREFS_CHK_BIDBUBBLES", wxCheckBox);
+	new_conf.prefs_data.show_bid_bubbles = check_bidbubbles->GetValue();
 
 	raConfig::GetInstance()->SetData(&new_conf);
 ////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_PREFS_BTN_APPLY in raDlgPrefs.
     // Before editing this code, remove the block markers.
     event.Skip();
 ////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_PREFS_BTN_APPLY in raDlgPrefs. 
+
+	Destroy();
 }
 
 

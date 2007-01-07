@@ -177,6 +177,8 @@ void raDlgRules::OnRulesBtnApplyClick( wxCommandEvent& event )
     // Before editing this code, remove the block markers.
     event.Skip();
 ////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BUTTON in Dialog. 
+
+	Destroy();
 }
 
 /*!
