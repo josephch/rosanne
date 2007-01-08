@@ -64,7 +64,7 @@
 #define raPartner(X) ((X + 2) % raTOTAL_PLAYERS)
 #define raBID_INVALID -2
 #define raBID_PASS 0
-#define raBID_ALL -1
+#define raBID_ALL 1000
 #define raTOTAL_SUITS 4
 #define raTOTAL_VALUES 8
 #define raTOTAL_TRICKS 8

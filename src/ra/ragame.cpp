@@ -2155,6 +2155,7 @@ int raGame::MakeBid(int bid, int loc)
 			return ret_val;
 		}
 
+		// Append to the auciton history
 		if(bid != raBID_PASS)
 		{
 			wxString temp;
@@ -2197,7 +2198,7 @@ int raGame::MakeBid(int bid, int loc)
 	back_draw_info.bid = bid_info.bid;
 	back_draw_info.bid_loc = bid_info.player;
 
-	if(m_show_bidbubbles)
+	if(m_show_bidbubbles && (bid != raBID_PASS))
 	{
 		// Hide the bid window
 		m_bid->Show(false);

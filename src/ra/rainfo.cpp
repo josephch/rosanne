@@ -512,6 +512,9 @@ bool raInfo::SetDetails(raInfoDetails *details)
 	if(details->bidder == raPLAYER_INVALID)
 		m_deal_info_panel_texts[1][2]->
 			SetLabel(wxString::Format(wxT("N/A")));
+	else if (details->bid == raBID_ALL)
+		m_deal_info_panel_texts[1][2]->
+			SetLabel(wxString::Format(wxT("All by %s"), raLib::m_long_locs[details->bidder].c_str()));
 	else
 		m_deal_info_panel_texts[1][2]->
 			SetLabel(wxString::Format(wxT("%d by %s"), details->bid, raLib::m_long_locs[details->bidder].c_str()));

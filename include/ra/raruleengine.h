@@ -182,6 +182,7 @@ typedef struct tagRA_RULEENGINE_DATA
 	int curr_max_bidder;
 	int last_bidder;
 	bool bid_hist[raTOTAL_BID_ROUNDS][raTOTAL_PLAYERS];
+	unsigned long passed_round1;
 
 	// Related to the trump card
 	int trump_suit;

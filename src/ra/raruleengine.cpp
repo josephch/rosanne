@@ -85,6 +85,7 @@ bool raRuleEngine::Reset(raRuleEngineData *data)
 	for(i = 0; i < raTOTAL_BID_ROUNDS; i++)
 		for(j = 0; j < raTOTAL_PLAYERS; j++)
 			data->bid_hist[i][j] = false;
+	data->passed_round1 = 0;
 
 	// Resetting trump suit and card
 	data->trump_card = raCARD_INVALID;
@@ -361,6 +362,13 @@ bool raRuleEngine::Continue()
 		break;
 
 	case raSTATUS_BID1:
+		// If All Tricks has already been bid,
+		// move to next stage
+		if(m_data.curr_max_bid == raBID_ALL)
+		{
+			m_data.status++;
+			return false;
+		}
 		// If no bids have been made yet, start with the player next to dealer
 		if(m_data.last_bidder == raPLAYER_INVALID)
 			i = raNext(m_data.dealer); 
@@ -415,6 +423,13 @@ bool raRuleEngine::Continue()
 		break;
 
 	case raSTATUS_BID2:
+		// If All Tricks has already been bid,
+		// move to next stage
+		if(m_data.curr_max_bid == raBID_ALL)
+		{
+			m_data.status++;
+			return false;
+		}
 		// If no bids have been made yet in this round,
 		// start with the player next to dealer
 		if(m_data.last_bidder == raPLAYER_INVALID)
@@ -430,8 +445,13 @@ bool raRuleEngine::Continue()
 		{
 			// If the player has not already bid
 			// and the highest bid is not by the player
-			// then a bid is expected.
-			if(!m_data.bid_hist[1][i] && (i != m_data.curr_max_bidder))
+			// then a bid is expected and if the player 
+			// had not passed in the first round
+			if(
+				!m_data.bid_hist[1][i] && 
+				(i != m_data.curr_max_bidder) &&
+				!(m_data.passed_round1 & (1 << i))
+				)
 			{	
 				// Fill data in the input bid structure
 				m_data.in_bid_info.player = i;
@@ -462,6 +482,13 @@ bool raRuleEngine::Continue()
 		break;
 
 	case raSTATUS_BID3:
+		// If All Tricks has already been bid,
+		// move to next stage
+		if(m_data.curr_max_bid == raBID_ALL)
+		{
+			m_data.status++;
+			return false;
+		}
 		// If no bids have been made yet in this round,
 		// start with the player next to dealer
 		if(m_data.last_bidder == raPLAYER_INVALID)
@@ -509,7 +536,7 @@ bool raRuleEngine::Continue()
 
 	case raSTATUS_TRUMPSEL1:
 	case raSTATUS_TRUMPSEL2:
-		if(m_data.trump_card == raCARD_INVALID)
+		if((m_data.trump_card == raCARD_INVALID) && (m_data.curr_max_bid != raBID_ALL))
 		{
 			// Fill data in the input trumpsel info structure
 			m_data.in_trumpsel_info.card = raCARD_INVALID;
@@ -547,36 +574,42 @@ bool raRuleEngine::Continue()
 		{
 
 			m_data.in_trick_info.ask_trump = false;
-			// Player can ask for trump to be shown if,
-			// 1. Trump is not shown
-			// 2. The trick has a valid lead suit
-			// 3. Player does not have any lead suit
-			m_data.in_trick_info.can_ask_trump = false;
-			if(
-				!m_data.trump_shown && 
-				(m_data.tricks[m_data.trick_round].lead_suit != raSUIT_INVALID)
-				)
+			
+			// A player can ask for the trump 
+			// only if the bid is not for All tricks
+			if(m_data.curr_max_bid != raBID_ALL)
 			{
+				// Player can ask for trump to be shown if,
+				// 1. Trump is not shown
+				// 2. The trick has a valid lead suit
+				// 3. Player does not have any lead suit
+				m_data.in_trick_info.can_ask_trump = false;
 				if(
-					!(m_data.hands[raTrickNext] & 
-					raLib::m_suit_mask[m_data.tricks[m_data.trick_round].lead_suit])
+					!m_data.trump_shown && 
+					(m_data.tricks[m_data.trick_round].lead_suit != raSUIT_INVALID)
 					)
 				{
-					m_data.in_trick_info.can_ask_trump = true;
+					if(
+						!(m_data.hands[raTrickNext] & 
+						raLib::m_suit_mask[m_data.tricks[m_data.trick_round].lead_suit])
+						)
+					{
+						m_data.in_trick_info.can_ask_trump = true;
+					}
 				}
+
+				// Player can also ask for trump if
+				// 1. He is the max bidder
+				// 2. And trump is not shown
+				// 3. and he does not have any card in his hand
+
+				if(
+					(raTrickNext == m_data.curr_max_bidder) &&
+					!m_data.trump_shown &&
+					!m_data.hands[raTrickNext]
+					)
+						m_data.in_trick_info.can_ask_trump = true;
 			}
-
-			// Player can also ask for trump if
-			// 1. He is the max bidder
-			// 2. And trump is not shown
-			// 3. and he does not have any card in his hand
-
-			if(
-				(raTrickNext == m_data.curr_max_bidder) &&
-				!m_data.trump_shown &&
-				!m_data.hands[raTrickNext]
-				)
-				m_data.in_trick_info.can_ask_trump = true;
 
 			m_data.in_trick_info.card = raCARD_INVALID;
 			
@@ -746,6 +779,10 @@ int raRuleEngine::PostInputMessage(int input_type, void *input)
 			// If pass is a valid bid, accept the bid
 			m_data.last_bidder = exist_bid_info->player;
 			m_data.bid_hist[exist_bid_info->round][exist_bid_info->player] = true;
+			// If a player is passing in round 1, keep a note of the same,
+			// so that the player cannot bid in round 2
+			if(exist_bid_info->round == 0)
+				m_data.passed_round1 |= (1 << exist_bid_info->player);
 			break;
 		}
 
