@@ -183,7 +183,7 @@ void raFrame::OnQuit(wxCommandEvent& event)
 }
 void raFrame::OnGameNew(wxCommandEvent& event)
 {
-	m_game->NewGame();
+	m_game->NewGame(raGetRandPlayer());
 }
 
 void raFrame::OnClose(wxCloseEvent& event)
@@ -457,5 +457,6 @@ raFrame::raFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title)
 	int status_widths[raSBAR_FIELDS] = {-1, 200};
 	status_bar->SetStatusWidths(raSBAR_FIELDS, status_widths);
 
-	m_game->NewGame();
+	// Start a new game but do not deal immediately
+	m_game->NewGame(raGetRandPlayer(), false);
 }

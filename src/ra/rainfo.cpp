@@ -557,10 +557,7 @@ void raInfo::GetDetails(raInfoDetails *details)
 
 bool raInfo::SetInstruction(wxString instruction, int cmd)
 {
-	unsigned int rand_seed;
-#ifdef raREAD_SEED_FROM_FILE
-	long seed_read;
-#endif
+
 	if((cmd != m_curr_cmd) || (cmd == raINFO_CMD_NONE))
 	{
 		m_instruction = instruction;
@@ -582,43 +579,6 @@ bool raInfo::SetInstruction(wxString instruction, int cmd)
 
 			// Generate a random number and set it as the random seed
 			// Also print the same so that games can be replicated
-
-			rand_seed = rand();
-			srand(rand_seed);
-#ifdef raREAD_SEED_FROM_FILE
-			if(::wxFileExists(raTEST_DATA_FILE))
-			{
-				wxFFileInputStream in(raTEST_DATA_FILE);
-				wxFileConfig fcfg(in);
-				if(fcfg.Exists(raTEXT_SEED))
-				{
-					wxLogDebug(wxString::Format(
-						wxT("Reading seed from %s. %s:%d"),
-						raTEST_DATA_FILE, __FILE__, __LINE__));
-
-					seed_read = -1;
-					if(!fcfg.Read(raTEXT_SEED, &seed_read))
-					{
-						wxLogError(wxString::Format(
-							wxT("Read failed. %s:%d"), __FILE__, __LINE__));
-
-					}
-					else
-					{
-						rand_seed = (unsigned int)seed_read;
-						srand(rand_seed);
-					}
-				}
-				else
-				{
-					wxLogError(wxString::Format(
-						wxT("Could not find seed in %s. %s:%d"),
-						raTEST_DATA_FILE, __FILE__, __LINE__));
-				}
-			}
-#endif
-			wxLogMessage(wxString::Format("Deal ID - %u", rand_seed));
-			//srand(11428);
 
 			break;
 		case raINFO_CMD_SHOW_TRUMP:

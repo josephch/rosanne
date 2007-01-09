@@ -77,6 +77,7 @@
 #define raGetPartner(X) ((X + 2) % raTOTAL_PLAYERS)
 #define raGetOpponentOne(X) ((X + 1) % raTOTAL_PLAYERS)
 #define raGetOpponentTwo(X) ((X + 2) % raTOTAL_PLAYERS)
+#define raGetRandPlayer() (rand() % raTOTAL_PLAYERS)
 
 // Colours
 #define raCLR_HEAD_DARK (wxColour(0, 92, 133))
@@ -105,7 +106,7 @@
 
 // For testing purposes
 #define raREAD_SEED_FROM_FILE 0
-//#define raREAD_DEALER_FROM_FILE 0
+#define raREAD_DEALER_FROM_FILE 0
 //#define raREAD_DEAL_FROM_FILE 0
 #define raTEST_DATA_FILE "ra_test_data.ini"
 #define raTEXT_SEED "rand/seed"

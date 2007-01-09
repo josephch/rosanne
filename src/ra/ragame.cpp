@@ -295,7 +295,7 @@ bool raGame::SetInfoPanel(raInfo *info_panel)
 	m_info = info_panel;
 	return true;
 }
-bool raGame::NewGame(int dealer)
+bool raGame::NewGame(int dealer, bool immediate)
 {
 	if(!ResetGame())
 	{
@@ -308,8 +308,116 @@ bool raGame::NewGame(int dealer)
 	m_engine.SetDealer(dealer);
 
 	m_info->ResetDetails(true);
-	m_info->SetInstruction(wxT("New Game started. Please click on the button below to deal cards."), 
-		raINFO_CMD_NEW_DEAL);
+	if(immediate)
+	{
+		if(!NewDeal())
+		{
+			wxLogError(wxString::Format(wxT("NewDeal failed. %s:%d"), __FILE__, __LINE__));
+			return false;
+		}
+	}
+	else
+	{
+		m_info->SetInstruction(wxT("New Game started. Please click on the button below to deal cards."), 
+			raINFO_CMD_NEW_DEAL);
+	}
+	return true;
+}
+bool raGame::NewDeal()
+{
+	int dealer = raPLAYER_INVALID;
+	unsigned int rand_seed;
+
+	rand_seed = rand();
+	srand(rand_seed);
+
+#ifdef raREAD_SEED_FROM_FILE
+	long seed_read;
+	if(::wxFileExists(raTEST_DATA_FILE))
+	{
+		wxFFileInputStream in(raTEST_DATA_FILE);
+		wxFileConfig fcfg(in);
+		if(fcfg.Exists(raTEXT_SEED))
+		{
+			wxLogDebug(wxString::Format(
+				wxT("Reading seed from %s. %s:%d"),
+				raTEST_DATA_FILE, __FILE__, __LINE__));
+
+			seed_read = -1;
+			if(!fcfg.Read(raTEXT_SEED, &seed_read))
+			{
+				wxLogError(wxString::Format(
+					wxT("Read failed. %s:%d"), __FILE__, __LINE__));
+
+			}
+			else
+			{
+				rand_seed = (unsigned int)seed_read;
+				srand(rand_seed);
+			}
+		}
+		else
+		{
+			wxLogError(wxString::Format(
+				wxT("Could not find seed in %s. %s:%d"),
+				raTEST_DATA_FILE, __FILE__, __LINE__));
+		}
+	}
+#endif
+
+#ifdef raREAD_DEALER_FROM_FILE
+	long dealer_read;
+	if(::wxFileExists(raTEST_DATA_FILE))
+	{
+		wxFFileInputStream in(raTEST_DATA_FILE);
+		wxFileConfig fcfg(in);
+		if(fcfg.Exists(raTEXT_DEALER))
+		{
+			wxLogDebug(wxString::Format(
+				wxT("Reading dealer from %s. %s:%d"),
+				raTEST_DATA_FILE, __FILE__, __LINE__));
+
+			dealer_read = -1;
+			if(!fcfg.Read(raTEXT_DEALER, &dealer_read))
+			{
+				wxLogError(wxString::Format(
+					wxT("Read failed. %s:%d"), __FILE__, __LINE__));
+
+			}
+			else
+			{
+				dealer = (int)dealer_read;
+				wxASSERT((dealer >= 0) && (dealer < raTOTAL_PLAYERS));
+			}
+		}
+		else
+		{
+			wxLogError(wxString::Format(
+				wxT("Could not find dealer in %s. %s:%d"),
+				raTEST_DATA_FILE, __FILE__, __LINE__));
+		}
+	}
+#endif
+
+	wxLogMessage(wxString::Format("Deal ID - %u", rand_seed));
+
+	// Save the dealer information lest it gets reset
+	// while resetting the rule engine
+	if(dealer == raPLAYER_INVALID)
+	{
+		dealer = m_engine.GetDealer();
+	}
+	if(!ResetDeal())
+	{
+		wxLogError(wxString::Format(wxT("ResetDeal failed. %s:%d"), __FILE__, __LINE__));
+		return false;
+	}
+
+	wxASSERT((dealer > raPLAYER_INVALID) && (dealer < raTOTAL_PLAYERS));
+	m_engine.SetDealer(dealer);
+	wxLogMessage(wxString::Format("Dealer - %s", raLib::m_long_locs[dealer].c_str()));
+
+	while(Continue());
 	return true;
 }
 
@@ -1114,20 +1222,24 @@ bool raGame::DrawTrump()
 void raGame::OnInfo(raInfoEvent& event)
 {
 	int ret_val;
-	int dealer;
+	//int dealer;
 	switch(event.GetCommand())
 	{
 	case raINFO_CMD_NEW_DEAL:
 		// Save the dealer information lest it gets reset
 		// while resetting the rule engine
-		dealer = m_engine.GetDealer();
+		/*dealer = m_engine.GetDealer();
 		if(!ResetDeal())
 		{
 			wxLogError(wxString::Format(wxT("ResetDeal failed. %s:%d"), __FILE__, __LINE__));
 		}
 		m_engine.SetDealer(dealer);
 		
-		while(Continue());
+		while(Continue());*/
+		if(!NewDeal())
+		{
+			wxLogError(wxString::Format(wxT("NewDeal() failed. %s:%d"), __FILE__, __LINE__));
+		}
 		break;
 	case raINFO_CMD_SHOW_TRUMP:
 		if((ret_val = ShowTrump()) != 0)
@@ -2167,8 +2279,7 @@ int raGame::MakeBid(int bid, int loc)
 			{
 				temp.Append(wxString::Format("%d", bid_info.bid));
 			}
-			temp.Append(wxT(" by ") + raLib::m_long_locs[bid_info.player] + " (Round " + 
-				wxString::Format("%d)", bid_info.round + 1) + "\n");
+			temp.Append(wxT(" by ") + raLib::m_long_locs[bid_info.player] + "\n");
 			m_bid_history.Append(temp);
 		}	
 

@@ -1086,48 +1086,8 @@ int raRuleEngine::GetDealer()
 }
 void raRuleEngine::SetDealer(int dealer)
 {
-#ifdef raREAD_DEALER_FROM_FILE
-	long dealer_read;
-#endif
-
 	wxASSERT((dealer >= 0) && (dealer < raTOTAL_PLAYERS));
 	m_data.dealer = dealer;
-
-	// If neeeded, for testing purposes, read the dealer location
-	// from the testing data file
-#ifdef raREAD_DEALER_FROM_FILE
-	if(::wxFileExists(raTEST_DATA_FILE))
-	{
-		wxFFileInputStream in(raTEST_DATA_FILE);
-		wxFileConfig fcfg(in);
-		if(fcfg.Exists(raTEXT_DEALER))
-		{
-			wxLogDebug(wxString::Format(
-				wxT("Reading dealer from %s. %s:%d"),
-				raTEST_DATA_FILE, __FILE__, __LINE__));
-
-			dealer_read = -1;
-			if(!fcfg.Read(raTEXT_DEALER, &dealer_read))
-			{
-				wxLogError(wxString::Format(
-					wxT("Read failed. %s:%d"), __FILE__, __LINE__));
-
-			}
-			else
-			{
-				m_data.dealer = (int)dealer_read;
-				wxASSERT((m_data.dealer >= 0) && (m_data.dealer < raTOTAL_PLAYERS));
-			}
-		}
-		else
-		{
-			wxLogError(wxString::Format(
-				wxT("Could not find dealer in %s. %s:%d"),
-				raTEST_DATA_FILE, __FILE__, __LINE__));
-		}
-	}
-#endif
-
 }
 
 void raRuleEngine::ResetTrick(raTrick *trick)

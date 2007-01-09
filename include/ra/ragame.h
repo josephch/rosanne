@@ -205,7 +205,8 @@ public:
 	virtual ~raGame();
 	bool SetTile(wxBitmap *tile);
 	bool SetInfoPanel(raInfo *info_panel);
-	bool NewGame(int dealer = raPLAYER_INVALID);
+	bool NewGame(int dealer = raPLAYER_INVALID, bool immediate = true);
+	bool NewDeal();
 	bool SetClockwise(bool flag);
 	bool GetClockwise();
 	bool ReloadFromConfig();
