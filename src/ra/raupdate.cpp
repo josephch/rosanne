@@ -55,7 +55,22 @@ void* raUpdate::Entry()
 		msg.Append(wxT("Please download from "));
 		msg.Append(ra_APP_URL);
 		msg.Append(wxT("."));
-		wxMessageBox(msg, wxT("Update"));
+		//wxMessageBox(msg, wxT("Update"));
+		
+		wxFrame *main_frame;
+		main_frame = NULL;
+		main_frame = (wxFrame *)wxTheApp->GetTopWindow();
+		if(main_frame)
+		{
+			raUpdateEvent update_event;
+			update_event.SetMessage(msg);
+			wxLogMessage(update_event.GetMessage());
+			main_frame->GetEventHandler()->AddPendingEvent(update_event);
+		}
+		else
+		{
+			wxLogError(wxString::Format(wxT("main_frame is null. %s:%d"), __FILE__, __LINE__));
+		}
 	}
 
 	return NULL;

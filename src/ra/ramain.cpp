@@ -40,6 +40,7 @@ BEGIN_EVENT_TABLE(raFrame, wxFrame)
 	EVT_MENU(raID_LAST_TRICK,  raFrame::OnLastTrick)
 	EVT_CLOSE(raFrame::OnClose)
 	EVT_SIZE(raFrame::OnSize)
+	EVT_UPDATE(raFrame::OnUpdate)
 END_EVENT_TABLE()
 
 // Give wxWidgets the means to create a raApp object
@@ -277,6 +278,11 @@ void raFrame::OnSize(wxSizeEvent& event)
 		m_split_main->Refresh();
 		m_split_main->Update();
 	}
+	event.Skip();
+}
+void raFrame::OnUpdate(raUpdateEvent& event)
+{
+	wxMessageBox(event.GetMessage());
 	event.Skip();
 }
 bool raFrame::ShowPreferences()

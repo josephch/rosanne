@@ -20,6 +20,7 @@
 
 const wxEventType raINFO_EVT = wxNewEventType();
 const wxEventType raBID_EVT = wxNewEventType();
+const wxEventType raUPDATE_EVT = wxNewEventType();
 
 IMPLEMENT_DYNAMIC_CLASS(raInfoEvent, wxEvent)
 //DEFINE_EVENT_TYPE(EVT_GAME_NEW)
@@ -65,4 +66,25 @@ int raBidEvent::GetBid()
 {
 	return m_bid;
 }
+
+IMPLEMENT_DYNAMIC_CLASS(raUpdateEvent, wxEvent)
+
+raUpdateEvent::raUpdateEvent() : wxEvent( raUPDATE_EVT )
+{
+	
+}
+raUpdateEvent::raUpdateEvent(const raUpdateEvent &evt)
+{
+	SetEventType(raUPDATE_EVT);
+	m_msg = evt.m_msg;
+}
+void raUpdateEvent::SetMessage(wxString msg)
+{
+	m_msg = msg;
+}
+wxString raUpdateEvent::GetMessage()
+{
+	return m_msg;
+}
+
 

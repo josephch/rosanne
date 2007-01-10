@@ -20,6 +20,7 @@
 #define _RAUPDATE_H_
 
 #include "ra/racommon.h"
+#include "ra/raevents.h"
 #include "wx/thread.h"
 //#include "wx/filesys.h"
 //#include "wx/fs_inet.h"

@@ -24,6 +24,7 @@
 
 extern const wxEventType raINFO_EVT;
 extern const wxEventType raBID_EVT;
+extern const wxEventType raUPDATE_EVT;
 
 class raInfoEvent : public wxEvent
 {
@@ -72,5 +73,27 @@ typedef void (wxEvtHandler::*raBidEventFunction)(raBidEvent&);
 	(wxObjectEventFunction)(wxEventFunction)(raBidEventFunction)&fn, \
 	(wxObject *) NULL \
 	),
+class raUpdateEvent : public wxEvent
+{
+	DECLARE_DYNAMIC_CLASS(raUpdateEvent)
+public:
+	/** Default constructor */
+	raUpdateEvent();
+	raUpdateEvent(const raUpdateEvent &evt);
+	wxEvent *Clone(void) const { return new raUpdateEvent(*this); }
+	void SetMessage(wxString msg);
+	wxString GetMessage();
+private:
+	wxString m_msg;
 
+};
+
+typedef void (wxEvtHandler::*raUpdateEventFunction)(raUpdateEvent&);
+
+#define EVT_UPDATE(fn) \
+	DECLARE_EVENT_TABLE_ENTRY( \
+	raUPDATE_EVT, wxID_ANY, wxID_ANY, \
+	(wxObjectEventFunction)(wxEventFunction)(raUpdateEventFunction)&fn, \
+	(wxObject *) NULL \
+	),
 #endif

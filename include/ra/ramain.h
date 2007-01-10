@@ -85,6 +85,7 @@ public:
 	void OnAuction(wxCommandEvent& event);
 	void OnLastTrick(wxCommandEvent& event);
 	void OnSize(wxSizeEvent& event);
+	void OnUpdate(raUpdateEvent& event);
 
 private:
 	wxSplitterWindow *m_split_main;//, *m_split_vert;
