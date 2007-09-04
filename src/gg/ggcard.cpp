@@ -186,11 +186,11 @@ bool ggCard::LoadFace(wxString res_name)
 	img_face = bmp_temp2.ConvertToImage();
 	img_mask = s_mask_bmp.ConvertToImage();
 
-	if(!img_face.SetMaskFromImage(&img_mask, col_mask.Red(), col_mask.Green(), col_mask.Blue()))
+	if(!img_face.SetMaskFromImage(img_mask, col_mask.Red(), col_mask.Green(), col_mask.Blue()))
 		wxLogError(wxString::Format(wxT("Failed to set mask from image. %s:%d"), __FILE__, __LINE__));
 
 	// And then finally create a bitmap from the masked image
-	m_face = new wxBitmap(&img_face, -1);
+	m_face = new wxBitmap(img_face, -1);
 
 	if(!m_face)
 	{

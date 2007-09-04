@@ -81,7 +81,7 @@ bool raPlayer::Reset()
 }
 void raPlayer::SetRules(praRules rules)
 {
-	return m_agent.SetRules(rules);
+	m_agent.SetRules(rules);
 }
 bool raPlayer::SetClockwise(bool flag)
 {

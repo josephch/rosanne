@@ -18,6 +18,8 @@
 
 #include "ra/raruleengine.h"
 
+//#define raREAD_DEAL_FROM_FILE 0
+
 //
 // Constructor
 //
@@ -162,7 +164,7 @@ bool raRuleEngine::Shuffle()
 
 			for(i = 0; i < raTOTAL_PLAYERS; i++)
 			{
-				key = wxString::Format("%s/%s", text_round, raLib::m_short_locs[i].c_str());
+				key = wxString::Format("%s/%s", text_round.c_str(), raLib::m_short_locs[i].c_str());
 				if(fcfg.Exists(key))
 				{
 					if(!fcfg.Read(key, &str_cards_read))
@@ -227,11 +229,11 @@ bool raRuleEngine::Shuffle()
 		for(i = 0; i < 2; i++)
 			for(j = 0; j < raTOTAL_PLAYERS; j++)
 				all_read |= cards_read[i][j];
-		if(bhLib::CountBitsSet(all_read) != count_read)
+		if((int)bhLib::CountBitsSet(all_read) != count_read)
 		{
 			wxLogError(wxString::Format(
 				"Duplicate cards. From all read %d count read %d", 
-				bhLib::CountBitsSet(all_read), count_read));
+				(int)bhLib::CountBitsSet(all_read), count_read));
 		}
 		else
 		{
@@ -265,7 +267,7 @@ bool raRuleEngine::Shuffle()
 						temp &= ~(1 << m_data.shuffled[l]);
 						//temp &= ~(1 << bhLib::HighestBitSet(temp));
 					}
-					wxASSERT(j == (bhLib::CountBitsSet(cards_read[k][i])));
+					wxASSERT(j == (int)(bhLib::CountBitsSet(cards_read[k][i])));
 				}
 			}
 			j = 0;
