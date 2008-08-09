@@ -78,7 +78,6 @@ typedef struct tag_RA_CONF_DATA
 class raConfig
 {
 public:
-	virtual ~raConfig();
 	static raConfig *GetInstance();
 	bool Save();
 	void GetData(raConfData *data);
@@ -88,6 +87,7 @@ private:
 	raConfData m_data;
 
 	raConfig();
+	virtual ~raConfig();
 	
 	static void Create();
 	static raConfig *s_instance;

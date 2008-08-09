@@ -24,49 +24,12 @@
 #pragma interface "radlgprefs.h"
 #endif
 
-/*!
- * Includes
- */
-
-////@begin includes
 #include "wx/xrc/xmlres.h"
-////@end includes
-
-/*!
- * Forward declarations
- */
-
-////@begin forward declarations
-////@end forward declarations
-
-/*!
- * Control identifiers
- */
-
-////@begin control identifiers
-#define ID_RADLGPREFS 10006
-#define SYMBOL_RADLGPREFS_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
-#define SYMBOL_RADLGPREFS_TITLE _("Preferences")
-#define SYMBOL_RADLGPREFS_IDNAME ID_RADLGPREFS
-#define SYMBOL_RADLGPREFS_SIZE wxSize(400, 300)
-#define SYMBOL_RADLGPREFS_POSITION wxDefaultPosition
-////@end control identifiers
 
 #define raPREFS_PLAYCARDON_SCLICK 0
 #define raPREFS_PLAYCARDON_DCLICK 1
 #define raPREFS_CARDBACK_BLUE 0
 #define raPREFS_CARDBACK_RED 1
-/*!
- * Compatibility
- */
-
-#ifndef wxCLOSE_BOX
-#define wxCLOSE_BOX 0x1000
-#endif
-
-/*!
- * raDlgPrefs class declaration
- */
 
 class raDlgPrefs: public wxDialog
 {    
@@ -74,44 +37,11 @@ class raDlgPrefs: public wxDialog
     DECLARE_EVENT_TABLE()
 
 public:
-    /// Constructors
     raDlgPrefs( );
-    raDlgPrefs( wxWindow* parent, wxWindowID id = SYMBOL_RADLGPREFS_IDNAME, const wxString& caption = SYMBOL_RADLGPREFS_TITLE, const wxPoint& pos = SYMBOL_RADLGPREFS_POSITION, const wxSize& size = SYMBOL_RADLGPREFS_SIZE, long style = SYMBOL_RADLGPREFS_STYLE );
-
-    /// Creation
-    bool Create( wxWindow* parent, wxWindowID id = SYMBOL_RADLGPREFS_IDNAME, const wxString& caption = SYMBOL_RADLGPREFS_TITLE, const wxPoint& pos = SYMBOL_RADLGPREFS_POSITION, const wxSize& size = SYMBOL_RADLGPREFS_SIZE, long style = SYMBOL_RADLGPREFS_STYLE );
-
-    /// Initialises member variables
-    void Init();
-
-    /// Creates the controls and sizers
-    void CreateControls();
-
-////@begin raDlgPrefs event handler declarations
-
-    /// wxEVT_INIT_DIALOG event handler for ID_RADLGPREFS
+    raDlgPrefs( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style);
     void OnInitDialog( wxInitDialogEvent& event );
-
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_PREFS_BTN_APPLY
     void OnPrefsBtnApplyClick( wxCommandEvent& event );
 
-////@end raDlgPrefs event handler declarations
-
-////@begin raDlgPrefs member function declarations
-
-    /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource( const wxString& name );
-
-    /// Retrieves icon resources
-    wxIcon GetIconResource( const wxString& name );
-////@end raDlgPrefs member function declarations
-
-    /// Should we show tooltips?
-    static bool ShowToolTips();
-
-////@begin raDlgPrefs member variables
-////@end raDlgPrefs member variables
 };
 
 #endif
-    // _RADLGPREFS_H_

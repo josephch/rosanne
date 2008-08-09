@@ -1,5 +1,5 @@
 // rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006-2007 Vipin Cherian
+// Copyright (C) 2006-2008 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,98 +30,31 @@
 #include "wx/wx.h"
 #endif
 
-////@begin includes
-////@end includes
-
 #include "ra/radlgrules.h"
 #include "ra/raconfig.h"
 
-////@begin XPM images
-////@end XPM images
-
-/*!
- * raDlgRules type definition
- */
-
 IMPLEMENT_DYNAMIC_CLASS( raDlgRules, wxDialog )
 
-/*!
- * raDlgRules event table definition
- */
-
 BEGIN_EVENT_TABLE( raDlgRules, wxDialog )
-
-////@begin raDlgRules event table entries
     EVT_INIT_DIALOG( raDlgRules::OnInitDialog )
-
-    EVT_BUTTON( XRCID("ID_RULES_BTN_APPLY"), raDlgRules::OnRulesBtnApplyClick )
-
-////@end raDlgRules event table entries
-
+    EVT_BUTTON( XRCID("m_radlgrules_apply"), raDlgRules::OnRulesBtnApplyClick )
 END_EVENT_TABLE()
-
-/*!
- * raDlgRules constructors
- */
 
 raDlgRules::raDlgRules( )
 {
-    Init();
 }
 
 raDlgRules::raDlgRules( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
-    Init();
-    Create(parent, id, caption, pos, size, style);
-}
-
-/*!
- * Dialog creator
- */
-
-bool raDlgRules::Create( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
-{
-////@begin raDlgRules creation
-    SetExtraStyle(GetExtraStyle()|wxWS_EX_BLOCK_EVENTS);
-    SetParent(parent);
-    CreateControls();
-    if (GetSizer())
-    {
-        GetSizer()->SetSizeHints(this);
-    }
-    Centre();
-////@end raDlgRules creation
-    return true;
-}
-
-/*!
- * Member initialisation 
- */
-
-void raDlgRules::Init()
-{
-////@begin raDlgRules member initialisation
-////@end raDlgRules member initialisation
-}
-/*!
- * Control creation for Dialog
- */
-
-void raDlgRules::CreateControls()
-{    
-////@begin raDlgRules content construction
-    if (!wxXmlResource::Get()->LoadDialog(this, GetParent(), _T("ID_RADLGRULES")))
+	SetParent(parent);
+    if (!wxXmlResource::Get()->LoadDialog(this, GetParent(), _T("raDlgRules")))
         wxLogError(wxT("Missing wxXmlResource::Get()->Load() in OnInit()?"));
-////@end raDlgRules content construction
-
-    // Create custom windows not generated automatically here.
-////@begin raDlgRules content initialisation
-////@end raDlgRules content initialisation
+	if (GetSizer())
+	{
+		GetSizer()->SetSizeHints(this);
+	}
 }
 
-/*!
- * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BUTTON
- */
 
 void raDlgRules::OnRulesBtnApplyClick( wxCommandEvent& event )
 {
@@ -134,12 +67,11 @@ void raDlgRules::OnRulesBtnApplyClick( wxCommandEvent& event )
 
 	raConfig::GetInstance()->GetData(&new_conf);
 
-	radio_clockwise = XRCCTRL(*this, "ID_RULES_RAD_CLOCKWISE", wxRadioButton);
-	radio_anticlockwise = XRCCTRL(*this, "ID_RULES_RAD_ANTICLOCKWISE", wxRadioButton);
-	//ID_RULES_CMB_MINBID3RDROUND
-	combo_minbid3 = XRCCTRL(*this, "ID_RULES_CMB_MINBID3RDROUND", wxComboBox);
-	check_waiverule4 = XRCCTRL(*this, "ID_RULES_CHK_WAIVERULE4", wxCheckBox);
-	check_sluffjacks = XRCCTRL(*this, "ID_RULES_CHK_SLUFFJACKS", wxCheckBox);
+	radio_clockwise = XRCCTRL(*this, "m_radlgrules_clockwise", wxRadioButton);
+	radio_anticlockwise = XRCCTRL(*this, "m_radlgrules_anticlockwise", wxRadioButton);
+	combo_minbid3 = XRCCTRL(*this, "m_radlgrules_minbidthird", wxComboBox);
+	check_waiverule4 = XRCCTRL(*this, "m_radlgrules_waiverule4", wxCheckBox);
+	check_sluffjacks = XRCCTRL(*this, "m_radlgrules_sluffjacks", wxCheckBox);
 
 	if(radio_clockwise->GetValue())
 	{
@@ -173,51 +105,10 @@ void raDlgRules::OnRulesBtnApplyClick( wxCommandEvent& event )
 
 
 	raConfig::GetInstance()->SetData(&new_conf);
-////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BUTTON in Dialog.
-    // Before editing this code, remove the block markers.
     event.Skip();
-////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BUTTON in Dialog. 
 
 	Destroy();
 }
-
-/*!
- * Should we show tooltips?
- */
-
-bool raDlgRules::ShowToolTips()
-{
-    return true;
-}
-
-/*!
- * Get bitmap resources
- */
-
-wxBitmap raDlgRules::GetBitmapResource( const wxString& name )
-{
-    // Bitmap retrieval
-////@begin raDlgRules bitmap retrieval
-    wxUnusedVar(name);
-    return wxNullBitmap;
-////@end raDlgRules bitmap retrieval
-}
-
-/*!
- * Get icon resources
- */
-
-wxIcon raDlgRules::GetIconResource( const wxString& name )
-{
-    // Icon retrieval
-////@begin raDlgRules icon retrieval
-    wxUnusedVar(name);
-    return wxNullIcon;
-////@end raDlgRules icon retrieval
-}
-/*!
- * wxEVT_INIT_DIALOG event handler for ID_RADLGRULES
- */
 
 void raDlgRules::OnInitDialog( wxInitDialogEvent& event )
 {
@@ -229,11 +120,11 @@ void raDlgRules::OnInitDialog( wxInitDialogEvent& event )
 	raConfData conf_data;
 
 	raConfig::GetInstance()->GetData(&conf_data);
-	radio_clockwise = XRCCTRL(*this, "ID_RULES_RAD_CLOCKWISE", wxRadioButton);
-	radio_anticlockwise = XRCCTRL(*this, "ID_RULES_RAD_ANTICLOCKWISE", wxRadioButton);
-	combo_minbid3 = XRCCTRL(*this, "ID_RULES_CMB_MINBID3RDROUND", wxComboBox);
-	check_waiverule4 = XRCCTRL(*this, "ID_RULES_CHK_WAIVERULE4", wxCheckBox);
-	check_sluffjacks = XRCCTRL(*this, "ID_RULES_CHK_SLUFFJACKS", wxCheckBox);
+	radio_clockwise = XRCCTRL(*this, "m_radlgrules_clockwise", wxRadioButton);
+	radio_anticlockwise = XRCCTRL(*this, "m_radlgrules_anticlockwise", wxRadioButton);
+	combo_minbid3 = XRCCTRL(*this, "m_radlgrules_minbidthird", wxComboBox);
+	check_waiverule4 = XRCCTRL(*this, "m_radlgrules_waiverule4", wxCheckBox);
+	check_sluffjacks = XRCCTRL(*this, "m_radlgrules_sluffjacks", wxCheckBox);
 
 	if(conf_data.game_data.clockwise)
 	{
@@ -262,10 +153,7 @@ void raDlgRules::OnInitDialog( wxInitDialogEvent& event )
 	check_sluffjacks->SetValue(conf_data.game_data.sluff_jacks);
 
 
-////@begin wxEVT_INIT_DIALOG event handler for ID_RADLGRULES in raDlgRules.
-    // Before editing this code, remove the block markers.
     event.Skip();
-////@end wxEVT_INIT_DIALOG event handler for ID_RADLGRULES in raDlgRules. 
 }
 
 

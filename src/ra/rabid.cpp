@@ -22,19 +22,20 @@
 BEGIN_EVENT_TABLE(raBid, wxPanel)
 	EVT_BUTTON(raBID_BTN_ID_ALL, raBid::OnButtonClick)
 	EVT_BUTTON(raBID_BTN_ID_PASS, raBid::OnButtonClick)
-	//EVT_COMMAND_RANGE(wxEVT_COMMAND_BUTTON_CLICKED, raBID_BTN_ID_START, raBID_BTN_ID_MAX, wxCommandEventHandler(raBid::OnButtonClick))
 END_EVENT_TABLE()
 
 raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 {
-	int i, j;
-	int best_width;
-	int temp_width, temp_height;
+	int i = 0;
+	int j = 0;
+	int best_width = 0;
+	int temp_width = 0;
+	int temp_height = 0;
 
 	m_game = NULL;
 	m_min_bid = 0;
 
-	// Initilizing buttons to NULL
+	// Initializing the value of all the buttons to NULL
 	for(i = 0; i < raBID_TOTAL_BTNS; i++)
 		m_buttons[i] = NULL;
 
@@ -42,6 +43,9 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	m_button_pass = NULL;
 
 	// Calculate the best width for the buttons
+	// The best width should be able to contain all bids from 14
+	// to 28 and the strings "All" and "Pass"
+
 	best_width = 0;
 	for(i = 0 ; i < raBID_TOTAL_BTNS; i++)
 	{
@@ -54,6 +58,7 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	best_width = raMax(best_width, temp_width);
 	this->GetTextExtent(wxT("Pass"), &temp_width, &temp_height);
 	best_width = raMax(best_width, temp_width);
+
 	wxLogDebug(wxString::Format("Best width %d", best_width));
 
 #ifdef __WXMSW__
@@ -61,9 +66,16 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 #endif
 
 	m_main_panel = new wxPanel(this);
+	if(!m_main_panel)
+	{
+		wxLogError(wxString::Format(wxT("Failed to create main panel. %s:%d"), __FILE__, __LINE__));
+		return;
+	}
+
 #ifdef __WXMSW__
 	m_main_panel->SetWindowStyle(wxSUNKEN_BORDER);
 #endif
+	
 	m_main_panel->SetBackgroundColour(*wxWHITE);
 	m_main_sizer = new wxGridSizer(0, 0, 0, 0);
 
@@ -154,6 +166,7 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	this->GetEventHandler()->Connect(raBID_BTN_ID_START, raBID_BTN_ID_START + raBID_TOTAL_BTNS - 1, 
 		wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(raBid::OnButtonClick));
 }
+
 raBid::~raBid()
 {
 }
@@ -166,33 +179,29 @@ bool raBid::SetGamePanel(raGame *game_panel)
 	m_game = game_panel;
 	return true;
 }
+
 bool raBid::SetPassable(bool passable)
 {
 	// Enable/disable the pass button
 	// as per the input criteria
 
-	if(passable)
-		m_button_pass->Enable(true);
-	else
-		m_button_pass->Enable(false);
+	m_button_pass->Enable(passable);
 
 	return true;
 }
+
 bool raBid::SetMinimumBid(int min_bid)
 {
 	int i;
 
 	m_min_bid = min_bid;
+
 	// Disable all the bid buttons less than the minimum bid
 	// and enable the rest
-
+	
 	for(i = 0; i < raBID_TOTAL_BTNS; i++)
-	{
-		if(i < (min_bid - 14))
-			m_buttons[i]->Enable(false);
-		else
-			m_buttons[i]->Enable(true);
-	}
+		m_buttons[i]->Enable(!(i < (min_bid - 14)));
+
 	return true;
 }
 
@@ -247,7 +256,7 @@ void raBid::OnButtonClick(wxCommandEvent &event)
 		m_game->AddPendingEvent(new_event);
 	}
 	else
-		wxLogError(wxString::Format(wxT("Game panel not sent in raBid. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Game panel not set in raBid. %s:%d"), __FILE__, __LINE__));
 
 	event.Skip();
 }

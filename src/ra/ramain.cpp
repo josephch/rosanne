@@ -170,7 +170,7 @@ void raFrame::OnAbout(wxCommandEvent& event)
 
 	//wxMessageBox(msg, wxT("About"),
 	//	wxOK | wxICON_INFORMATION, this);
-	if(!wxXmlResource::Get()->LoadDialog(&about, this, "ID_RADLGABOUT"))
+	if(!wxXmlResource::Get()->LoadDialog(&about, this, "raDlgAbout"))
 	{
 		wxLogError(wxString::Format(wxT("Attempt to save settings failed. %s:%d"), __FILE__, __LINE__));
 	}
@@ -289,7 +289,7 @@ bool raFrame::ShowPreferences()
 {
 	raDlgPrefs dlg_prefs;
 
-	if(!wxXmlResource::Get()->LoadDialog(&dlg_prefs, this, "ID_RADLGPREFS"))
+	if(!wxXmlResource::Get()->LoadDialog(&dlg_prefs, this, "raDlgPrefs"))
 	{
 		wxLogError(wxString::Format(wxT("Attempt to save settings failed. %s:%d"), __FILE__, __LINE__));
 		return false;
@@ -308,7 +308,7 @@ bool raFrame::ShowRules()
 {
 	raDlgRules dlg_rules;
 
-	if(!wxXmlResource::Get()->LoadDialog(&dlg_rules, this, "ID_RADLGRULES"))
+	if(!wxXmlResource::Get()->LoadDialog(&dlg_rules, this, "raDlgRules"))
 	{
 		wxLogError(wxString::Format(wxT("Attempt to save settings failed. %s:%d"), __FILE__, __LINE__));
 		return false;
