@@ -62,6 +62,7 @@ bool raApp::OnInit()
 	wxLog::SetActiveTarget(m_logger);
 	wxLogDebug("Logging opened.");
 
+
 	// Obtain the configuration data
 	config = raConfig::GetInstance();
 	config->GetData(&conf_data);
@@ -70,10 +71,18 @@ bool raApp::OnInit()
 	// Randomizing the PRNG
 	srand(time(NULL));
 
-	//wxImage::AddHandler(new wxXPMHandler);
-	//wxImage::AddHandler(new wxPNGHandler);
 	//For usage of sockets or derived classes such as wxFTP in a secondary thread
 	wxSocketBase::Initialize();
+
+	// Initiate all handlers and then enable the ZipFsHandler. This is required because we are
+	// calling the wxXmlResource::Get()->Load() from OnInit()
+	wxXmlResource::Get()->InitAllHandlers();
+	wxFileSystem::AddHandler(new wxZipFSHandler); 
+	if(!wxXmlResource::Get()->Load("gui.xrs"))
+	{
+		wxLogError(wxString::Format(wxT("Failed to load xrs %s. %s:%d"),GG_CARD_XRS,  __FILE__, __LINE__));
+		return 1;
+	}
 
 	// Create the main application window
 	m_frame = new raFrame(RA_APP_FULL_NAME);
@@ -113,13 +122,6 @@ bool raApp::OnInit()
 int raApp::OnRun()
 {
 	// Check for updates
-	wxXmlResource::Get()->InitAllHandlers();
-	if(!wxXmlResource::Get()->Load("ra_all_dlgs.xrs"))
-	{
-		wxLogError(wxString::Format(wxT("Failed to load xrs %s. %s:%d"),GG_CARD_XRS,  __FILE__, __LINE__));
-		return 1;
-	}
-
 	m_update = NULL;
 	m_update = new raUpdate();
 	if(!m_update)
@@ -159,18 +161,9 @@ int raApp::OnExit()
 
 void raFrame::OnAbout(wxCommandEvent& event)
 {
-	wxString msg;
 	raDlgAbout about;
-	msg.Append(RA_APP_FULL_NAME);
-	msg.Append("\n\n - Copyright, Vipin Cherian 2006-2007");
-	// TODO : Add thanks in a respectable version
-	//msg.Append(wxT("\n - Special thanks to Gigi, Kamjith,"));
-	//msg.Append(wxT("\n     Aravind, Gaurav, Balji, Rajeev,"));
-	//msg.Append(wxT("\n     Manish, Keya, Johns."));
-
-	//wxMessageBox(msg, wxT("About"),
-	//	wxOK | wxICON_INFORMATION, this);
 	if(!wxXmlResource::Get()->LoadDialog(&about, this, "raDlgAbout"))
+
 	{
 		wxLogError(wxString::Format(wxT("Attempt to save settings failed. %s:%d"), __FILE__, __LINE__));
 	}

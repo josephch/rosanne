@@ -36,7 +36,7 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	m_min_bid = 0;
 
 	// Initializing the value of all the buttons to NULL
-	for(i = 0; i < raBID_TOTAL_BTNS; i++)
+	for(i = 0; i < raBID_TOTAL_BTNS; ++i)
 		m_buttons[i] = NULL;
 
 	m_button_all = NULL;

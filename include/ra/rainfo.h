@@ -21,48 +21,17 @@
 
 #include "ra/racommon.h"
 #include "ra/raevents.h"
-//#include "ra/ragame.h"
 
 #ifdef raREAD_SEED_FROM_FILE
 #include "wx/wfstream.h"
 #include "wx/fileconf.h"
 #endif
 
-#define raINFO_DEAL_COUNT 4
-#define raINFO_POINT_COUNT 2
-#define raINFO_PNLTY_COUNT 2
-#define raINFO_TWO 2
-#define raINFO_TEXT_RELIEF 2
-#define raINFO_INSTR_RELIEF 10
-#define raINFO_PNL_BORDER 1
-
-#define raINFO_TEXT_SHOW_TRUMP wxT("Show Trump")
-
-#define raINFO_DEAL_NO_TEXT wxT("Deal Number")
-#define raINFO_DEALER_TEXT wxT("Dealer")
-#define raINFO_BID_TEXT wxT("Bid")
-#define raINFO_TRUMP_TEXT wxT("Trump")
-
-//#define raINFO_NS_TEXT wxT("North/South")
-//#define raINFO_EW_TEXT wxT("East/West")
-#define raINFO_NS_TEXT wxT("N/S")
-#define raINFO_EW_TEXT wxT("E/W")
-
-#define raINFO_PTS_TEXT wxT("Game Points")
-#define raINFO_PEN_TEXT wxT("Penalties")
-
-
-
 enum
 {
 	raINFO_CMD_NONE = 1,
 	raINFO_CMD_NEW_DEAL,
 	raINFO_CMD_SHOW_TRUMP
-};
-
-enum
-{
-	raINFO_CMD_BUTTON_ID = 100
 };
 
 #define raINFO_SHOW_TRUMP_TEXT wxT("Show Trump")
@@ -85,57 +54,32 @@ class raInfo: public wxPanel
 {
 private:
 	DECLARE_EVENT_TABLE()
-	wxBoxSizer * m_main_sizer;
-
-	wxPanel * m_deal_head_panel;
-	wxGridSizer * m_deal_head_panel_sizer;
-	wxStaticText * m_deal_head_panel_text;
-
-	wxPanel * m_deal_info_panels[raINFO_TWO][raINFO_DEAL_COUNT];
-	wxGridSizer * m_deal_info_panel_sizers[raINFO_TWO][raINFO_DEAL_COUNT];
-	wxBoxSizer * m_deal_info_sizers[raINFO_DEAL_COUNT];
-	wxStaticText * m_deal_info_panel_texts[raINFO_TWO][raINFO_DEAL_COUNT];
-
-	wxPanel * m_point_head_panel;
-	wxGridSizer * m_point_head_panel_sizer;
-	wxStaticText * m_point_head_panel_text;
-
-	wxPanel * m_point_info_panels[raINFO_TWO][raINFO_POINT_COUNT];
-	wxGridSizer * m_point_info_panel_sizers[raINFO_TWO][raINFO_POINT_COUNT];
-	wxBoxSizer * m_point_info_sizers[raINFO_POINT_COUNT];
-	wxStaticText * m_point_info_panel_texts[raINFO_TWO][raINFO_POINT_COUNT];
-
-	wxPanel * m_pnlty_head_panel;
-	wxGridSizer * m_pnlty_head_panel_sizer;
-	wxStaticText * m_pnlty_head_panel_text;
-
-	wxPanel * m_pnlty_info_panels[raINFO_TWO][raINFO_PNLTY_COUNT];
-	wxGridSizer * m_pnlty_info_panel_sizers[raINFO_TWO][raINFO_PNLTY_COUNT];
-	wxBoxSizer * m_pnlty_info_sizers[raINFO_PNLTY_COUNT];
-	wxStaticText * m_pnlty_info_panel_texts[raINFO_TWO][raINFO_PNLTY_COUNT];
-
-	wxPanel * m_instr_head_panel;
-	wxGridSizer * m_instr_head_panel_sizer;
-	wxStaticText * m_instr_head_panel_text;
-
-	//wxTextCtrl *m_instr_text_ctrl;
-	wxPanel *m_instr_text_panel;
-	wxGridSizer * m_instr_text_panel_sizer;
-	wxStaticText * m_instr_text_panel_text;
 
 	wxButton *m_button;
-	wxFont m_bold_font;
+	wxStaticText *m_dealno; 
+	wxStaticText *m_dealer; 
+	wxStaticText *m_bid; 
+	wxStaticText *m_trump;
 
-	wxString m_instruction;
+	wxStaticText *m_nspts;
+	wxStaticText *m_ewpts;
+
+	wxStaticText *m_spnlty;
+	wxStaticText *m_npnlty;
+	wxStaticText *m_epnlty;
+	wxStaticText *m_wpnlty;
+
+	wxStaticText *m_instr;
+
+
 	int m_curr_cmd;
-
 	raGame *m_game;
 	raInfoDetails m_details;
+	wxString m_instruction;
 
-	void OnSize(wxSizeEvent &event);
 	void OnButtonClick(wxCommandEvent &event);
 public:
-	raInfo(const wxWindow* parent);
+	raInfo(wxWindow* parent);
 	~raInfo();
 	bool SetDetails(raInfoDetails *details);
 	void GetDetails(raInfoDetails *details);
