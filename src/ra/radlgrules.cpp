@@ -1,5 +1,5 @@
-// rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006-2008 Vipin Cherian
+// Rosanne : Twenty Eight (28) Card Game
+// Copyright (C) 2006-2009 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, 
 // Boston, MA  02110-1301, USA
+
 #if defined(__GNUG__) && !defined(NO_GCC_PRAGMA)
 #pragma implementation "radlgrules.h"
 #endif
@@ -83,7 +84,7 @@ void raDlgRules::OnRulesBtnApplyClick( wxCommandEvent& event )
 	}
 	else
 	{
-		wxLogError(wxString::Format(wxT("Unexpected value. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Unexpected value. %s:%d"), wxT(__FILE__), __LINE__));
 	}
 
 	switch(combo_minbid3->GetSelection())
@@ -95,7 +96,7 @@ void raDlgRules::OnRulesBtnApplyClick( wxCommandEvent& event )
 		new_conf.game_data.min_bid3 = 24;
 		break;
 	default:
-		wxLogError(wxString::Format(wxT("Unexpected value. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Unexpected value. %s:%d"), wxT(__FILE__), __LINE__));
 		break;
 	}
 
@@ -145,7 +146,7 @@ void raDlgRules::OnInitDialog( wxInitDialogEvent& event )
 		combo_minbid3->SetSelection(1);
 		break;
 	default:
-		wxLogError(wxString::Format(wxT("Unexpected value. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Unexpected value. %s:%d"), wxT(__FILE__), __LINE__));
 		break;
 	}
 

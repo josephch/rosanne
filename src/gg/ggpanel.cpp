@@ -1,5 +1,5 @@
-// rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006-2007 Vipin Cherian
+// Rosanne : Twenty Eight (28) Card Game
+// Copyright (C) 2006-2009 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #include "gg/ggpanel.h"
 
 // TODO : Reduce flickering
-// TODO : Change log statements to include __FILE__ and __LINE__
+// TODO : Change log statements to include wxT(__FILE__) and __LINE__
 
 BEGIN_EVENT_TABLE(ggPanel, wxPanel)
 	EVT_PAINT(ggPanel::OnPaint)
@@ -58,12 +58,12 @@ bool ggPanel::Size()
 
 	if(!m_back)
 	{
-		wxLogError("ggPanel::Size - Creation of m_back failed in wxcTable::Resize");
+		wxLogError(wxT("ggPanel::Size - Creation of m_back failed in wxcTable::Resize"));
 		return false;
 	}
 	if(!m_work)
 	{
-		wxLogError("ggPanel::Size - Creation of m_work failed in wxcTable::Resize");
+		wxLogError(wxT("ggPanel::Size - Creation of m_work failed in wxcTable::Resize"));
 		return false;
 	}
 
@@ -83,7 +83,7 @@ bool ggPanel::Paint()
 
 	if(!pdc.Ok())
 	{
-		wxLogError("wxcTable::Paint - Paint DC is not OK");
+		wxLogError(wxT("wxcTable::Paint - Paint DC is not OK"));
 		return false;
 	}
 
@@ -98,7 +98,7 @@ bool ggPanel::Paint()
 		mdc.SelectObject(*m_work);
 		if(!pdc.Blit(wxPoint(0, 0), wxSize(m_work->GetWidth(), m_work->GetHeight()), &mdc, wxPoint(0, 0)))
 		{
-			wxLogError("wxcTable::Paint - Blt to wxPaintDC failed in wxCardTable::Paint");
+			wxLogError(wxT("wxcTable::Paint - Blt to wxPaintDC failed in wxCardTable::Paint"));
 			return false;
 		}
 		mdc.SelectObject(wxNullBitmap);
@@ -127,7 +127,7 @@ bool ggPanel::RefreshScreen()
 		//wxLogDebug(wxString::Format("Blit area %d-%d %d-%d", pos.x, pos.y, size.GetWidth(), size.GetHeight()));
 		if(!tdc.Blit(pos, size, &wdc, pos))
 		{
-			wxLogError("wxcTable::RefreshTable - Blit to wxcTable client failed");
+			wxLogError(wxT("wxcTable::RefreshTable - Blit to wxcTable client failed"));
 			return false;
 		}
 		wdc.SelectObject(wxNullBitmap);

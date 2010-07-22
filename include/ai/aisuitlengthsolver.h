@@ -1,5 +1,23 @@
-#ifndef _SLSOLVER_H_
-#define _SLSOLVER_H_
+// Rosanne : Twenty Eight (28) Card Game
+// Copyright (C) 2006-2009 Vipin Cherian
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, 
+// Boston, MA  02110-1301, USA
+
+#ifndef _AI_SUITLENGTHSOLVER_H_
+#define _AI_SUITLENGTHSOLVER_H_
 //#include <assert.h>
 //#include <memory.h>
 //#include <stdio.h>
@@ -21,6 +39,8 @@
 #define slLOG_DEBUG_RECALCCELL_MIN 0
 #define slLOG_DEBUG_GETRANDSOLN 0
 */
+//#include "gsl/gsl_rng.h"
+//extern gsl_rng *g_rng;
 
 typedef struct slCELL
 {
@@ -64,7 +84,7 @@ typedef struct slDATA
 	//bool cell_set;
 }slData;
 
-class slSolver
+class aiSuitLengthSolver
 {
 private:
 	slProblem m_problem;
@@ -77,8 +97,8 @@ private:
 	bool RecalcAllCellMin(slData *data);
 	bool RecalcCellMin(slData *data, int hand, int suit);
 public:
-	slSolver();
-	~slSolver();
+	aiSuitLengthSolver();
+	~aiSuitLengthSolver();
 	bool SetProblem(slProblem *problem);
 	bool GetRandomSolution(slSolution *solution);
 	static bool ResetProblem(slProblem *problem);

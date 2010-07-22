@@ -19,7 +19,7 @@
 #ifndef _RA_H_
 #define _RA_H_
 
-#include "ra/raruleengine.h"
+#include "gm/gmengine.h"
 #include "ra/ragame.h"
 #include "ra/rainfo.h"
 #include "ra/rabid.h"

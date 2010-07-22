@@ -1,5 +1,5 @@
-// rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006-2007 Vipin Cherian
+// Rosanne : Twenty Eight (28) Card Game
+// Copyright (C) 2006-2009 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #define _RAINFO_H
 
 #include "ra/racommon.h"
-#include "ra/raevents.h"
+#include "gm/gmutil.h"
 
 #ifdef raREAD_SEED_FROM_FILE
 #include "wx/wfstream.h"
@@ -44,11 +44,11 @@ typedef struct tagraINFO_DETAILS
 	int bid;
 	int bidder;
 	int trump;
-	int points[raTOTAL_TEAMS];
-	int pnlties[raTOTAL_PLAYERS];
+	int points[gmTOTAL_TEAMS];
+	int pnlties[gmTOTAL_PLAYERS];
 }raInfoDetails;
 
-class raGame;
+class raGamePanel;
 
 class raInfo: public wxPanel
 {
@@ -73,7 +73,7 @@ private:
 
 
 	int m_curr_cmd;
-	raGame *m_game;
+	raGamePanel *m_game;
 	raInfoDetails m_details;
 	wxString m_instruction;
 
@@ -84,7 +84,7 @@ public:
 	bool SetDetails(raInfoDetails *details);
 	void GetDetails(raInfoDetails *details);
 	bool SetInstruction(wxString instruction, int cmd = raINFO_CMD_NONE);
-	bool SetGamePanel(raGame *game_panel);
+	bool SetGamePanel(raGamePanel *game_panel);
 	bool ResetDetails(bool refresh = false);
 };
 

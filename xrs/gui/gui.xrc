@@ -63,12 +63,12 @@
 			</object>
 			<object class="sizeritem">
 				<option>1</option>
-				<flag>wxEXPAND | wxALL</flag>
+				<flag>wxEXPAND|wxALL</flag>
 				<border>5</border>
 				<object class="wxNotebook" name="m_notebook4">
 					<object class="notebookpage">
 						<label>License</label>
-						<selected>1</selected>
+						<selected>0</selected>
 						<object class="wxPanel" name="m_panel6">
 							<style>wxSUNKEN_BORDER|wxTAB_TRAVERSAL</style>
 							<object class="wxBoxSizer">
@@ -86,7 +86,7 @@
 					</object>
 					<object class="notebookpage">
 						<label>Credits</label>
-						<selected>0</selected>
+						<selected>1</selected>
 						<object class="wxPanel" name="m_panel7">
 							<style>wxSUNKEN_BORDER|wxTAB_TRAVERSAL</style>
 							<object class="wxBoxSizer">
@@ -266,10 +266,7 @@
 								<border>5</border>
 								<object class="wxComboBox" name="m_radlgprefs_playcardon">
 									<value>Single-click</value>
-									<content>
-										<item>Single-click</item>
-										<item>Double-click</item>
-									</content>
+									<content />
 								</object>
 							</object>
 						</object>
@@ -330,10 +327,7 @@
 								<border>5</border>
 								<object class="wxComboBox" name="m_radlgprefs_cardback">
 									<value>Blue</value>
-									<content>
-										<item>Blue</item>
-										<item>Red</item>
-									</content>
+									<content />
 								</object>
 							</object>
 						</object>
@@ -392,10 +386,7 @@
 								<border>5</border>
 								<object class="wxComboBox" name="m_radlgrules_minbidthird">
 									<value>23</value>
-									<content>
-										<item>23</item>
-										<item>24</item>
-									</content>
+									<content />
 								</object>
 							</object>
 						</object>
@@ -753,7 +744,7 @@
 						<object class="sizeritem">
 							<option>0</option>
 							<flag>wxALIGN_CENTER|wxALL</flag>
-							<border>5</border>
+							<border>2</border>
 							<object class="wxStaticText" name="m_staticText20">
 								<fg>#ffffff</fg>
 								<font>
@@ -876,7 +867,7 @@
 						<object class="sizeritem">
 							<option>0</option>
 							<flag>wxALIGN_CENTER|wxALL</flag>
-							<border>5</border>
+							<border>2</border>
 							<object class="wxStaticText" name="m_staticText32">
 								<fg>#ffffff</fg>
 								<font>
@@ -999,7 +990,7 @@
 						<object class="sizeritem">
 							<option>0</option>
 							<flag>wxALIGN_CENTER|wxALL</flag>
-							<border>5</border>
+							<border>2</border>
 							<object class="wxStaticText" name="m_staticText37">
 								<fg>#ffffff</fg>
 								<font>

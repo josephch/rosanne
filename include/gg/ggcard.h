@@ -1,5 +1,5 @@
-// rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006-2007 Vipin Cherian
+// Rosanne : Twenty Eight (28) Card Game
+// Copyright (C) 2006-2009 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@
 #define GG_CARD_WIDTH 71
 #define GG_CARD_HEIGHT 96
 
-#define GG_CARD_XRS "cards.xrs"
+#define GG_CARD_XRS wxT("cards.xrs")
 
 class ggCard:public wxObject
 {

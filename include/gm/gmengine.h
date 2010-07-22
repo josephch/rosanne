@@ -1,5 +1,5 @@
-// rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006-2007 Vipin Cherian
+// Rosanne : Twenty Eight (28) Card Game
+// Copyright (C) 2006-2009 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,79 +16,84 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, 
 // Boston, MA  02110-1301, USA
 
-#ifndef _RARULEENGINE_H_
-#define _RARULEENGINE_H_
+#ifndef _GMENGINE_H_
+#define _GMENGINE_H_
 
-#include "ra/racommon.h"
+#include "wx/wxprec.h"
 
-#if defined ( raREAD_DEALER_FROM_FILE )
-#include "wx/wfstream.h"
-#include "wx/fileconf.h"
-#elif defined ( raREAD_DEAL_FROM_FILE )
-#include "wx/wfstream.h"
-#include "wx/fileconf.h"
+#ifdef __BORLANDC__
+#pragma hdrstop
 #endif
+
+#ifndef WX_PRECOMP
+#include "wx/wx.h"
+#endif
+
+//#include "ra/racommon.h"
+#include "gm/gmutil.h"
+
+
 
 enum
 {
-	raSTATUS_NOT_STARTED = 0,
-	raSTATUS_DEAL1,
-	raSTATUS_BID1,
-	raSTATUS_BID2,
-	raSTATUS_TRUMPSEL1,
-	raSTATUS_DEAL2,
-	raSTATUS_BID3,
-	raSTATUS_TRUMPSEL2,
-	raSTATUS_TRICKS,
-	raSTATUS_FINISHED
+	gmSTATUS_NOT_STARTED = 0,
+	gmSTATUS_DEAL1,
+	gmSTATUS_BID1,
+	gmSTATUS_BID2,
+	gmSTATUS_TRUMPSEL1,
+	gmSTATUS_DEAL2,
+	gmSTATUS_BID3,
+	gmSTATUS_TRUMPSEL2,
+	gmSTATUS_TRICKS,
+	gmSTATUS_FINISHED
 };
 
 enum{
-	raOUTPUT_INVALID = -1,
-	raOUTPUT_STARTED,
-	raOUTPUT_DEAL,
-	raOUPUT_BID1,
-	raOUPUT_BID2,
-	raOUTPUT_TRUMPSEL,
-	raOUTPUT_TRICK,
-	raOUTPUT_DEAL_END
+	gmOUTPUT_INVALID = -1,
+	gmOUTPUT_STARTED,
+	gmOUTPUT_DEAL,
+	gmOUPUT_BID1,
+	gmOUPUT_BID2,
+	gmOUTPUT_TRUMPSEL,
+	gmOUTPUT_TRICK,
+	gmOUTPUT_DEAL_END
 };
 
 enum{
-	raINPUT_INVALID = -1,
-	raINPUT_BID,
-	raINPUT_TRUMPSEL,
-	raINPUT_TRICK
+	gmINPUT_INVALID = -1,
+	gmINPUT_BID,
+	gmINPUT_TRUMPSEL,
+	gmINPUT_TRICK
 };
 enum{
-	raERR_CANNOT_PASS = 1,
-	raERR_BID_LESS_THAN_MIN,
-	raERR_BID_BY_WRONG_PLAYER,
-	raERR_TRUMPSEL_BY_WRONG_PLAYER,
-	raERR_TRUMPSEL_NONEXIST_CARD,
-	raERR_TRICK_BY_WRONG_PLAYER,
-	raERR_TRICK_INVALID_TRUMP_REQ,
-	raERR_TRICK_MASK_MISMATCH,
-	raERR_TRICK_CARD_NOT_IN_HAND
+	gmERR_CANNOT_PASS = 1,
+	gmERR_BID_LESS_THAN_MIN,
+	gmERR_BID_BY_WRONG_PLAYER,
+	gmERR_TRUMPSEL_BY_WRONG_PLAYER,
+	gmERR_TRUMPSEL_NONEXIST_CARD,
+	gmERR_TRICK_BY_WRONG_PLAYER,
+	gmERR_TRICK_INVALID_TRUMP_REQ,
+	gmERR_TRICK_MASK_MISMATCH,
+	gmERR_TRICK_CARD_NOT_IN_HAND
 };
 
-#define	raRULE_1 1
-#define	raRULE_2 2
-#define	raRULE_3 4
-#define	raRULE_4 8
+#define	gmRULE_1 1
+#define	gmRULE_2 2
+#define	gmRULE_3 4
+#define	gmRULE_4 8
 // Sluffing of jacks
-#define	raRULE_5 16 
+#define	gmRULE_5 16 
 
-#define raDEAL_ROUND_1 0
-#define raDEAL_ROUND_2 1
+#define gmDEAL_ROUND_1 0
+#define gmDEAL_ROUND_2 1
 
 #define raBID_ROUND_3 2
 
-#define raFOUR_JACKS 0x80808080
-#define raJACK 0x80
-#define raALL_CARDS 0xFFFFFFFF
+#define gmFOUR_JACKS 0x80808080
+#define gmJACK 0x80
+#define gmALL_CARDS 0xFFFFFFFF
 
-typedef struct tagRA_RULES
+typedef struct tagGM_RULES
 {
 	int rot_addn;
 	int min_bid_1;
@@ -96,41 +101,41 @@ typedef struct tagRA_RULES
 	int min_bid_3;
 	bool waive_rule_4;
 	bool sluff_jacks;
-}raRules, *praRules;
+}gmRules, *pgmRules;
 
-typedef struct tag_raTRICK{
+typedef struct tagGM_TRICK{
 	bool trumped;
-	int cards[raTOTAL_PLAYERS];
+	int cards[gmTOTAL_PLAYERS];
 	int lead_suit;
 	int lead_loc;
 	int count;
 	int points;
 	int winner;
 	//bool wait;
-} raTrick, *praTrick;
+} gmTrick, *pgmTrick;
 
-#define raNext(X) ((X + m_data.rules.rot_addn) % raTOTAL_PLAYERS)
-#define raTrickNext ((m_data.tricks[m_data.trick_round].lead_loc + (m_data.tricks[m_data.trick_round].count * m_data.rules.rot_addn)) % 4)
-#define raWinnerCard (m_data.tricks[m_data.trick_round].cards[m_data.tricks[m_data.trick_round].winner])
+#define gmNext(X) ((X + m_data.rules.rot_addn) % gmTOTAL_PLAYERS)
+#define gmTrickNext ((m_data.tricks[m_data.trick_round].lead_loc + (m_data.tricks[m_data.trick_round].count * m_data.rules.rot_addn)) % 4)
+#define gmWinnerCard (m_data.tricks[m_data.trick_round].cards[m_data.tricks[m_data.trick_round].winner])
 
-typedef struct tagRA_OUTPUT_DEAL_INFO
+typedef struct tagGM_OUTPUT_DEAL_INFO
 {
 	int round;
-	unsigned long hands[raTOTAL_PLAYERS];
-}raOutputDealInfo;
+	unsigned long hands[gmTOTAL_PLAYERS];
+}gmOutputDealInfo;
 
-typedef struct tagRA_OUTPUT_TRICK_INFO
+typedef struct tagGM_OUTPUT_TRICK_INFO
 {
-	int points[raTOTAL_TEAMS];
-	raTrick trick;
-}raOutputTrickInfo;
+	int points[gmTOTAL_TEAMS];
+	gmTrick trick;
+}gmOutputTrickInfo;
 
-typedef struct tagRA_OUTPUT_DEAL_END_INFO
+typedef struct tagGM_OUTPUT_DEAL_END_INFO
 {
 	int winner;
-}raOutputDealEndInfo;
+}gmOutputDealEndInfo;
 
-typedef struct tagRA_INPUT_BID_INFO
+typedef struct tagGM_INPUT_BID_INFO
 {
 	int player;
 	int min;
@@ -138,15 +143,15 @@ typedef struct tagRA_INPUT_BID_INFO
 	bool passable;
 	int bid;
 	int round;
-}raInputBidInfo;
+}gmInputBidInfo;
 
-typedef struct tagRA_INPUT_TRUMPSEL_INFO
+typedef struct tagGM_INPUT_TRUMPSEL_INFO
 {
 	int card;
 	int player;
-}raInputTrumpselInfo;
+}gmInputTrumpselInfo;
 
-typedef struct tagRA_INPUT_TRICK_INFO
+typedef struct tagGM_INPUT_TRICK_INFO
 {
 	int player;
 	bool can_ask_trump;
@@ -154,19 +159,19 @@ typedef struct tagRA_INPUT_TRICK_INFO
 	unsigned long mask;
 	int card;
 	unsigned long rules;
-}raInputTrickInfo;
+}gmInputTrickInfo;
 
-typedef struct tagRA_RULEENGINE_DATA
+typedef struct tagGM_ENGINE_DATA
 {
 	bool ok;
 	bool feedback;
 
-	raRules rules;
+	gmRules rules;
 
 	int status;
 	int dealer;
 
-	int shuffled[raTOTAL_CARDS];
+	int shuffled[gmTOTAL_CARDS];
 	//int deal_pos;
 
 	// Variables related to messaging
@@ -181,7 +186,7 @@ typedef struct tagRA_RULEENGINE_DATA
 	int curr_max_bid;
 	int curr_max_bidder;
 	int last_bidder;
-	bool bid_hist[raTOTAL_BID_ROUNDS][raTOTAL_PLAYERS];
+	bool bid_hist[gmTOTAL_BID_ROUNDS][gmTOTAL_PLAYERS];
 	unsigned long passed_round1;
 
 	// Related to the trump card
@@ -189,48 +194,48 @@ typedef struct tagRA_RULEENGINE_DATA
 	int trump_card;
 
 	// Cards held by players
-	unsigned long hands[raTOTAL_PLAYERS];
+	unsigned long hands[gmTOTAL_PLAYERS];
 
 	// Related to tricks
-	int pts[raTOTAL_TEAMS];
+	int pts[gmTOTAL_TEAMS];
 	int trick_round;
-	raTrick tricks[raTOTAL_TRICKS];
-	unsigned long played_cards[raTOTAL_PLAYERS];
+	gmTrick tricks[gmTOTAL_TRICKS];
+	unsigned long played_cards[gmTOTAL_PLAYERS];
 	bool should_trump;
 	bool should_play_trump_card;
 	bool trump_shown;
 
 	// Related to output messages
-	raOutputDealInfo out_deal_info;
-	raOutputDealEndInfo out_deal_end_info;
+	gmOutputDealInfo out_deal_info;
+	gmOutputDealEndInfo out_deal_end_info;
 	// Structures to hold data related to the pending input message
-	raInputBidInfo in_bid_info;
-	raInputTrumpselInfo in_trumpsel_info;
-	raInputTrickInfo in_trick_info;
-} raRuleEngineData;
+	gmInputBidInfo in_bid_info;
+	gmInputTrumpselInfo in_trumpsel_info;
+	gmInputTrickInfo in_trick_info;
+} gmEngineData;
 
-/*typedef struct tagRA_OUPUT
+/*typedef struct tagGM_OUPUT
 {
 	int type;
 	void *output;
 } raOutput, *praOutput;*/
 
 
-class raRuleEngine
+class gmEngine
 {
 private:
-	raRuleEngineData m_data;
+	gmEngineData m_data;
 	void SetOutput(int output_type);
 	void SetInput(int input_type);
 	unsigned long GenerateMask(unsigned long *rules = NULL);
 	bool SetDealEndOutput();
 
 public:
-	raRuleEngine();
-	virtual ~raRuleEngine();
+	gmEngine();
+	virtual ~gmEngine();
 	bool IsOk();
 	int GetStatus();
-	static bool Reset(raRuleEngineData *data);
+	static bool Reset(gmEngineData *data);
 	bool Reset();
 	bool Shuffle();
 	bool Continue();
@@ -243,13 +248,13 @@ public:
 	int PostInputMessage(int input_type, void *input);
 	bool GetFeedback();
 	void SetFeedback(bool feedback);
-	void GetRules(raRules *rules);
-	void SetRules(raRules *rules);
+	void GetRules(gmRules *rules);
+	void SetRules(gmRules *rules);
 	void GetHands(unsigned long *hands);
 	void GetCardsPlayed(unsigned long *cards);
 	// TODO : Try to implement one method with trick_round as default variable
-	void GetTrick(int trick_round, raTrick *trick); 
-	void GetTrick(raTrick *trick); 
+	void GetTrick(int trick_round, gmTrick *trick); 
+	void GetTrick(gmTrick *trick); 
 	int GetTrickRound();
 	int GetPoints(int team);
 	void GetPoints(int *pts);
@@ -257,12 +262,12 @@ public:
 	int GetTrumpCard();
 	int GetDealer();
 	void SetDealer(int dealer);
-	static void ResetTrick(raTrick *trick);
-	bool GetData(raRuleEngineData *data);
-	bool SetData(raRuleEngineData *data, bool check = true);
+	static void ResetTrick(gmTrick *trick);
+	bool GetData(gmEngineData *data);
+	bool SetData(gmEngineData *data, bool check = true);
 	bool GetMaxBid(int *bid, int *loc);
 	wxString GetLoggable();
-	static wxString PrintRuleEngineData(raRuleEngineData *data);
+	static wxString PrintRuleEngineData(gmEngineData *data);
 	bool IsTrumpShown();
 	int GetTrickNextToPlay();
 	void SetMinBid(int round, int bid);

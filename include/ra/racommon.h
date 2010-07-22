@@ -1,5 +1,5 @@
-// rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006-2007 Vipin Cherian
+// Rosanne : Twenty Eight (28) Card Game
+// Copyright (C) 2006-2009 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,8 +29,7 @@
 #include "wx/wx.h"
 #endif
 
-#include "bh/bh.h"
-#include "ra/ralib.h"
+//#include "bh/bh.h"
 
 // Including images
 //#include "main_icon_16.xpm"
@@ -39,23 +38,24 @@
 //#include "options.xpm"
 //#include "help.xpm"
 
-#define RA_APP_MAJOR_VER 1
-#define RA_APP_MINOR_VER 0
-#define RA_APP_REL_TYPE "b"
-#define RA_APP_REL_TYPE_VER 1 
-#define RA_APP_NAME "Rosanne"
-#define RA_APP_AUTHOR "Vipin Cherian"
 
-#define RA_APP_FULL_VER (wxString::Format ("%d.%d%s%d", \
-	RA_APP_MAJOR_VER, RA_APP_MINOR_VER, \
-	RA_APP_REL_TYPE, RA_APP_REL_TYPE_VER))
 
-#define RA_APP_FULL_NAME (wxString::Format("%s %s", \
-	RA_APP_NAME, RA_APP_FULL_VER.c_str()))
+#define RA_APP_MAJOR_VER wxT("1")
+#define RA_APP_MINOR_VER wxT("0")
+#define RA_APP_REL_TYPE wxT("b")
+#define RA_APP_REL_TYPE_VER wxT("1")
+#define RA_APP_NAME wxT("Rosanne")
+#define RA_APP_AUTHOR wxT("Vipin Cherian")
 
-#define ra_APP_URL "http://rosanne.sourceforge.net"
+#define RA_APP_FULL_VER RA_APP_MAJOR_VER wxT(".") RA_APP_MINOR_VER RA_APP_REL_TYPE RA_APP_REL_TYPE_VER
 
-#define raTOTAL_CARDS 32
+
+#define RA_APP_FULL_NAME RA_APP_NAME RA_APP_FULL_VER
+
+
+#define ra_APP_URL wxT("http://rosanne.sourceforge.net")
+
+/*#define raTOTAL_CARDS 32
 #define raTOTAL_PLAYERS 4
 #define raTOTAL_BID_ROUNDS 3
 #define raPLAYER_INVALID -1
@@ -77,7 +77,18 @@
 #define raGetPartner(X) ((X + 2) % raTOTAL_PLAYERS)
 #define raGetOpponentOne(X) ((X + 1) % raTOTAL_PLAYERS)
 #define raGetOpponentTwo(X) ((X + 3) % raTOTAL_PLAYERS)
-#define raGetRandPlayer() (rand() % raTOTAL_PLAYERS)
+#define raGetRandPlayer() (rand() % raTOTAL_PLAYERS)*/
+
+#define raBID_INVALID -2
+#define raGetRandPlayer() (rand() % gmTOTAL_PLAYERS)
+
+#if defined ( raREAD_DEALER_FROM_FILE )
+#include "wx/wfstream.h"
+#include "wx/fileconf.h"
+#elif defined ( raREAD_DEAL_FROM_FILE )
+#include "wx/wfstream.h"
+#include "wx/fileconf.h"
+#endif
 
 // Colours
 #define raCLR_HEAD_DARK (wxColour(0, 92, 133))
@@ -108,10 +119,10 @@
 #define raREAD_SEED_FROM_FILE 0
 #define raREAD_DEALER_FROM_FILE 0
 #define raREAD_DEAL_FROM_FILE 0
-#define raTEST_DATA_FILE "ra_test_data.ini"
-#define raTEXT_SEED "rand/seed"
-#define raTEXT_DEALER "deal/dealer"
-#define raTEXT_DEAL_ROUND "deal_round"
+#define raTEST_DATA_FILE wxT("ra_test_data.ini")
+#define raTEXT_SEED wxT("rand/seed")
+#define raTEXT_DEALER wxT("deal/dealer")
+#define raTEXT_DEAL_ROUND wxT("deal_round")
 
 enum
 {

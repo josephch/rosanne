@@ -1,33 +1,34 @@
-// rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006-2007 Vipin Cherian
+// Rosanne : Twenty Eight (28) Card Game
+// Copyright (C) 2006-2010 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, 
+// Foundation, Inc., 51 Franklin Street, Fifth Floor,
 // Boston, MA  02110-1301, USA
 
 #include "ra/ramain.h"
 #include <time.h>
-#include "main_icon_16.xpm"
-#include "new_game.xpm"
-#include "exit.xpm"
-#include "options.xpm"
-#include "rules.xpm"
-#include "help.xpm"
-#include "about.xpm"
-#include "tile.xpm"
-#include "bid_history.xpm"
-#include "last_trick.xpm"
+
+#include "images/main_icon_16.xpm"
+#include "images/new_game.xpm"
+#include "images/exit.xpm"
+#include "images/options.xpm"
+#include "images/rules.xpm"
+#include "images/help.xpm"
+#include "images/about.xpm"
+#include "images/tile.xpm"
+#include "images/bid_history.xpm"
+#include "images/last_trick.xpm"
 
 // Event table for raFrame
 BEGIN_EVENT_TABLE(raFrame, wxFrame)
@@ -48,11 +49,18 @@ IMPLEMENT_APP(raApp)
 
 // Initialize the application
 bool raApp::OnInit()
-{	
+{
 	raConfig *config;
 	raConfData conf_data;
 
-	m_logfile = fopen("ra_gui.log", "w+");
+	// Open the log file for writing
+	m_logfile = fopen(raLOG_FILE, "w+");
+	if(m_logfile == NULL)
+	{
+		::wxMessageBox(wxString::Format(wxT("Failed to open log file \"%s\" for writing."), wxT(raLOG_FILE)),
+			wxT("Fatal Error!"), wxICON_ERROR);
+		return false;
+	}
 
 	m_logger = new wxLogStderr(m_logfile);
 	wxASSERT(m_logger);
@@ -60,13 +68,11 @@ bool raApp::OnInit()
 	m_old_logger = wxLog::GetActiveTarget();
 
 	wxLog::SetActiveTarget(m_logger);
-	wxLogDebug("Logging opened.");
-
+	wxLogDebug(wxT("Logging opened."));
 
 	// Obtain the configuration data
 	config = raConfig::GetInstance();
 	config->GetData(&conf_data);
-		
 
 	// Randomizing the PRNG
 	srand(time(NULL));
@@ -77,46 +83,63 @@ bool raApp::OnInit()
 	// Initiate all handlers and then enable the ZipFsHandler. This is required because we are
 	// calling the wxXmlResource::Get()->Load() from OnInit()
 	wxXmlResource::Get()->InitAllHandlers();
-	wxFileSystem::AddHandler(new wxZipFSHandler); 
-	if(!wxXmlResource::Get()->Load("gui.xrs"))
+	wxFileSystem::AddHandler(new wxZipFSHandler);
+
+
+	if(!wxFile::Exists(raGUI_XRS))
 	{
-		wxLogError(wxString::Format(wxT("Failed to load xrs %s. %s:%d"),GG_CARD_XRS,  __FILE__, __LINE__));
-		return 1;
+		::wxMessageBox(wxString::Format(wxT("Compiled resource file \"%s\" does not exist."), raGUI_XRS),
+			wxT("Fatal Error!"), wxICON_ERROR);
+		wxLog::SetActiveTarget(m_old_logger);
+		delete m_logger;
+		fclose(m_logfile);
+		return false;
+	}
+
+	if(!wxXmlResource::Get()->Load(raGUI_XRS))
+	{
+		wxLogError(wxString::Format(wxT("Failed to load xrs %s. %s:%d"), raGUI_XRS,  wxT(__FILE__), __LINE__));
+		wxLog::SetActiveTarget(m_old_logger);
+		delete m_logger;
+		fclose(m_logfile);
+		return false;
 	}
 
 	// Create the main application window
+	wxLogDebug(RA_APP_FULL_VER);
 	m_frame = new raFrame(RA_APP_FULL_NAME);
 
-	// Attempt to create the frame with the saved dimensions
+	// If the window dimensions have been saved from the previous run,
+	// try to create the main window using the same. Othewise, try to
+	// create the window of 3/4th size of the desktop
 	if(
 		(conf_data.app_data.x != -1) &&
 		(conf_data.app_data.y != -1) &&
 		(conf_data.app_data.width != -1) &&
-		(conf_data.app_data.height != -1) 
+		(conf_data.app_data.height != -1)
 		)
 	{
 		m_frame->SetSize(wxRect(
-			conf_data.app_data.x, 
-			conf_data.app_data.y, 
-			conf_data.app_data.width, 
+			conf_data.app_data.x,
+			conf_data.app_data.y,
+			conf_data.app_data.width,
 			conf_data.app_data.height));
 	}
 	else
 	{
 		m_frame->SetSize(
-			(wxSystemSettings::GetMetric(wxSYS_SCREEN_Y) * 3 / 4) + 120,
+			(wxSystemSettings::GetMetric(wxSYS_SCREEN_X) * 3 / 4),
 			wxSystemSettings::GetMetric(wxSYS_SCREEN_Y) * 3 / 4
 			);
 	}
 
+	// Depending on the saved configuration, maxim
 	if(conf_data.app_data.maximized)
 		m_frame->Maximize();
 
 	SetTopWindow(m_frame);
-	// Show it
 	m_frame->Show(true);
 
-	// Start the event loop
 	return true;
 }
 int raApp::OnRun()
@@ -126,12 +149,12 @@ int raApp::OnRun()
 	m_update = new raUpdate();
 	if(!m_update)
 	{
-		wxLogError(wxString::Format(wxT("m_update = new raUpdate(); failed. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("m_update = new raUpdate(); failed. %s:%d"), wxT(__FILE__), __LINE__));
 		wxMessageBox(wxT("Failed to create an instance of the thread which checks for updates!"));
 	}
 	if (m_update->Create() != wxTHREAD_NO_ERROR )
 	{
-		wxLogError(wxString::Format(wxT("m_update->Create(). %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("m_update->Create(). %s:%d"), wxT(__FILE__), __LINE__));
 		wxMessageBox(wxT("Failed to create the thread which checks for updates!"));
 	}
 	m_update->Run();
@@ -146,11 +169,11 @@ int raApp::OnExit()
 	// Save settings
 	if(!raConfig::GetInstance()->Save())
 	{
-		wxLogError(wxString::Format(wxT("Attempt to save settings failed. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Attempt to save settings failed. %s:%d"), wxT(__FILE__), __LINE__));
 	}
-	
+
 	// Stop logging
-	wxLogDebug("Attempting to stop logger.");
+	wxLogDebug(wxT("Attempting to stop logger."));
 
 	wxLog::SetActiveTarget(m_old_logger);
 	delete m_logger;
@@ -162,10 +185,10 @@ int raApp::OnExit()
 void raFrame::OnAbout(wxCommandEvent& event)
 {
 	raDlgAbout about;
-	if(!wxXmlResource::Get()->LoadDialog(&about, this, "raDlgAbout"))
+	if(!wxXmlResource::Get()->LoadDialog(&about, this, wxT("raDlgAbout")))
 
 	{
-		wxLogError(wxString::Format(wxT("Attempt to save settings failed. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Attempt to save settings failed. %s:%d"), wxT(__FILE__), __LINE__));
 	}
 	about.ShowModal();
 }
@@ -189,7 +212,7 @@ void raFrame::OnClose(wxCloseEvent& event)
 
 	// Get confirmation from the user before
 	// closing the appliation
-	if(wxMessageBox(wxT("Exit application?"), 
+	if(wxMessageBox(wxT("Exit application?"),
 		wxT("Confirm"), wxYES_NO | wxICON_QUESTION) == wxNO)
 	{
 		event.Veto();
@@ -232,36 +255,36 @@ void raFrame::OnPreferences(wxCommandEvent& event)
 {
 	if(!ShowPreferences())
 	{
-		wxLogError(wxString::Format(wxT("ShowPreferences() failed. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("ShowPreferences() failed. %s:%d"), wxT(__FILE__), __LINE__));
 	}
-	event.Skip();
+	//event.Skip();
 }
 
 void raFrame::OnRules(wxCommandEvent& event)
 {
 	if(!ShowRules())
 	{
-		wxLogError(wxString::Format(wxT("ShowRules() failed. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("ShowRules() failed. %s:%d"), wxT(__FILE__), __LINE__));
 	}
-	event.Skip();
+	//event.Skip();
 }
 
 void raFrame::OnAuction(wxCommandEvent& event)
 {
 	if(!m_game->ShowAuction())
 	{
-		wxLogError(wxString::Format(wxT("ShowAuction() failed. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("ShowAuction() failed. %s:%d"), wxT(__FILE__), __LINE__));
 	}
-	event.Skip();
+	//event.Skip();
 }
 
 void raFrame::OnLastTrick(wxCommandEvent& event)
 {
 	if(!m_game->ShowLastTrick())
 	{
-		wxLogError(wxString::Format(wxT("ShowLastTricks() failed. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("ShowLastTricks() failed. %s:%d"), wxT(__FILE__), __LINE__));
 	}
-	event.Skip();
+	//event.Skip();
 }
 
 void raFrame::OnSize(wxSizeEvent& event)
@@ -282,16 +305,16 @@ bool raFrame::ShowPreferences()
 {
 	raDlgPrefs dlg_prefs;
 
-	if(!wxXmlResource::Get()->LoadDialog(&dlg_prefs, this, "raDlgPrefs"))
+	if(!wxXmlResource::Get()->LoadDialog(&dlg_prefs, this, wxT("raDlgPrefs")))
 	{
-		wxLogError(wxString::Format(wxT("Attempt to save settings failed. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Attempt to save settings failed. %s:%d"), wxT(__FILE__), __LINE__));
 		return false;
 	}
 	dlg_prefs.ShowModal();
 
 	if(!m_game->ReloadFromConfig())
 	{
-		wxLogError(wxString::Format(wxT("ReloadFromConfig failed. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("ReloadFromConfig failed. %s:%d"), wxT(__FILE__), __LINE__));
 		return false;
 	}
 	return true;
@@ -301,16 +324,16 @@ bool raFrame::ShowRules()
 {
 	raDlgRules dlg_rules;
 
-	if(!wxXmlResource::Get()->LoadDialog(&dlg_rules, this, "raDlgRules"))
+	if(!wxXmlResource::Get()->LoadDialog(&dlg_rules, this, wxT("raDlgRules")))
 	{
-		wxLogError(wxString::Format(wxT("Attempt to save settings failed. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Attempt to save settings failed. %s:%d"), wxT(__FILE__), __LINE__));
 		return false;
 	}
 	dlg_rules.ShowModal();
 
 	if(!m_game->ReloadFromConfig())
 	{
-		wxLogError(wxString::Format(wxT("ReloadFromConfig failed. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("ReloadFromConfig failed. %s:%d"), wxT(__FILE__), __LINE__));
 		return false;
 	}
 	return true;
@@ -345,7 +368,7 @@ raFrame::raFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title)
 
 	wxMenuItem *opt_prefs = NULL;
 	wxMenuItem *opt_rules = NULL;
-	
+
 	wxMenuItem *view_bid_history = NULL;
 	wxMenuItem *view_last_trick = NULL;
 
@@ -440,7 +463,7 @@ raFrame::raFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title)
 	m_info = new raInfo(m_split_main);
 	//m_info->SetWindowStyle(wxSUNKEN_BORDER );
 
-	m_game = new raGame(m_split_main);
+	m_game = new raGamePanel(m_split_main);
 	//tile.LoadFile("tile.bmp", wxBITMAP_TYPE_BMP);
 	m_game->SetTile(&tile);
 	//m_game->SetWindowStyle(wxSUNKEN_BORDER);

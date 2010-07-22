@@ -1,5 +1,5 @@
-// rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006-2007 Vipin Cherian
+// Rosanne : Twenty Eight (28) Card Game
+// Copyright (C) 2006-2009 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,21 +22,21 @@
 #include "ra/racommon.h"
 #include "wx/config.h"
 
-#define raCONFPATH_APP_DATA_X "application/x"
-#define raCONFPATH_APP_DATA_Y "application/y"
-#define raCONFPATH_APP_DATA_WIDTH "application/width"
-#define raCONFPATH_APP_DATA_HEIGHT "application/height"
-#define raCONFPATH_APP_DATA_MAX "application/maximized"
+#define raCONFPATH_APP_DATA_X wxT("application/x")
+#define raCONFPATH_APP_DATA_Y wxT("application/y")
+#define raCONFPATH_APP_DATA_WIDTH wxT("application/width")
+#define raCONFPATH_APP_DATA_HEIGHT wxT("application/height")
+#define raCONFPATH_APP_DATA_MAX wxT("application/maximized")
 
-#define raCONFPATH_GAME_DATA_CLOCK "game/clockwise"
-#define raCONFPATH_GAME_DATA_MINBID3 "game/minbid3"
-#define raCONFPATH_GAME_DATA_WAIVERULE4 "game/waiverule4"
-#define raCONFPATH_GAME_DATA_SLUFFJACKS "game/sluffjacks"
+#define raCONFPATH_GAME_DATA_CLOCK wxT("game/clockwise")
+#define raCONFPATH_GAME_DATA_MINBID3 wxT("game/minbid3")
+#define raCONFPATH_GAME_DATA_WAIVERULE4 wxT("game/waiverule4")
+#define raCONFPATH_GAME_DATA_SLUFFJACKS wxT("game/sluffjacks")
 
-#define raCONFPATH_PREFS_PLAYCARDON "preferences/playcardon"
-#define raCONFPATH_PREFS_CARDBACK "preferences/cardback"
-#define raCONFPATH_PREFS_AUTOPLAYSINGLE "preferences/autoplaysingle"
-#define raCONFPATH_PREFS_BIDBUBBLES "preferences/bidbubbles"
+#define raCONFPATH_PREFS_PLAYCARDON wxT("preferences/playcardon")
+#define raCONFPATH_PREFS_CARDBACK wxT("preferences/cardback")
+#define raCONFPATH_PREFS_AUTOPLAYSINGLE wxT("preferences/autoplaysingle")
+#define raCONFPATH_PREFS_BIDBUBBLES wxT("preferences/bidbubbles")
 
 #define raCONFIG_PREFS_PLAYCARDON_SCLICK 0
 #define raCONFIG_PREFS_PLAYCARDON_DCLICK 1
@@ -82,13 +82,28 @@ public:
 	bool Save();
 	void GetData(raConfData *data);
 	bool SetData(raConfData *data);
+	// Configure to make the destructor public with Visual Studio 6 - stupid compiler
+#ifdef _MSC_VER
+	#if _MSC_VER <= 1200
+	virtual ~raConfig();
+	#endif
+#endif
+
 private:
 	wxConfig *m_config;
 	raConfData m_data;
 
 	raConfig();
+//#ifndef __VISUALC6__
+//	virtual ~raConfig();
+//#endif
+#ifdef _MSC_VER
+	#if _MSC_VER > 1200
 	virtual ~raConfig();
-	
+	#endif
+#else
+	virtual ~raConfig();
+#endif	
 	static void Create();
 	static raConfig *s_instance;
 	static wxMutex s_mutex;

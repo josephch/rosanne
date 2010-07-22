@@ -1,5 +1,5 @@
-// rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006-2007 Vipin Cherian
+// Rosanne : Twenty Eight (28) Card Game
+// Copyright (C) 2006-2009 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -45,13 +45,13 @@ ggCard::ggCard()
 			wxXmlResource::Get()->InitAllHandlers();
 			if(!wxXmlResource::Get()->Load(GG_CARD_XRS))
 			{
-				wxLogError(wxString::Format(wxT("Failed to load xrs %s. %s:%d"),GG_CARD_XRS,  __FILE__, __LINE__));
+				wxLogError(wxString::Format(wxT("Failed to load xrs %s. %s:%d"),GG_CARD_XRS,  wxT(__FILE__), __LINE__));
 				return;
 			}
 			s_mask_bmp = wxXmlResource::Get()->LoadBitmap(wxT("mask"));
 			if(!s_mask_bmp.Ok())
 			{
-				wxLogError(wxString::Format(wxT("Failed to load mask bitmap. %s:%d"), __FILE__, __LINE__));
+				wxLogError(wxString::Format(wxT("Failed to load mask bitmap. %s:%d"), wxT(__FILE__), __LINE__));
 				return;
 			}
 			s_init = true;
@@ -66,7 +66,7 @@ ggCard::ggCard(int suit, int value)
 
 	ggCard();
 	if(!LoadFace(wxString::Format(wxT("face_%02d"), (suit * GG_CARD_TOTAL_VALUES) + value)))
-		wxLogError(wxString::Format(wxT("LoadFace failed. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("LoadFace failed. %s:%d"), wxT(__FILE__), __LINE__));
 
 	wxASSERT(m_face);
 	return;
@@ -79,22 +79,22 @@ ggCard::ggCard(int other)
 	{
 	case GG_CARD_BACK_1:
 		if(!LoadFace(wxT("back_00")))
-			wxLogError(wxString::Format(wxT("LoadFace failed. %s:%d"), __FILE__, __LINE__));
+			wxLogError(wxString::Format(wxT("LoadFace failed. %s:%d"), wxT(__FILE__), __LINE__));
 		break;
 	case GG_CARD_BACK_2:
 		if(!LoadFace(wxT("back_01")))
-			wxLogError(wxString::Format(wxT("LoadFace failed. %s:%d"), __FILE__, __LINE__));
+			wxLogError(wxString::Format(wxT("LoadFace failed. %s:%d"), wxT(__FILE__), __LINE__));
 		break;
 	case GG_CARD_JOKER_1:
 		if(!LoadFace(wxT("joker_01")))
-			wxLogError(wxString::Format(wxT("LoadFace failed. %s:%d"), __FILE__, __LINE__));
+			wxLogError(wxString::Format(wxT("LoadFace failed. %s:%d"), wxT(__FILE__), __LINE__));
 		break;
 	case GG_CARD_JOKER_2:
 		if(!LoadFace(wxT("joker_01")))
-			wxLogError(wxString::Format(wxT("LoadFace failed. %s:%d"), __FILE__, __LINE__));
+			wxLogError(wxString::Format(wxT("LoadFace failed. %s:%d"), wxT(__FILE__), __LINE__));
 		break;
 	default:
-		wxLogError(wxString::Format(wxT("Incorrect argument passed. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Incorrect argument passed. %s:%d"), wxT(__FILE__), __LINE__));
 		break;
 	}
 
@@ -127,7 +127,7 @@ bool ggCard::BlitTo(wxDC* dest, wxCoord xdest, wxCoord ydest, int logicalFunc)
 	mdc.SelectObject(*m_face);
 	if(!dest->Blit(xdest, ydest, GG_CARD_WIDTH, GG_CARD_HEIGHT, &mdc, 0, 0, logicalFunc, true))
 	{
-		wxLogError(wxString::Format(wxT("Blit failed. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Blit failed. %s:%d"), wxT(__FILE__), __LINE__));
 		return false;
 	}
 	return true;
@@ -160,7 +160,7 @@ bool ggCard::LoadFace(wxString res_name)
 	bmp_temp1 = wxXmlResource::Get()->LoadBitmap(res_name);
 	if(!bmp_temp1.Ok())
 	{
-		wxLogError(wxString::Format(wxT("Failed to load resource %s. %s:%d"), res_name.c_str(), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Failed to load resource %s. %s:%d"), res_name.c_str(), wxT(__FILE__), __LINE__));
 		return false;
 	}
 
@@ -169,7 +169,7 @@ bool ggCard::LoadFace(wxString res_name)
 	// copy the data to the same.
 	if(!bmp_temp2.Create(GG_CARD_WIDTH, GG_CARD_HEIGHT, -1))
 	{
-		wxLogError(wxString::Format(wxT("Failed to create bitmap. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Failed to create bitmap. %s:%d"), wxT(__FILE__), __LINE__));
 		return false;
 	}
 
@@ -178,7 +178,7 @@ bool ggCard::LoadFace(wxString res_name)
 
 	if(!mdc2.Blit(0, 0, GG_CARD_WIDTH, GG_CARD_HEIGHT, &mdc1, 0, 0))
 	{
-		wxLogError(wxString::Format(wxT("Blit failed. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Blit failed. %s:%d"), wxT(__FILE__), __LINE__));
 		return false;
 	}
 
@@ -187,14 +187,14 @@ bool ggCard::LoadFace(wxString res_name)
 	img_mask = s_mask_bmp.ConvertToImage();
 
 	if(!img_face.SetMaskFromImage(img_mask, col_mask.Red(), col_mask.Green(), col_mask.Blue()))
-		wxLogError(wxString::Format(wxT("Failed to set mask from image. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Failed to set mask from image. %s:%d"), wxT(__FILE__), __LINE__));
 
 	// And then finally create a bitmap from the masked image
 	m_face = new wxBitmap(img_face, -1);
 
 	if(!m_face)
 	{
-		wxLogError(wxString::Format(wxT("Creation of bitmap from image failed. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Creation of bitmap from image failed. %s:%d"), wxT(__FILE__), __LINE__));
 		return false;
 	}
 	

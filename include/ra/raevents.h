@@ -1,5 +1,5 @@
-// rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006-2007 Vipin Cherian
+// Rosanne : Twenty Eight (28) Card Game
+// Copyright (C) 2006-2009 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 #define _RAEVENTS_H
 
 #include "ra/racommon.h"
-#include "ra/raruleengine.h"
 
 extern const wxEventType raINFO_EVT;
 extern const wxEventType raBID_EVT;

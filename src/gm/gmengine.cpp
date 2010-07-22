@@ -1,5 +1,5 @@
-// rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006-2007 Vipin Cherian
+// Rosanne : Twenty Eight (28) Card Game
+// Copyright (C) 2006-2009 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, 
 // Boston, MA  02110-1301, USA
 
-#include "ra/raruleengine.h"
+#include "gm/gmengine.h"
 
 //#define raREAD_DEAL_FROM_FILE 0
 
@@ -24,7 +24,7 @@
 // Constructor
 //
 
-raRuleEngine::raRuleEngine()
+gmEngine::gmEngine()
 {
 	m_data.ok = Reset(&m_data);
 	m_data.feedback = true;
@@ -42,7 +42,7 @@ raRuleEngine::raRuleEngine()
 // Destructor
 //
 
-raRuleEngine::~raRuleEngine()
+gmEngine::~gmEngine()
 {
 }
 
@@ -50,54 +50,53 @@ raRuleEngine::~raRuleEngine()
 // Public Methods
 //
 
-bool raRuleEngine::IsOk()
+bool gmEngine::IsOk()
 {
 	return m_data.ok;
 }
-int raRuleEngine::GetStatus()
+int gmEngine::GetStatus()
 {
 	return m_data.status;
 }
-bool raRuleEngine::Reset(raRuleEngineData *data)
+bool gmEngine::Reset(gmEngineData *data)
 {
 	int i, j;
 	//TODO : Reduce the number of loops
 
-	data->status = raSTATUS_NOT_STARTED; 
+	data->status = gmSTATUS_NOT_STARTED; 
 	data->dealer = 0;
 
 	// Filling m_shuffled with values for all the 32 cards
-	for(i = 0; i < raTOTAL_CARDS; i++)
+	for(i = 0; i < gmTOTAL_CARDS; i++)
 		data->shuffled[i] = i;
 
 	// Neither input or output is pending at the start
 	data->input_pending = false;
 	data->output_pending = false;
 
-
 	// Reset the hands
-	for(i = 0; i < raTOTAL_PLAYERS; i++)
+	for(i = 0; i < gmTOTAL_PLAYERS; i++)
 		data->hands[i] = 0;
 
 	// Resetting variables related to bidding
 	data->first_bid = true;
 	data->curr_max_bid = 0;
-	data->curr_max_bidder = raPLAYER_INVALID;
-	data->last_bidder = raPLAYER_INVALID;
-	for(i = 0; i < raTOTAL_BID_ROUNDS; i++)
-		for(j = 0; j < raTOTAL_PLAYERS; j++)
+	data->curr_max_bidder = gmPLAYER_INVALID;
+	data->last_bidder = gmPLAYER_INVALID;
+	for(i = 0; i < gmTOTAL_BID_ROUNDS; i++)
+		for(j = 0; j < gmTOTAL_PLAYERS; j++)
 			data->bid_hist[i][j] = false;
 	data->passed_round1 = 0;
 
 	// Resetting trump suit and card
-	data->trump_card = raCARD_INVALID;
-	data->trump_suit = raSUIT_INVALID;
+	data->trump_card = gmCARD_INVALID;
+	data->trump_suit = gmSUIT_INVALID;
 
 	// Resetting variables related to tricks
-	for(i = 0; i < raTOTAL_TEAMS; i++)
+	for(i = 0; i < gmTOTAL_TEAMS; i++)
 		data->pts[i] = 0;
 
-	for(i = 0; i < raTOTAL_PLAYERS; i++)
+	for(i = 0; i < gmTOTAL_PLAYERS; i++)
 		data->played_cards[i] = 0;
 
 	data->trick_round = 0;
@@ -106,26 +105,26 @@ bool raRuleEngine::Reset(raRuleEngineData *data)
 	data->trump_shown = false;
 
 	// TODO : Use ResetTrick
-	for(i = 0; i < raTOTAL_TRICKS; i++)
+	for(i = 0; i < gmTOTAL_TRICKS; i++)
 	{
-		for(j = 0; j < raTOTAL_PLAYERS; j++)
-			data->tricks[i].cards[j] = raCARD_INVALID;
+		for(j = 0; j < gmTOTAL_PLAYERS; j++)
+			data->tricks[i].cards[j] = gmCARD_INVALID;
 		data->tricks[i].count = 0;
-		data->tricks[i].lead_loc = raPLAYER_INVALID;
-		data->tricks[i].lead_suit = raSUIT_INVALID;
+		data->tricks[i].lead_loc = gmPLAYER_INVALID;
+		data->tricks[i].lead_suit = gmSUIT_INVALID;
 		data->tricks[i].points = 0;
 		data->tricks[i].trumped = false;
-		data->tricks[i].winner = raPLAYER_INVALID;
+		data->tricks[i].winner = gmPLAYER_INVALID;
 	}
 
 	return true;
 
 }
-bool raRuleEngine::Reset()
+bool gmEngine::Reset()
 {
 	return Reset(&m_data);
 }
-bool raRuleEngine::Shuffle()
+bool gmEngine::Shuffle()
 {
 	int i, j;
 	int t;
@@ -144,7 +143,7 @@ bool raRuleEngine::Shuffle()
 		wxFFileInputStream in(raTEST_DATA_FILE);
 		wxFileConfig fcfg(in);
 		int k, l;
-		unsigned long cards_read[2][raTOTAL_PLAYERS];
+		unsigned long cards_read[2][gmTOTAL_PLAYERS];
 		unsigned long all_read = 0;
 		unsigned long temp;
 		int count_read = 0;
@@ -153,7 +152,7 @@ bool raRuleEngine::Shuffle()
 		wxLogDebug("Attempting to read deal information from file");
 
 		for(i = 0; i < 2; i++)
-			for(j = 0; j < raTOTAL_PLAYERS; j++)
+			for(j = 0; j < gmTOTAL_PLAYERS; j++)
 				cards_read[i][j] = 0;
 
 		for(k = 1; k <= 2; k++)
@@ -162,22 +161,22 @@ bool raRuleEngine::Shuffle()
 			if(!fcfg.Exists(text_round))
 				continue;
 
-			for(i = 0; i < raTOTAL_PLAYERS; i++)
+			for(i = 0; i < gmTOTAL_PLAYERS; i++)
 			{
-				key = wxString::Format("%s/%s", text_round.c_str(), raLib::m_short_locs[i].c_str());
+				key = wxString::Format("%s/%s", text_round.c_str(), gmUtil::m_short_locs[i].c_str());
 				if(fcfg.Exists(key))
 				{
 					if(!fcfg.Read(key, &str_cards_read))
 					{
 						wxLogError(wxString::Format(
-							wxT("Read failed. %s:%d"), __FILE__, __LINE__));
+							wxT("Read failed. %s:%d"), wxT(__FILE__), __LINE__));
 
 					}
 					else
 					{
 						wxLogDebug(wxString::Format(
 							"Cards to be dealt to %s are %s", 
-							raLib::m_short_locs[i].c_str(), str_cards_read.c_str()));
+							gmUtil::m_short_locs[i].c_str(), str_cards_read.c_str()));
 
 						// Get each str_card from the list of str_cards to be 
 						// dealt to the location
@@ -189,12 +188,12 @@ bool raRuleEngine::Shuffle()
 							str_card.Trim();
 							str_card.Trim(false);
 							wxLogDebug(wxString::Format("Card %s", str_card.c_str()));
-							idx = raLib::GetCardIndex(str_card);
+							idx = gmUtil::GetCardIndex(str_card);
 							if(idx == -1)
 							{
 								wxLogDebug(wxString::Format(
 									wxT("GetCardIndex failed. %s:%d"),
-									__FILE__, __LINE__));
+									wxT(__FILE__), __LINE__));
 								break;
 							}
 							else
@@ -207,71 +206,71 @@ bool raRuleEngine::Shuffle()
 								break;
 							str_cards_read = str_cards_read.Mid(j + 1);
 						}
-						wxASSERT(bhLib::CountBitsSet(cards_read[k - 1][i]) <= 4);
+						wxASSERT(gmUtil::CountBitsSet(cards_read[k - 1][i]) <= 4);
 					}
 				}
 			}
 			wxLogDebug(wxString::Format("For round %d", k));
 			// Print the cards to be dealt for each player
-			for(i = 0; i < raTOTAL_PLAYERS; i++)
+			for(i = 0; i < gmTOTAL_PLAYERS; i++)
 			{
 				wxLogDebug(wxString::Format("Cards for %s - %s", 
-					raLib::m_short_locs[i].c_str(),
-					raLib::PrintLong(cards_read[k - 1][i]).c_str()));
+					gmUtil::m_short_locs[i].c_str(),
+					gmUtil::PrintLong(cards_read[k - 1][i]).c_str()));
 			}
 		}
 		/*else
 		{
 		wxLogDebug(wxString::Format(
 		wxT("Cards to be dealt for round 1 not read from %s. %s:%d"),
-		raTEST_DATA_FILE, __FILE__, __LINE__));
+		raTEST_DATA_FILE, wxT(__FILE__), __LINE__));
 		}*/
 		for(i = 0; i < 2; i++)
-			for(j = 0; j < raTOTAL_PLAYERS; j++)
+			for(j = 0; j < gmTOTAL_PLAYERS; j++)
 				all_read |= cards_read[i][j];
-		if((int)bhLib::CountBitsSet(all_read) != count_read)
+		if((int)gmUtil::CountBitsSet(all_read) != count_read)
 		{
 			wxLogError(wxString::Format(
 				"Duplicate cards. From all read %d count read %d", 
-				(int)bhLib::CountBitsSet(all_read), count_read));
+				(int)gmUtil::CountBitsSet(all_read), count_read));
 		}
 		else
 		{
-			int * unassigned = new int[raTOTAL_CARDS - count_read];
+			int * unassigned = new int[gmTOTAL_CARDS - count_read];
 			j = 0;
-			for(i = 0; i < raTOTAL_CARDS; i++)
+			for(i = 0; i < gmTOTAL_CARDS; i++)
 			{
 				if(!(all_read & (1 << i)))
 					unassigned[j++] = i;
 			}
-			wxASSERT(j == (raTOTAL_CARDS - count_read));
-			raLib::ShuffleArray(unassigned, (raTOTAL_CARDS - count_read));
+			wxASSERT(j == (gmTOTAL_CARDS - count_read));
+			gmUtil::ShuffleArray(unassigned, (gmTOTAL_CARDS - count_read));
 
-			bool flags[raTOTAL_CARDS];
-			for(i = 0; i < raTOTAL_CARDS; i++)
+			bool flags[gmTOTAL_CARDS];
+			for(i = 0; i < gmTOTAL_CARDS; i++)
 			{
 				flags[i] = false;
 			}
 			for(k = 0; k < 2; k++)
 			{
-				for(i = 0; i < raTOTAL_PLAYERS; i++)
+				for(i = 0; i < gmTOTAL_PLAYERS; i++)
 				{
 					j = 0;
 					temp = cards_read[k][i];
 					while(temp)
 					{
-						l = (k * (raTOTAL_CARDS / 2)) + (i * (raTOTAL_CARDS / (raTOTAL_PLAYERS * 2))) +  j;
+						l = (k * (gmTOTAL_CARDS / 2)) + (i * (gmTOTAL_CARDS / (gmTOTAL_PLAYERS * 2))) +  j;
 						j++;
-						m_data.shuffled[l] = bhLib::HighestBitSet(temp);
+						m_data.shuffled[l] = gmUtil::HighestBitSet(temp);
 						flags[l] = true;
 						temp &= ~(1 << m_data.shuffled[l]);
-						//temp &= ~(1 << bhLib::HighestBitSet(temp));
+						//temp &= ~(1 << gmUtil::HighestBitSet(temp));
 					}
-					wxASSERT(j == (int)(bhLib::CountBitsSet(cards_read[k][i])));
+					wxASSERT(j == (int)(gmUtil::CountBitsSet(cards_read[k][i])));
 				}
 			}
 			j = 0;
-			for(i = 0; i < raTOTAL_CARDS; i++)
+			for(i = 0; i < gmTOTAL_CARDS; i++)
 			{
 				if(!flags[i])
 				{
@@ -279,13 +278,13 @@ bool raRuleEngine::Shuffle()
 					flags[i] = true;
 				}
 			}
-			for(i = 0; i < raTOTAL_CARDS; i++)
+			for(i = 0; i < gmTOTAL_CARDS; i++)
 			{
 				wxASSERT(flags[i]);
 				//wxLogDebug(wxString::Format("%d - %s%s", 
 				//	i,
-				//	raLib::m_suits[raGetSuit(m_data.shuffled[i])],
-				//	raLib::m_values[raGetValue(m_data.shuffled[i])]
+				//	gmUtil::m_suits[gmGetSuit(m_data.shuffled[i])],
+				//	gmUtil::m_values[gmGetValue(m_data.shuffled[i])]
 				//	));
 			}
 
@@ -299,11 +298,11 @@ bool raRuleEngine::Shuffle()
 
 	// Sorting, for full replication
 	// can be removed, functionality will not be affected.
-	for (i = 0; i < raTOTAL_CARDS; i++) 
+	for (i = 0; i < gmTOTAL_CARDS; i++) 
 		m_data.shuffled[i] = i;
 
-	for (i = 0; i < raTOTAL_CARDS - 1; i++) {
-		j = i + rand() / (RAND_MAX / (raTOTAL_CARDS - i) + 1);
+	for (i = 0; i < gmTOTAL_CARDS - 1; i++) {
+		j = i + rand() / (RAND_MAX / (gmTOTAL_CARDS - i) + 1);
 		t = m_data.shuffled[j];
 		m_data.shuffled[j] = m_data.shuffled[i];
 		m_data.shuffled[i] = t;
@@ -311,7 +310,7 @@ bool raRuleEngine::Shuffle()
 
 	return true;
 }
-bool raRuleEngine::Continue()
+bool gmEngine::Continue()
 {
 	int i;
 	unsigned long u;
@@ -328,55 +327,55 @@ bool raRuleEngine::Continue()
 	switch(m_data.status)
 	{
 
-	case raSTATUS_NOT_STARTED:
+	case gmSTATUS_NOT_STARTED:
 		if(m_data.feedback)
-			SetOutput(raOUTPUT_STARTED);
+			SetOutput(gmOUTPUT_STARTED);
 		m_data.status++;
 		return false;
 		break;
 
-	case raSTATUS_DEAL1:
+	case gmSTATUS_DEAL1:
 		// Shuffle the cards before dealing round 1
 		if(!Shuffle())
 		{
 			wxLogDebug(wxString::Format(
-				"Unexpected error while shuffling cards. File - %s Line - %d",
-				__FILE__, __LINE__));
+				wxT("Unexpected error while shuffling cards. File - %s Line - %d"),
+				wxT(__FILE__), __LINE__));
 			return false;
 		}
 
 		// Deal round 1
-		for(i = 0; i < raTOTAL_CARDS / 2; i++)
+		for(i = 0; i < gmTOTAL_CARDS / 2; i++)
 			m_data.hands[i / 4] |= (1 << m_data.shuffled[i]);
 
 		if(m_data.feedback)
 		{
-			m_data.out_deal_info.round = raDEAL_ROUND_1;
+			m_data.out_deal_info.round = gmDEAL_ROUND_1;
 			//TODO : Is this memcpy correct?
 			memcpy(&m_data.out_deal_info.hands, &m_data.hands, 
 				sizeof(m_data.hands));
 
 			// Set output pending
-			SetOutput(raOUTPUT_DEAL);
+			SetOutput(gmOUTPUT_DEAL);
 		}
 		m_data.status++;
 		return false;
 		break;
 
-	case raSTATUS_BID1:
+	case gmSTATUS_BID1:
 		// If All Tricks has already been bid,
 		// move to next stage
-		if(m_data.curr_max_bid == raBID_ALL)
+		if(m_data.curr_max_bid == gmBID_ALL)
 		{
 			m_data.status++;
 			return false;
 		}
 		// If no bids have been made yet, start with the player next to dealer
-		if(m_data.last_bidder == raPLAYER_INVALID)
-			i = raNext(m_data.dealer); 
+		if(m_data.last_bidder == gmPLAYER_INVALID)
+			i = gmNext(m_data.dealer); 
 		// Otherwise, start with the player next to the last bidder
 		else
-			i = raNext(m_data.last_bidder); 
+			i = gmNext(m_data.last_bidder); 
 
 		// u will hold the list of players for which 
 		// it was checked as to whether the player can bid
@@ -386,14 +385,14 @@ bool raRuleEngine::Continue()
 			// If the player has not already bid
 			// and the highest bid is not held by his partner
 			// then a bid is expected.
-			if(!m_data.bid_hist[0][i] && (raPartner(i) 
+			if(!m_data.bid_hist[0][i] && (gmPartner(i) 
 				!= m_data.curr_max_bidder))
 			{	
 				// Fill data in the input bid structure
 				m_data.in_bid_info.player = i;
 				m_data.in_bid_info.bid = 0;
 
-				if(m_data.last_bidder == raPLAYER_INVALID)
+				if(m_data.last_bidder == gmPLAYER_INVALID)
 					m_data.in_bid_info.passable = false;  
 				else
 					m_data.in_bid_info.passable = true;
@@ -409,36 +408,36 @@ bool raRuleEngine::Continue()
 
 				m_data.in_bid_info.round = 0;
 
-				SetInput(raINPUT_BID);
+				SetInput(gmINPUT_BID);
 
 				return false;
 			}
 			u |= (1 << i);
-			i = raNext(i);
+			i = gmNext(i);
 		}
 		// Before moving to round 2 of the auction,
 		// reset values
-		m_data.last_bidder = raPLAYER_INVALID;
+		m_data.last_bidder = gmPLAYER_INVALID;
 
 		m_data.status++;
 		return false;
 		break;
 
-	case raSTATUS_BID2:
+	case gmSTATUS_BID2:
 		// If All Tricks has already been bid,
 		// move to next stage
-		if(m_data.curr_max_bid == raBID_ALL)
+		if(m_data.curr_max_bid == gmBID_ALL)
 		{
 			m_data.status++;
 			return false;
 		}
 		// If no bids have been made yet in this round,
 		// start with the player next to dealer
-		if(m_data.last_bidder == raPLAYER_INVALID)
-			i = raNext(m_data.dealer); 
+		if(m_data.last_bidder == gmPLAYER_INVALID)
+			i = gmNext(m_data.dealer); 
 		// Otherwise, start with the player next to the last bidder
 		else
-			i = raNext(m_data.last_bidder);
+			i = gmNext(m_data.last_bidder);
 
 		// u will hold the list of players for which 
 		// it was checked as to whether the player can bid
@@ -465,39 +464,39 @@ bool raRuleEngine::Continue()
 				// maximum of the current highest bid and the minimum allowed
 				// bid for the round.
 				m_data.in_bid_info.min = 
-					raMax(m_data.rules.min_bid_2, (m_data.curr_max_bid + 1));
+					gmMax(m_data.rules.min_bid_2, (m_data.curr_max_bid + 1));
 				m_data.in_bid_info.round = 1;
 
-				SetInput(raINPUT_BID);
+				SetInput(gmINPUT_BID);
 
 				return false;
 			}
 			u |= (1 << i);
-			i = raNext(i);
+			i = gmNext(i);
 		}
 		// Before moving to round 3 of the auction,
 		// reset values
-		m_data.last_bidder = raPLAYER_INVALID;
+		m_data.last_bidder = gmPLAYER_INVALID;
 
 		m_data.status++;
 		return false;
 		break;
 
-	case raSTATUS_BID3:
+	case gmSTATUS_BID3:
 		// If All Tricks has already been bid,
 		// move to next stage
-		if(m_data.curr_max_bid == raBID_ALL)
+		if(m_data.curr_max_bid == gmBID_ALL)
 		{
 			m_data.status++;
 			return false;
 		}
 		// If no bids have been made yet in this round,
 		// start with the player next to dealer
-		if(m_data.last_bidder == raPLAYER_INVALID)
-			i = raNext(m_data.dealer); 
+		if(m_data.last_bidder == gmPLAYER_INVALID)
+			i = gmNext(m_data.dealer); 
 		// Otherwise, start with the player next to the last bidder
 		else
-			i = raNext(m_data.last_bidder);
+			i = gmNext(m_data.last_bidder);
 
 		// u will hold the list of players for which 
 		// it was checked as to whether the player can bid
@@ -518,68 +517,68 @@ bool raRuleEngine::Continue()
 				// maximum of the current highest bid and the minimum allowed
 				// bid for the round.
 				m_data.in_bid_info.min = 
-					raMax(m_data.rules.min_bid_3, (m_data.curr_max_bid + 1));
+					gmMax(m_data.rules.min_bid_3, (m_data.curr_max_bid + 1));
 				m_data.in_bid_info.round = 2;
 
-				SetInput(raINPUT_BID);
+				SetInput(gmINPUT_BID);
 
 				return false;
 			}
 			u |= (1 << i);
-			i = raNext(i);
+			i = gmNext(i);
 		}
 		// Before moving to round 3 of the auction,
 		// reset values
-		m_data.last_bidder = raPLAYER_INVALID;
+		m_data.last_bidder = gmPLAYER_INVALID;
 
 		m_data.status++;
 		return false;
 		break;
 
-	case raSTATUS_TRUMPSEL1:
-	case raSTATUS_TRUMPSEL2:
-		if((m_data.trump_card == raCARD_INVALID) && (m_data.curr_max_bid != raBID_ALL))
+	case gmSTATUS_TRUMPSEL1:
+	case gmSTATUS_TRUMPSEL2:
+		if((m_data.trump_card == gmCARD_INVALID) && (m_data.curr_max_bid != gmBID_ALL))
 		{
 			// Fill data in the input trumpsel info structure
-			m_data.in_trumpsel_info.card = raCARD_INVALID;
+			m_data.in_trumpsel_info.card = gmCARD_INVALID;
 			m_data.in_trumpsel_info.player = m_data.curr_max_bidder;
-			SetInput(raINPUT_TRUMPSEL);
+			SetInput(gmINPUT_TRUMPSEL);
 		}
 
 		// Set the player to lead the first trick
-		m_data.tricks[0].lead_loc = raNext(m_data.dealer);
+		m_data.tricks[0].lead_loc = gmNext(m_data.dealer);
 
 		m_data.status++;
 		break;
 
-	case raSTATUS_DEAL2:
+	case gmSTATUS_DEAL2:
 		// Deal round 1
-		for(i = 0; i < raTOTAL_CARDS / 2; i++)
+		for(i = 0; i < gmTOTAL_CARDS / 2; i++)
 			m_data.hands[i / 4] |= 
-				(1 << m_data.shuffled[i + (raTOTAL_CARDS / 2)]);
+				(1 << m_data.shuffled[i + (gmTOTAL_CARDS / 2)]);
 
 		if(m_data.feedback)
 		{
-			m_data.out_deal_info.round = raDEAL_ROUND_2;
+			m_data.out_deal_info.round = gmDEAL_ROUND_2;
 			// TODO : Is this memcpy correct?
 			memcpy(&m_data.out_deal_info.hands, 
 				&m_data.hands, sizeof(m_data.hands));
 
 			// Set output pending
-			SetOutput(raOUTPUT_DEAL);
+			SetOutput(gmOUTPUT_DEAL);
 		}
 		m_data.status++;
 		return false;
 		break;
-	case raSTATUS_TRICKS:
-		if(m_data.trick_round < raTOTAL_TRICKS)
+	case gmSTATUS_TRICKS:
+		if(m_data.trick_round < gmTOTAL_TRICKS)
 		{
 
 			m_data.in_trick_info.ask_trump = false;
 			
 			// A player can ask for the trump 
 			// only if the bid is not for All tricks
-			if(m_data.curr_max_bid != raBID_ALL)
+			if(m_data.curr_max_bid != gmBID_ALL)
 			{
 				// Player can ask for trump to be shown if,
 				// 1. Trump is not shown
@@ -588,12 +587,12 @@ bool raRuleEngine::Continue()
 				m_data.in_trick_info.can_ask_trump = false;
 				if(
 					!m_data.trump_shown && 
-					(m_data.tricks[m_data.trick_round].lead_suit != raSUIT_INVALID)
+					(m_data.tricks[m_data.trick_round].lead_suit != gmSUIT_INVALID)
 					)
 				{
 					if(
-						!(m_data.hands[raTrickNext] & 
-						raLib::m_suit_mask[m_data.tricks[m_data.trick_round].lead_suit])
+						!(m_data.hands[gmTrickNext] & 
+						gmUtil::m_suit_mask[m_data.tricks[m_data.trick_round].lead_suit])
 						)
 					{
 						m_data.in_trick_info.can_ask_trump = true;
@@ -606,21 +605,21 @@ bool raRuleEngine::Continue()
 				// 3. and he does not have any card in his hand
 
 				if(
-					(raTrickNext == m_data.curr_max_bidder) &&
+					(gmTrickNext == m_data.curr_max_bidder) &&
 					!m_data.trump_shown &&
-					!m_data.hands[raTrickNext]
+					!m_data.hands[gmTrickNext]
 					)
 						m_data.in_trick_info.can_ask_trump = true;
 			}
 
-			m_data.in_trick_info.card = raCARD_INVALID;
+			m_data.in_trick_info.card = gmCARD_INVALID;
 			
 			// Obtain the mask and the rules applicable 
 			// and set the same
 			rules = 0;
 			m_data.in_trick_info.mask = GenerateMask(&rules);
 			m_data.in_trick_info.rules = rules;
-			m_data.in_trick_info.player = raTrickNext;
+			m_data.in_trick_info.player = gmTrickNext;
 
 			// If the player has no card which matches 
 			// the mask, player can play any card
@@ -629,36 +628,36 @@ bool raRuleEngine::Continue()
 				// If jacks cannot be sluffed, set the mask appropriately
 				if(!m_data.rules.sluff_jacks)
 				{
-					unsigned long jacks = raFOUR_JACKS;
+					unsigned long jacks = gmFOUR_JACKS;
 					// Rule 5 is applicable only if the player is not leading
 					if(m_data.tricks[m_data.trick_round].count)
 					{
 						// If trump is shown the Jack of trumps can be played
 						if(m_data.trump_shown)
 						{
-							jacks &= ~(raJACK << raLib::m_suit_rs[m_data.trump_suit]);
+							jacks &= ~(gmJACK << gmUtil::m_suit_rs[m_data.trump_suit]);
 						}
-						m_data.in_trick_info.mask = raALL_CARDS & ~(jacks);
-						m_data.in_trick_info.rules = raRULE_5;
+						m_data.in_trick_info.mask = gmALL_CARDS & ~(jacks);
+						m_data.in_trick_info.rules = gmRULE_5;
 					
 					}
 					// If after applying rule 5, no cards can be played
 					// reset the mask
 					if(!(m_data.hands[m_data.in_trick_info.player] & m_data.in_trick_info.mask))
-						m_data.in_trick_info.mask = raALL_CARDS;
+						m_data.in_trick_info.mask = gmALL_CARDS;
 				}
 				else
-					m_data.in_trick_info.mask = raALL_CARDS;
+					m_data.in_trick_info.mask = gmALL_CARDS;
 			}
 
 			wxASSERT(m_data.in_trick_info.mask);
 
-			SetInput(raINPUT_TRICK);
+			SetInput(gmINPUT_TRICK);
 			return false;
 		}
 		m_data.status++;
 		break;
-	case raSTATUS_FINISHED:
+	case gmSTATUS_FINISHED:
 		SetDealEndOutput();
 		return true;
 		break;
@@ -668,7 +667,7 @@ bool raRuleEngine::Continue()
 }
 
 
-bool raRuleEngine::GetOutput(int *output_type, void *output)
+bool gmEngine::GetOutput(int *output_type, void *output)
 {
 	// If output is not pending, return false
 	if(!m_data.output_pending)
@@ -678,51 +677,51 @@ bool raRuleEngine::GetOutput(int *output_type, void *output)
 		*output_type = m_data.output_type;
 	switch(m_data.output_type)
 	{
-	case raOUTPUT_STARTED:
+	case gmOUTPUT_STARTED:
 		break;
-	case raOUTPUT_DEAL:
-		memcpy(output, &m_data.out_deal_info, sizeof(raOutputDealInfo));
+	case gmOUTPUT_DEAL:
+		memcpy(output, &m_data.out_deal_info, sizeof(gmOutputDealInfo));
 		break;
-	case raOUTPUT_DEAL_END:
-		memcpy(output, &m_data.out_deal_end_info, sizeof(raOutputDealEndInfo));
+	case gmOUTPUT_DEAL_END:
+		memcpy(output, &m_data.out_deal_end_info, sizeof(gmOutputDealEndInfo));
 		break;
 	default:
-		wxLogDebug(wxString::Format("Inside default in switch. File - %s Line - %d", __FILE__, __LINE__));
+		wxLogDebug(wxString::Format(wxT("Inside default in switch. File - %s Line - %d"), wxT(__FILE__), __LINE__));
 		break;
 	}
 
 	m_data.output_pending = false;
 	return true;
 }
-bool raRuleEngine::IsOutputPending()
+bool gmEngine::IsOutputPending()
 {
 	return m_data.output_pending;
 }
-int raRuleEngine::GetPendingOutputType()
+int gmEngine::GetPendingOutputType()
 {
 	// If no output is pending,
 	// return invalid type
 	if(!m_data.output_pending)
-		return raOUTPUT_INVALID;
+		return gmOUTPUT_INVALID;
 
 	return m_data.output_type;
 }
 
-bool raRuleEngine::IsInputPending()
+bool gmEngine::IsInputPending()
 {
 	return m_data.input_pending;
 }
-int raRuleEngine::GetPendingInputType()
+int gmEngine::GetPendingInputType()
 {
 	// If no input is pending,
 	// return invalid type
 	if(!m_data.input_pending)
-		return raINPUT_INVALID;
+		return gmINPUT_INVALID;
 
 	return m_data.input_type;
 }
 
-bool raRuleEngine::GetPendingInputCriteria(int *input_type, void *input)
+bool gmEngine::GetPendingInputCriteria(int *input_type, void *input)
 {
 	// If input is not pending, return false
 	if(!m_data.input_pending)
@@ -733,27 +732,27 @@ bool raRuleEngine::GetPendingInputCriteria(int *input_type, void *input)
 
 	switch(m_data.input_type)
 	{
-	case raINPUT_BID:
-		memcpy(input, &m_data.in_bid_info, sizeof(raInputBidInfo));
+	case gmINPUT_BID:
+		memcpy(input, &m_data.in_bid_info, sizeof(gmInputBidInfo));
 		break;
-	case raINPUT_TRUMPSEL:
-		memcpy(input, &m_data.in_trumpsel_info, sizeof(raInputTrumpselInfo));
+	case gmINPUT_TRUMPSEL:
+		memcpy(input, &m_data.in_trumpsel_info, sizeof(gmInputTrumpselInfo));
 		break;
-	case raINPUT_TRICK:
-		memcpy(input, &m_data.in_trick_info, sizeof(raInputTrickInfo));
+	case gmINPUT_TRICK:
+		memcpy(input, &m_data.in_trick_info, sizeof(gmInputTrickInfo));
 		break;
 	default:
-		wxLogDebug(wxString::Format("Inside default in switch. File - %s Line - %d", __FILE__, __LINE__));
+		wxLogDebug(wxString::Format(wxT("Inside default in switch. File - %s Line - %d"), wxT(__FILE__), __LINE__));
 		break;
 	}
 
 	return true;
 }
-int raRuleEngine::PostInputMessage(int input_type, void *input)
+int gmEngine::PostInputMessage(int input_type, void *input)
 {
-	raInputBidInfo *in_bid_info, *exist_bid_info;
-	raInputTrumpselInfo *in_trumpsel_info, *exist_trumpsel_info;
-	raInputTrickInfo *in_trick_info, *exist_trick_info;
+	gmInputBidInfo *in_bid_info, *exist_bid_info;
+	gmInputTrumpselInfo *in_trumpsel_info, *exist_trumpsel_info;
+	gmInputTrickInfo *in_trick_info, *exist_trick_info;
 	// Check whether input is pending
 	if(!m_data.input_pending)
 		return false;
@@ -764,19 +763,19 @@ int raRuleEngine::PostInputMessage(int input_type, void *input)
 
 	switch(m_data.input_type)
 	{
-	case raINPUT_BID:
-		in_bid_info = (raInputBidInfo *)input;
+	case gmINPUT_BID:
+		in_bid_info = (gmInputBidInfo *)input;
 		exist_bid_info = &m_data.in_bid_info;
 
 		// Check whether the player making the bid is correct
 		if(exist_bid_info->player != in_bid_info->player)
-			return raERR_BID_BY_WRONG_PLAYER;
+			return gmERR_BID_BY_WRONG_PLAYER;
 
 		// If passed, check whether the bid is indeed passable
-		if(in_bid_info->bid == raBID_PASS)
+		if(in_bid_info->bid == gmBID_PASS)
 		{
 			if(!exist_bid_info->passable)
-				return raERR_CANNOT_PASS;
+				return gmERR_CANNOT_PASS;
 
 			// If pass is a valid bid, accept the bid
 			m_data.last_bidder = exist_bid_info->player;
@@ -790,15 +789,15 @@ int raRuleEngine::PostInputMessage(int input_type, void *input)
 
 		// Check whether the bid is less than the minimum allowed
 		if(in_bid_info->bid < exist_bid_info->min)
-			return raERR_BID_LESS_THAN_MIN;
+			return gmERR_BID_LESS_THAN_MIN;
 
 		// If there is an existing trump, invalidate the same
 		// and add the card back to the max bidder
-		if(m_data.trump_card != raCARD_INVALID)
+		if(m_data.trump_card != gmCARD_INVALID)
 		{
 			m_data.hands[m_data.curr_max_bidder] |= (1 << m_data.trump_card);
-			m_data.trump_card = raCARD_INVALID;
-			m_data.trump_suit = raSUIT_INVALID;
+			m_data.trump_card = gmCARD_INVALID;
+			m_data.trump_suit = gmSUIT_INVALID;
 		}
 
 		// If the bid is valid, accept the same
@@ -810,24 +809,24 @@ int raRuleEngine::PostInputMessage(int input_type, void *input)
 
 
 		break;
-	case raINPUT_TRUMPSEL:
-		in_trumpsel_info = (raInputTrumpselInfo *)input;
+	case gmINPUT_TRUMPSEL:
+		in_trumpsel_info = (gmInputTrumpselInfo *)input;
 		exist_trumpsel_info = &m_data.in_trumpsel_info;
 
 		// Verify that the player is correct
 		if(in_trumpsel_info->player != exist_trumpsel_info->player)
-			return raERR_TRUMPSEL_BY_WRONG_PLAYER;
+			return gmERR_TRUMPSEL_BY_WRONG_PLAYER;
 
 		// Verify that the trump card has a valid value
 		wxASSERT(in_trumpsel_info->card >= 0);
-		wxASSERT(in_trumpsel_info->card < raTOTAL_CARDS);
+		wxASSERT(in_trumpsel_info->card < gmTOTAL_CARDS);
 
 		// Verify that the card exists in the highest bidders hand
 		if(!(m_data.hands[exist_trumpsel_info->player] & (1 << in_trumpsel_info->card)))
-			return raERR_TRUMPSEL_NONEXIST_CARD;
+			return gmERR_TRUMPSEL_NONEXIST_CARD;
 
 		// Set the trump card
-		m_data.trump_suit = in_trumpsel_info->card / raTOTAL_VALUES;
+		m_data.trump_suit = in_trumpsel_info->card / gmTOTAL_VALUES;
 		m_data.trump_card = in_trumpsel_info->card;
 
 		// TODO : Do this earlier, when the bid is made
@@ -838,19 +837,19 @@ int raRuleEngine::PostInputMessage(int input_type, void *input)
 		//m_data.status++;
 
 		break;
-	case raINPUT_TRICK:
-		in_trick_info = (raInputTrickInfo *)input;
+	case gmINPUT_TRICK:
+		in_trick_info = (gmInputTrickInfo *)input;
 		exist_trick_info = &m_data.in_trick_info;
 
 		// Verify that the player is correct
 		if(in_trick_info->player != exist_trick_info->player)
-			return raERR_TRICK_BY_WRONG_PLAYER;
+			return gmERR_TRICK_BY_WRONG_PLAYER;
 
 		// Is the player asking for trump to be shown?
 		if(in_trick_info->ask_trump)
 		{
 			if(!exist_trick_info->can_ask_trump)
-				return raERR_TRICK_INVALID_TRUMP_REQ;
+				return gmERR_TRICK_INVALID_TRUMP_REQ;
 
 			m_data.trump_shown = true;
 			m_data.should_trump = true;
@@ -868,9 +867,9 @@ int raRuleEngine::PostInputMessage(int input_type, void *input)
 				// Check if the player who asked for trump has 
 				// at least a single trump. If that is the case, 
 				// then he should play trump. Set mask accordingly
-				if(m_data.hands[m_data.in_trick_info.player] & raLib::m_suit_mask[m_data.trump_suit])
+				if(m_data.hands[m_data.in_trick_info.player] & gmUtil::m_suit_mask[m_data.trump_suit])
 				{
-					m_data.in_trick_info.mask &= raLib::m_suit_mask[m_data.trump_suit];
+					m_data.in_trick_info.mask &= gmUtil::m_suit_mask[m_data.trump_suit];
 				}
 			}
 
@@ -879,7 +878,7 @@ int raRuleEngine::PostInputMessage(int input_type, void *input)
 
 		// If the player has played a card
 		wxASSERT(in_trick_info->card >= 0);
-		wxASSERT(in_trick_info->card < raTOTAL_CARDS);
+		wxASSERT(in_trick_info->card < gmTOTAL_CARDS);
 
 		// If the player has at least one card which matches the mask
 		// then one such card should be played
@@ -887,35 +886,35 @@ int raRuleEngine::PostInputMessage(int input_type, void *input)
 			(m_data.hands[exist_trick_info->player] & exist_trick_info->mask) &&
 			!(exist_trick_info->mask & (1 << in_trick_info->card))
 			)
-			return raERR_TRICK_MASK_MISMATCH;
+			return gmERR_TRICK_MASK_MISMATCH;
 
 		// Check whether the card played actually exists in the players hand
 		if(!(m_data.hands[exist_trick_info->player] & (1 << in_trick_info->card)))
-			return raERR_TRICK_CARD_NOT_IN_HAND;
+			return gmERR_TRICK_CARD_NOT_IN_HAND;
 
 		// If the first card to be played in the round
 		if(!m_data.tricks[m_data.trick_round].count)
 		{
 			m_data.tricks[m_data.trick_round].lead_loc = exist_trick_info->player;
-			m_data.tricks[m_data.trick_round].lead_suit = raGetSuit(in_trick_info->card);
+			m_data.tricks[m_data.trick_round].lead_suit = gmGetSuit(in_trick_info->card);
 			m_data.tricks[m_data.trick_round].winner = exist_trick_info->player;
 
 			// If the trump has been shown and the first card 
 			// to be played is a trump then the trick is already trumped
-			if(m_data.trump_shown && (raGetSuit(in_trick_info->card) == m_data.trump_suit))
+			if(m_data.trump_shown && (gmGetSuit(in_trick_info->card) == m_data.trump_suit))
 				m_data.tricks[m_data.trick_round].trumped = true;
 		}
 		else
 		{
 
 			// If the card played is a trump
-			if(raGetSuit(in_trick_info->card) == m_data.trump_suit)
+			if(gmGetSuit(in_trick_info->card) == m_data.trump_suit)
 			{
 				// and if the trick is already trumped
 				if(m_data.tricks[m_data.trick_round].trumped)
 				{
 					// check for over trumping
-					if(raGetValue(in_trick_info->card) > raGetValue(raWinnerCard))
+					if(gmGetValue(in_trick_info->card) > gmGetValue(gmWinnerCard))
 					{
 						m_data.tricks[m_data.trick_round].winner = exist_trick_info->player;
 					}
@@ -931,7 +930,7 @@ int raRuleEngine::PostInputMessage(int input_type, void *input)
 					// then check whether we have a new winner
 					if(m_data.tricks[m_data.trick_round].lead_suit == m_data.trump_suit)
 					{
-						if(raGetValue(in_trick_info->card) > raGetValue(raWinnerCard))
+						if(gmGetValue(in_trick_info->card) > gmGetValue(gmWinnerCard))
 						{
 							m_data.tricks[m_data.trick_round].winner = exist_trick_info->player;
 						}
@@ -949,7 +948,7 @@ int raRuleEngine::PostInputMessage(int input_type, void *input)
 				// check if we have a new trump
 				else if(
 					(m_data.trump_suit == m_data.tricks[m_data.trick_round].lead_suit) &&
-					(raGetValue(in_trick_info->card) > raGetValue(raWinnerCard))
+					(gmGetValue(in_trick_info->card) > gmGetValue(gmWinnerCard))
 					)
 				{
 					m_data.tricks[m_data.trick_round].winner = exist_trick_info->player;
@@ -962,8 +961,8 @@ int raRuleEngine::PostInputMessage(int input_type, void *input)
 				// and if the lead suit has been followed,
 				// check whether we have a new winner
 				if(
-					(raGetSuit(in_trick_info->card) == m_data.tricks[m_data.trick_round].lead_suit) &&
-					(raGetValue(in_trick_info->card) > raGetValue(raWinnerCard)) &&
+					(gmGetSuit(in_trick_info->card) == m_data.tricks[m_data.trick_round].lead_suit) &&
+					(gmGetValue(in_trick_info->card) > gmGetValue(gmWinnerCard)) &&
 					!m_data.tricks[m_data.trick_round].trumped
 					)
 				{
@@ -983,33 +982,33 @@ int raRuleEngine::PostInputMessage(int input_type, void *input)
 		// Increment the number of cards played in this round
 		m_data.tricks[m_data.trick_round].count++;
 		// Increment the total points
-		m_data.tricks[m_data.trick_round].points += raLib::m_points[raGetValue(in_trick_info->card)];
+		m_data.tricks[m_data.trick_round].points += gmUtil::m_points[gmGetValue(in_trick_info->card)];
 
 		m_data.should_play_trump_card = false;
 		m_data.should_trump = false;
 
 		// To Remove
 		//wxLogDebug(wxString::Format("%s played card %s%s", 
-		//	raLib::m_long_locs[in_trick_info->player].c_str(), 
-		//	raLib::m_suits[raGetSuit(in_trick_info->card)].c_str(), 
-		//	raLib::m_values[raGetValue(in_trick_info->card)].c_str()));
+		//	gmUtil::m_long_locs[in_trick_info->player].c_str(), 
+		//	gmUtil::m_suits[gmGetSuit(in_trick_info->card)].c_str(), 
+		//	gmUtil::m_values[gmGetValue(in_trick_info->card)].c_str()));
 
 		// If all 4 cards have been played, move to the next round
-		if(m_data.tricks[m_data.trick_round].count == raTOTAL_PLAYERS)
+		if(m_data.tricks[m_data.trick_round].count == gmTOTAL_PLAYERS)
 		{
 			m_data.trick_round++;
 			m_data.tricks[m_data.trick_round].lead_loc = m_data.tricks[m_data.trick_round - 1].winner;
 			// To Remove
 			//wxLogDebug(wxString::Format("Trick %d completed. Winner - %s.", 
-			//	m_data.trick_round, raLib::m_long_locs[m_data.tricks[m_data.trick_round - 1].winner].c_str() ));
+			//	m_data.trick_round, gmUtil::m_long_locs[m_data.tricks[m_data.trick_round - 1].winner].c_str() ));
 
 			// Add points to the total of the winning team
-			m_data.pts[m_data.tricks[m_data.trick_round - 1].winner % raTOTAL_TEAMS] += m_data.tricks[m_data.trick_round - 1].points;
+			m_data.pts[m_data.tricks[m_data.trick_round - 1].winner % gmTOTAL_TEAMS] += m_data.tricks[m_data.trick_round - 1].points;
 
 			//TODO : For the trick ended, post and output message
 			//out_trick_info = new raOutputTrickInfo;
 			//memcpy(out_trick_info->points, m_data.pts, sizeof(m_data.pts));
-			//memcpy(&out_trick_info->trick, &m_data.tricks[m_data.trick_round - 1], sizeof(raTrick));
+			//memcpy(&out_trick_info->trick, &m_data.tricks[m_data.trick_round - 1], sizeof(gmTrick));
 		}
 
 		break;
@@ -1020,104 +1019,104 @@ int raRuleEngine::PostInputMessage(int input_type, void *input)
 	return 0;
 }
 
-bool raRuleEngine::GetFeedback()
+bool gmEngine::GetFeedback()
 {
 	return m_data.feedback;
 }
-void raRuleEngine::SetFeedback(bool feedback)
+void gmEngine::SetFeedback(bool feedback)
 {
 	m_data.feedback = feedback;
 	if(!m_data.feedback)
 		m_data.output_pending = false;
 }
 
-void raRuleEngine::GetRules(raRules *rules)
+void gmEngine::GetRules(gmRules *rules)
 {
-	memcpy(rules, &m_data.rules, sizeof(raRules));
+	memcpy(rules, &m_data.rules, sizeof(gmRules));
 }
-void raRuleEngine::SetRules(raRules *rules)
+void gmEngine::SetRules(gmRules *rules)
 {
-	memcpy(&m_data.rules, rules, sizeof(raRules));
+	memcpy(&m_data.rules, rules, sizeof(gmRules));
 }
-void raRuleEngine::GetHands(unsigned long *hands)
+void gmEngine::GetHands(unsigned long *hands)
 {
 	memcpy(hands, m_data.hands, sizeof(m_data.hands));
 }
-void raRuleEngine::GetCardsPlayed(unsigned long *cards)
+void gmEngine::GetCardsPlayed(unsigned long *cards)
 {
 	memcpy(cards, m_data.played_cards, sizeof(m_data.played_cards));
 }
-void raRuleEngine::GetTrick(int trick_round, raTrick *trick)
+void gmEngine::GetTrick(int trick_round, gmTrick *trick)
 {
-	wxASSERT((trick_round >= 0) && (trick_round < raTOTAL_TRICKS));
-	memcpy(trick, &m_data.tricks[trick_round], sizeof(raTrick));
+	wxASSERT((trick_round >= 0) && (trick_round < gmTOTAL_TRICKS));
+	memcpy(trick, &m_data.tricks[trick_round], sizeof(gmTrick));
 }
-void raRuleEngine::GetTrick(raTrick *trick) 
+void gmEngine::GetTrick(gmTrick *trick) 
 {
 	GetTrick(m_data.trick_round, trick);
 }
 
-int raRuleEngine::GetTrickRound()
+int gmEngine::GetTrickRound()
 {
 	return m_data.trick_round;
 }
 
-int raRuleEngine::GetPoints(int team)
+int gmEngine::GetPoints(int team)
 {
-	wxASSERT((team >= 0) && (team < raTOTAL_TEAMS));
+	wxASSERT((team >= 0) && (team < gmTOTAL_TEAMS));
 	return m_data.pts[team];
 }
-void raRuleEngine::GetPoints(int *pts)
+void gmEngine::GetPoints(int *pts)
 {
 	wxASSERT(pts);
 	memcpy(pts, m_data.pts, sizeof(m_data.pts));
 }
 
-int raRuleEngine::GetTrump()
+int gmEngine::GetTrump()
 {
 	return m_data.trump_suit;
 }
-int raRuleEngine::GetTrumpCard()
+int gmEngine::GetTrumpCard()
 {
 	return m_data.trump_card;
 }
-int raRuleEngine::GetDealer()
+int gmEngine::GetDealer()
 {
-	wxASSERT((m_data.dealer >= 0) && (m_data.dealer < raTOTAL_PLAYERS));
+	wxASSERT((m_data.dealer >= 0) && (m_data.dealer < gmTOTAL_PLAYERS));
 	return m_data.dealer;
 }
-void raRuleEngine::SetDealer(int dealer)
+void gmEngine::SetDealer(int dealer)
 {
-	wxASSERT((dealer >= 0) && (dealer < raTOTAL_PLAYERS));
+	wxASSERT((dealer >= 0) && (dealer < gmTOTAL_PLAYERS));
 	m_data.dealer = dealer;
 }
 
-void raRuleEngine::ResetTrick(raTrick *trick)
+void gmEngine::ResetTrick(gmTrick *trick)
 {
 	int j;
-	for(j = 0; j < raTOTAL_PLAYERS; j++)
-		trick->cards[j] = raCARD_INVALID;
+	for(j = 0; j < gmTOTAL_PLAYERS; j++)
+		trick->cards[j] = gmCARD_INVALID;
 	trick->count = 0;
-	trick->lead_loc = raPLAYER_INVALID;
-	trick->lead_suit = raSUIT_INVALID;
+	trick->lead_loc = gmPLAYER_INVALID;
+	trick->lead_suit = gmSUIT_INVALID;
 	trick->points = 0;
 	trick->trumped = false;
-	trick->winner = raPLAYER_INVALID;
+	trick->winner = gmPLAYER_INVALID;
 }
-bool raRuleEngine::GetData(raRuleEngineData *data)
+bool gmEngine::GetData(gmEngineData *data)
 {
-	memcpy(data, &m_data, sizeof(raRuleEngineData));
+	memcpy(data, &m_data, sizeof(gmEngineData));
 	return true;
 }
-bool raRuleEngine::SetData(raRuleEngineData *data, bool check)
+bool gmEngine::SetData(gmEngineData *data, bool check)
 {
 	// TODO : Add error checks and remove wxASSERT
 	wxASSERT(!check);
-	memcpy(&m_data, data, sizeof(raRuleEngineData));
+	memcpy(&m_data, data, sizeof(gmEngineData));
 	return true;
 }
 
-bool raRuleEngine::GetMaxBid(int *bid, int *loc)
+bool gmEngine::GetMaxBid(int *bid, int *loc)
 {
 	if(bid)
 		*bid = m_data.curr_max_bid;
@@ -1125,7 +1124,7 @@ bool raRuleEngine::GetMaxBid(int *bid, int *loc)
 		*loc = m_data.curr_max_bidder;
 	return true;
 }
-wxString raRuleEngine::GetLoggable()
+wxString gmEngine::GetLoggable()
 {
 	return PrintRuleEngineData(&m_data);
 	/*wxString out;//, temp;
@@ -1134,15 +1133,15 @@ wxString raRuleEngine::GetLoggable()
 	if(m_data.trump_shown)
 	{
 		out.Append(wxString::Format("Trump - %s(%s)\n", 
-			raLib::m_suits[raGetSuit(m_data.trump_card)].c_str(),
-			raLib::m_values[raGetValue(m_data.trump_card)].c_str()
+			gmUtil::m_suits[gmGetSuit(m_data.trump_card)].c_str(),
+			gmUtil::m_values[gmGetValue(m_data.trump_card)].c_str()
 			));
 	}
 	for(i = 0; i < m_data.trick_round; i++)
 	{
 		out.Append(wxString::Format("Trick %d - ", i));
 
-		for(j = 0; j < raTOTAL_PLAYERS; j++)
+		for(j = 0; j < gmTOTAL_PLAYERS; j++)
 		{
 
 		if(m_data.tricks[i].lead_loc == j)
@@ -1150,112 +1149,112 @@ wxString raRuleEngine::GetLoggable()
 		if(m_data.tricks[i].winner == j)
 			out.Append("*");
 		out.Append(wxString::Format("%s%s ", 
-			raLib::m_suits[raGetSuit(m_data.tricks[i].cards[j])].c_str(),
-			raLib::m_values[raGetValue(m_data.tricks[i].cards[j])].c_str()
+			gmUtil::m_suits[gmGetSuit(m_data.tricks[i].cards[j])].c_str(),
+			gmUtil::m_values[gmGetValue(m_data.tricks[i].cards[j])].c_str()
 			));
 		}
 		out.Append("\n");
 	}
 	out.Append("\n");
 	i = m_data.trick_round;
-	for(j = 0; j < raTOTAL_PLAYERS; j++)
+	for(j = 0; j < gmTOTAL_PLAYERS; j++)
 	{
-		if(m_data.tricks[i].cards[j] == raCARD_INVALID)
+		if(m_data.tricks[i].cards[j] == gmCARD_INVALID)
 			continue;
-		out.Append(wxString::Format("%s - ", raLib::m_short_locs[j].c_str()));
+		out.Append(wxString::Format("%s - ", gmUtil::m_short_locs[j].c_str()));
 		if(m_data.tricks[i].lead_loc == j)
 			out.Append("+");
 		if(m_data.tricks[i].winner == j)
 			out.Append("*");
 		out.Append(wxString::Format("%s%s ", 
-			raLib::m_suits[raGetSuit(m_data.tricks[i].cards[j])].c_str(),
-			raLib::m_values[raGetValue(m_data.tricks[i].cards[j])].c_str()
+			gmUtil::m_suits[gmGetSuit(m_data.tricks[i].cards[j])].c_str(),
+			gmUtil::m_values[gmGetValue(m_data.tricks[i].cards[j])].c_str()
 			));
 		out.Append("\n");
 	}
 	out.Append("\n");
-	out.Append(raLib::PrintHands(m_data.hands));
+	out.Append(gmUtil::PrintHands(m_data.hands));
 	return out;*/
 }
-wxString raRuleEngine::PrintRuleEngineData(raRuleEngineData *data)
+wxString gmEngine::PrintRuleEngineData(gmEngineData *data)
 {
 	wxString out;//, temp;
 	int i, j;
 
 	wxASSERT(data);
 
-	out.Append("\n");
+	out.Append(wxT("\n"));
 	if(data->trump_shown)
 	{
-		out.Append(wxString::Format("Trump - %s(%s)\n", 
-			raLib::m_suits[raGetSuit(data->trump_card)].c_str(),
-			raLib::m_values[raGetValue(data->trump_card)].c_str()
+		out.Append(wxString::Format(wxT("Trump - %s(%s)\n"), 
+			gmUtil::m_suits[gmGetSuit(data->trump_card)].c_str(),
+			gmUtil::m_values[gmGetValue(data->trump_card)].c_str()
 			));
 	}
 	for(i = 0; i < data->trick_round; i++)
 	{
-		out.Append(wxString::Format("Trick %d - ", i));
+		out.Append(wxString::Format(wxT("Trick %d - "), i));
 
-		for(j = 0; j < raTOTAL_PLAYERS; j++)
+		for(j = 0; j < gmTOTAL_PLAYERS; j++)
 		{
 
 			if(data->tricks[i].lead_loc == j)
-				out.Append("+");
+				out.Append(wxT("+"));
 			if(data->tricks[i].winner == j)
-				out.Append("*");
-			out.Append(wxString::Format("%s%s ", 
-				raLib::m_suits[raGetSuit(data->tricks[i].cards[j])].c_str(),
-				raLib::m_values[raGetValue(data->tricks[i].cards[j])].c_str()
+				out.Append(wxT("*"));
+			out.Append(wxString::Format(wxT("%s%s "), 
+				gmUtil::m_suits[gmGetSuit(data->tricks[i].cards[j])].c_str(),
+				gmUtil::m_values[gmGetValue(data->tricks[i].cards[j])].c_str()
 				));
 		}
-		out.Append("\n");
+		out.Append(wxT("\n"));
 	}
-	out.Append("\n");
+	out.Append(wxT("\n"));
 	i = data->trick_round;
-	for(j = 0; j < raTOTAL_PLAYERS; j++)
+	for(j = 0; j < gmTOTAL_PLAYERS; j++)
 	{
-		if(data->tricks[i].cards[j] == raCARD_INVALID)
+		if(data->tricks[i].cards[j] == gmCARD_INVALID)
 			continue;
-		out.Append(wxString::Format("%s - ", raLib::m_short_locs[j].c_str()));
+		out.Append(wxString::Format(wxT("%s - "), gmUtil::m_short_locs[j].c_str()));
 		if(data->tricks[i].lead_loc == j)
-			out.Append("+");
+			out.Append(wxT("+"));
 		if(data->tricks[i].winner == j)
-			out.Append("*");
-		out.Append(wxString::Format("%s%s ", 
-			raLib::m_suits[raGetSuit(data->tricks[i].cards[j])].c_str(),
-			raLib::m_values[raGetValue(data->tricks[i].cards[j])].c_str()
+			out.Append(wxT("*"));
+		out.Append(wxString::Format(wxT("%s%s "), 
+			gmUtil::m_suits[gmGetSuit(data->tricks[i].cards[j])].c_str(),
+			gmUtil::m_values[gmGetValue(data->tricks[i].cards[j])].c_str()
 			));
-		out.Append("\n");
+		out.Append(wxT("\n"));
 	}
-	out.Append("\n");
-	out.Append(raLib::PrintHands(data->hands));
+	out.Append(wxT("\n"));
+	out.Append(gmUtil::PrintHands(data->hands));
 	return out;
 }
-bool raRuleEngine::IsTrumpShown()
+bool gmEngine::IsTrumpShown()
 {
 	return m_data.trump_shown;
 }
-int raRuleEngine::GetTrickNextToPlay()
+int gmEngine::GetTrickNextToPlay()
 {
-	if(m_data.status != raSTATUS_TRICKS)
-		return raPLAYER_INVALID;
-	if(m_data.tricks[m_data.trick_round].count == raTOTAL_PLAYERS)
-		return raPLAYER_INVALID;
+	if(m_data.status != gmSTATUS_TRICKS)
+		return gmPLAYER_INVALID;
+	if(m_data.tricks[m_data.trick_round].count == gmTOTAL_PLAYERS)
+		return gmPLAYER_INVALID;
 
-	return raTrickNext;
+	return gmTrickNext;
 }
 
-void raRuleEngine::SetMinBid(int round, int bid)
+void gmEngine::SetMinBid(int round, int bid)
 {
 	wxASSERT(round == raBID_ROUND_3);
 	wxASSERT((bid == 23) || (bid == 24));
 	m_data.rules.min_bid_3 = bid;
 }
-void raRuleEngine::SetWaiveRuleFour(bool flag)
+void gmEngine::SetWaiveRuleFour(bool flag)
 {
 	m_data.rules.waive_rule_4 = flag;
 }
-void raRuleEngine::SetSluffJacks(bool flag)
+void gmEngine::SetSluffJacks(bool flag)
 {
 	m_data.rules.sluff_jacks = flag;
 }
@@ -1264,23 +1263,23 @@ void raRuleEngine::SetSluffJacks(bool flag)
 // Private methods
 //
 
-void raRuleEngine::SetOutput(int output_type)
+void gmEngine::SetOutput(int output_type)
 {
 	wxASSERT(!m_data.output_pending);
 	wxASSERT(!m_data.input_pending);
 	m_data.output_type = output_type;
 	m_data.output_pending = true;
 }
-void raRuleEngine::SetInput(int input_type)
+void gmEngine::SetInput(int input_type)
 {
 	wxASSERT(!m_data.output_pending);
 	wxASSERT(!m_data.input_pending);
 	m_data.input_type = input_type;
 	m_data.input_pending = true;
 }
-unsigned long raRuleEngine::GenerateMask(unsigned long *rules)
+unsigned long gmEngine::GenerateMask(unsigned long *rules)
 {
-	unsigned long mask = raALL_CARDS;
+	unsigned long mask = gmALL_CARDS;
 	unsigned long temp = 0;
 
 	// Rule 1 :
@@ -1290,36 +1289,36 @@ unsigned long raRuleEngine::GenerateMask(unsigned long *rules)
 	if(
 		!m_data.tricks[m_data.trick_round].count &&
 		!m_data.trump_shown &&
-		(raTrickNext == m_data.curr_max_bidder))
+		(gmTrickNext == m_data.curr_max_bidder))
 	{
-		wxASSERT(m_data.trump_suit != raSUIT_INVALID);
-		mask = ~(raLib::m_suit_mask[m_data.trump_suit]);
-		temp |= raRULE_1;
+		wxASSERT(m_data.trump_suit != gmSUIT_INVALID);
+		mask = ~(gmUtil::m_suit_mask[m_data.trump_suit]);
+		temp |= gmRULE_1;
 	}
 	// Rule 4 :
 	// If the max bidder asked for trump to be shown
 	// he/she must play the very same card
 	else if(m_data.should_play_trump_card && (!m_data.rules.waive_rule_4))
 	{
-		wxASSERT(m_data.trump_card != raCARD_INVALID);
+		wxASSERT(m_data.trump_card != gmCARD_INVALID);
 		mask  = 1 << m_data.trump_card;
-		temp |= raRULE_4;
+		temp |= gmRULE_4;
 	}
 	// Rule 2 :
 	// If trump was asked to be shown, then trump must be played
 	else if(m_data.should_trump)
 	{
-		wxASSERT(m_data.trump_suit != raSUIT_INVALID);
-		mask = raLib::m_suit_mask[m_data.trump_suit];
-		temp |= raRULE_2;
+		wxASSERT(m_data.trump_suit != gmSUIT_INVALID);
+		mask = gmUtil::m_suit_mask[m_data.trump_suit];
+		temp |= gmRULE_2;
 	}
 	// Rule 3 :
 	// Should follow suit
 	else if(m_data.tricks[m_data.trick_round].count)
 	{
-		wxASSERT(m_data.tricks[m_data.trick_round].lead_suit != raSUIT_INVALID);
-		mask = raLib::m_suit_mask[m_data.tricks[m_data.trick_round].lead_suit];
-		temp |= raRULE_3;
+		wxASSERT(m_data.tricks[m_data.trick_round].lead_suit != gmSUIT_INVALID);
+		mask = gmUtil::m_suit_mask[m_data.tricks[m_data.trick_round].lead_suit];
+		temp |= gmRULE_3;
 	}
 	wxASSERT(mask);
 
@@ -1328,7 +1327,7 @@ unsigned long raRuleEngine::GenerateMask(unsigned long *rules)
 		*rules = temp;
 	return mask;
 }
-bool raRuleEngine::SetDealEndOutput()
+bool gmEngine::SetDealEndOutput()
 {
 	// Check whether there is a winner?
 	if(m_data.pts[m_data.curr_max_bidder % 2] >= m_data.curr_max_bid)
@@ -1343,6 +1342,6 @@ bool raRuleEngine::SetDealEndOutput()
 	else
 		return false;
 	if(m_data.feedback)
-		SetOutput(raOUTPUT_DEAL_END);
+		SetOutput(gmOUTPUT_DEAL_END);
 	return true;
 }

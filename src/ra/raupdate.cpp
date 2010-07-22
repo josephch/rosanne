@@ -1,5 +1,5 @@
-// rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006-2007 Vipin Cherian
+// Rosanne : Twenty Eight (28) Card Game
+// Copyright (C) 2006-2009 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -34,11 +34,11 @@ void* raUpdate::Entry()
 
 	if(ret_val < 0)
 	{
-		wxLogError(wxString::Format(wxT("addr.GetError() returned error. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("addr.GetError() returned error. %s:%d"), wxT(__FILE__), __LINE__));
 	}
 	else if(ret_val == 0)
 	{
-		wxLogMessage("Check for update done successfully");
+		wxLogMessage(wxT("Check for update done successfully"));
 	}
 	else if(ret_val > 0)
 	{
@@ -69,7 +69,7 @@ void* raUpdate::Entry()
 		}
 		else
 		{
-			wxLogError(wxString::Format(wxT("main_frame is null. %s:%d"), __FILE__, __LINE__));
+			wxLogError(wxString::Format(wxT("main_frame is null. %s:%d"), wxT(__FILE__), __LINE__));
 		}
 	}
 
@@ -91,7 +91,7 @@ int raUpdate::CheckForUpdate(wxString *new_ver)
 	err = addr.GetError();
 	if ( err != wxURL_NOERR )
 	{
-		wxLogError(wxString::Format(wxT("addr.GetError() returned error. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("addr.GetError() returned error. %s:%d"), wxT(__FILE__), __LINE__));
 		return -1;
 	}
 
@@ -109,7 +109,7 @@ int raUpdate::CheckForUpdate(wxString *new_ver)
 	in = addr.GetInputStream();
 	if(!in)
 	{
-		wxLogError(wxString::Format(wxT("Attempt to read from wxInputStream failed. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Attempt to read from wxInputStream failed. %s:%d"), wxT(__FILE__), __LINE__));
 		return -1;
 	}
 	size = in->GetSize();
@@ -117,7 +117,7 @@ int raUpdate::CheckForUpdate(wxString *new_ver)
 	data = new wxChar[size + 1];
 	if(!data)
 	{
-		wxLogError(wxString::Format(wxT("Attempt allocate memory for data. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Attempt allocate memory for data. %s:%d"), wxT(__FILE__), __LINE__));
 		return -1;
 	}
 	if (!in->Read(data, size))
@@ -125,7 +125,7 @@ int raUpdate::CheckForUpdate(wxString *new_ver)
 		if(data)
 			delete [] data;
 
-		wxLogError(wxString::Format(wxT("Attempt to read from wxInputStream failed. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Attempt to read from wxInputStream failed. %s:%d"), wxT(__FILE__), __LINE__));
 		return -1;
 	}
 	else
@@ -143,14 +143,16 @@ int raUpdate::CheckForUpdate(wxString *new_ver)
 		pipe_pos = str->Find('|');
 		if(pipe_pos == -1)
 		{
-			wxLogError(wxString::Format(wxT("str->Find failed. %s:%d"), __FILE__, __LINE__));
+			wxLogError(wxString::Format(wxT("str->Find failed. %s:%d"), wxT(__FILE__), __LINE__));
+			delete str;
 			return -1;
 		}
 
 		temp = str->Left(pipe_pos);
 		if(temp.IsEmpty())
 		{
-			wxLogError(wxString::Format(wxT("Empty version or version information. %s:%d"), __FILE__, __LINE__));
+			wxLogError(wxString::Format(wxT("Empty version or version information. %s:%d"), wxT(__FILE__), __LINE__));
+			delete str;
 			return -1;
 		}
 

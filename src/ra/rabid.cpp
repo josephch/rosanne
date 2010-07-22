@@ -1,5 +1,5 @@
-// rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006-2007 Vipin Cherian
+// Rosanne : Twenty Eight (28) Card Game
+// Copyright (C) 2006-2009 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 // Boston, MA  02110-1301, USA
 
 #include "ra/rabid.h"
-#include "ra/ragame.h"
+#include "ra/ragamepanel.h"
 
 BEGIN_EVENT_TABLE(raBid, wxPanel)
 	EVT_BUTTON(raBID_BTN_ID_ALL, raBid::OnButtonClick)
@@ -51,15 +51,15 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	{
 		this->GetTextExtent(wxString::Format(wxT("%d"), i + 14),
 			&temp_width, &temp_height);
-		best_width = raMax(best_width, temp_width);
+		best_width = gmMax(best_width, temp_width);
 	}
 
 	this->GetTextExtent(wxT("All"), &temp_width, &temp_height);
-	best_width = raMax(best_width, temp_width);
+	best_width = gmMax(best_width, temp_width);
 	this->GetTextExtent(wxT("Pass"), &temp_width, &temp_height);
-	best_width = raMax(best_width, temp_width);
+	best_width = gmMax(best_width, temp_width);
 
-	wxLogDebug(wxString::Format("Best width %d", best_width));
+	wxLogDebug(wxString::Format(wxT("Best width %d"), best_width));
 
 #ifdef __WXMSW__
 	this->SetWindowStyle(wxRAISED_BORDER);
@@ -68,7 +68,7 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	m_main_panel = new wxPanel(this);
 	if(!m_main_panel)
 	{
-		wxLogError(wxString::Format(wxT("Failed to create main panel. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Failed to create main panel. %s:%d"), wxT(__FILE__), __LINE__));
 		return;
 	}
 
@@ -174,7 +174,7 @@ raBid::~raBid()
 // 
 // Public method/s
 //
-bool raBid::SetGamePanel(raGame *game_panel)
+bool raBid::SetGamePanel(raGamePanel *game_panel)
 {
 	m_game = game_panel;
 	return true;
@@ -221,28 +221,28 @@ void raBid::OnButtonClick(wxCommandEvent &event)
 		{
 		case raBID_BTN_ID_ALL:
 			// Alert the user if the bid is for All Cards
-			msg.Append("You have made a bid for All Cards\n\n");
-			msg.Append("If you want to continue with the bid, click Yes\n");
-			msg.Append("If you want to cancel the bid and make a new one, click No");
+			msg.Append(wxT("You have made a bid for All Cards\n\n"));
+			msg.Append(wxT("If you want to continue with the bid, click Yes\n"));
+			msg.Append(wxT("If you want to cancel the bid and make a new one, click No"));
 			if(wxMessageBox(msg, wxT("Confirm"), wxYES_NO | wxICON_QUESTION) != wxYES)
 			{
 				event.Skip();
 				return;
 			}
 
-			new_event.SetBid(raBID_ALL);
+			new_event.SetBid(gmBID_ALL);
 			break;
 		case raBID_BTN_ID_PASS:
-			new_event.SetBid(raBID_PASS);
+			new_event.SetBid(gmBID_PASS);
 			break;
 		default:
 			// Alert the user if the bid is relatively high
 			// as compared to the minimum possible
 			if((raGetBidFromId(id)) >= (m_min_bid + 3))
 			{
-				msg.Append(wxString::Format("You have bid %d\n\n", raGetBidFromId(id)));
-				msg.Append("If you want to continue with the bid, click Yes\n");
-				msg.Append("If you want to cancel the bid and make a new one, click No");
+				msg.Append(wxString::Format(wxT("You have bid %d\n\n"), raGetBidFromId(id)));
+				msg.Append(wxT("If you want to continue with the bid, click Yes\n"));
+				msg.Append(wxT("If you want to cancel the bid and make a new one, click No"));
 
 				if(wxMessageBox(msg, wxT("Confirm"), wxYES_NO | wxICON_QUESTION) != wxYES)
 				{
@@ -256,7 +256,7 @@ void raBid::OnButtonClick(wxCommandEvent &event)
 		m_game->AddPendingEvent(new_event);
 	}
 	else
-		wxLogError(wxString::Format(wxT("Game panel not set in raBid. %s:%d"), __FILE__, __LINE__));
+		wxLogError(wxString::Format(wxT("Game panel not set in raBid. %s:%d"), wxT(__FILE__), __LINE__));
 
 	event.Skip();
 }

@@ -1,5 +1,5 @@
-// rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006-2007 Vipin Cherian
+// Rosanne : Twenty Eight (28) Card Game
+// Copyright (C) 2006-2009 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,21 +20,20 @@
 #define _RAMAIN_H_
 
 //#include "wx/wx.h"
-#include "ra/racommon.h"
 #include "wx/image.h" 
 #include "wx/splitter.h"
 #include "wx/grid.h"
 #include "wx/socket.h"
-#include "gg/ggpanel.h"
-//#include "gg/ggcard.h"
-//#include "ra/rainfo.h"
-//#include "ra/ragame.h"
-#include "ra/ra.h"
+
+#include "ra/racommon.h"
+#include "ra/ragamepanel.h"
+#include "ra/rainfo.h"
 #include "ra/raupdate.h"
 #include "ra/raconfig.h"
 #include "ra/radlgabout.h"
 #include "ra/radlgprefs.h"
 #include "ra/radlgrules.h"
+
 
 enum 
 {
@@ -49,6 +48,9 @@ enum
 };
 
 #define raSBAR_FIELDS 2
+
+#define raLOG_FILE "ra_gui.log"
+#define raGUI_XRS wxT("gui.xrs")
 
 class raFrame;
 
@@ -89,7 +91,7 @@ public:
 
 private:
 	wxSplitterWindow *m_split_main;//, *m_split_vert;
-	raGame *m_game;
+	raGamePanel *m_game;
 	raInfo *m_info;
 	bool ShowPreferences();
 	bool ShowRules();

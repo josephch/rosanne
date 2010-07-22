@@ -1,5 +1,5 @@
-// rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006-2008 Vipin Cherian
+// Rosanne : Twenty Eight (28) Card Game
+// Copyright (C) 2006-2009 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,12 +15,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, 
 // Boston, MA  02110-1301, USA
+
 #ifndef _RADLGRULES_H_
 #define _RADLGRULES_H_
 
-#if defined(__GNUG__) && !defined(NO_GCC_PRAGMA)
-#pragma interface "radlgrules.h"
-#endif
+//#if defined(__GNUG__) && !defined(NO_GCC_PRAGMA)
+//#pragma interface "radlgrules.h"
+//#endif
 
 #include "wx/xrc/xmlres.h"
 

@@ -1,5 +1,5 @@
-// rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006-2007 Vipin Cherian
+// Rosanne : Twenty Eight (28) Card Game
+// Copyright (C) 2006-2009 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 #define _RABID_H
 
 #include "ra/racommon.h"
-#include "ra/raruleengine.h"
-#include "ra/raevents.h"
 
 #define raBID_BTN_ROWS 5
 #define raBID_BTN_COLS 3
@@ -38,7 +36,7 @@
 
 #define raBID_PNL_RELIEF 2
 
-class raGame;
+class raGamePanel;
 
 class raBid: public wxPanel
 {
@@ -62,13 +60,13 @@ private:
 	wxButton *m_button_all;
 	wxButton *m_button_pass;
 
-	raGame *m_game;
+	raGamePanel *m_game;
 	
 	void OnButtonClick(wxCommandEvent &event);
 public:
 	raBid(const wxWindow* parent);
 	~raBid();
-	bool SetGamePanel(raGame *game_panel);
+	bool SetGamePanel(raGamePanel *game_panel);
 	bool SetPassable(bool passable = true);
 	bool SetMinimumBid(int min_bid);
 };

@@ -1,5 +1,5 @@
-// rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006-2007 Vipin Cherian
+// Rosanne : Twenty Eight (28) Card Game
+// Copyright (C) 2006-2009 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #define _RAPLAYER_H_
 
 #include "ra/racommon.h"
-#include "ra/raaiagent.h"
+#include "ai/aiagent.h"
 
 enum {
 	raPLAYER_TYPE_INVALID = -1,
@@ -31,7 +31,7 @@ enum {
 class raPlayer
 {
 private:
-	raAIAgent m_agent;
+	aiAgent m_agent;
 	int m_loc;
 	int m_type;
 	int m_trump;
@@ -42,14 +42,14 @@ public:
 	int GetLocation();
 	int GetType();
 	void SetType(int type);
-	void SetRuleEngineData(raRuleEngineData *data);
+	void SetRuleEngineData(gmEngineData *data);
 	bool GetBid(int *bid, int *trump, int min, bool force_bid);
 	int GetTrump();
 	int GetPlay();
-	bool PostPlayUpdate(raRuleEngineData *data, int card);
-	bool CheckAssumptions(raRuleEngineData *data);
+	bool PostPlayUpdate(gmEngineData *data, int card);
+	bool CheckAssumptions(gmEngineData *data);
 	bool Reset();
-	void SetRules(praRules rules = NULL);
+	void SetRules(pgmRules rules = NULL);
 	bool SetClockwise(bool flag);
 	bool GetClockwise();
 	bool AbandonGame(bool *flag);

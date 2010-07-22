@@ -1,5 +1,5 @@
-// rosanne : Twenty-Eight(28) Card Game
-// Copyright (C) 2006-2007 Vipin Cherian
+// Rosanne : Twenty Eight (28) Card Game
+// Copyright (C) 2006-2009 Vipin Cherian
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,36 +16,36 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, 
 // Boston, MA  02110-1301, USA
 
-#include "ra/raaiagent.h"
+#include "ai/aiagent.h"
 
 #define raAI_ORDERMOVES  
 
-//const int raAIAgent::s_depths[] = {2, 3, 5, 7, 8, 8, 8, 8};
-const int raAIAgent::s_depths[] = {2, 3, 4, 6, 7, 8, 8, 8};
-//const int raAIAgent::s_depths[] = {2, 3, 4, 5, 6, 8, 8, 8};
+//const int aiAgent::s_depths[] = {2, 3, 5, 7, 8, 8, 8, 8};
+const int aiAgent::s_depths[] = {2, 3, 4, 6, 7, 8, 8, 8};
+//const int aiAgent::s_depths[] = {2, 3, 4, 5, 6, 8, 8, 8};
 
-raAIAgent::raAIAgent()
+aiAgent::aiAgent()
 {
 	// TODO : Remove hardcoding
 	m_loc = 0;
 	Reset();
 }
-raAIAgent::~raAIAgent()
+aiAgent::~aiAgent()
 {
 }
 //
 // Public method/s
 //
-void raAIAgent::SetLocation(int loc)
+void aiAgent::SetLocation(int loc)
 {
 	m_loc = loc;
 }
-int raAIAgent::GetLocation()
+int aiAgent::GetLocation()
 {
 	return m_loc;
 }
 
-bool raAIAgent::GetBid(unsigned long cards, int *bid, int *trump, int min, bool force_bid)
+bool aiAgent::GetBid(unsigned long cards, int *bid, int *trump, int min, bool force_bid)
 {
 	int i, k;
 	int initial;
@@ -62,16 +62,16 @@ bool raAIAgent::GetBid(unsigned long cards, int *bid, int *trump, int min, bool 
 	//data = new int[4][29];
 	/*for(i = 0; i < 4; i++)
 	{
-	data[i] = new int[raBID_SAMPLE];
-	memset(data[i], 0, raBID_SAMPLE * sizeof(int));
+	data[i] = new int[aiBID_SAMPLE];
+	memset(data[i], 0, aiBID_SAMPLE * sizeof(int));
 	}*/
 	memset(data, 0, 4 * 29 * sizeof(int));
 
 #ifdef raAI_LOG_GETBID
-	wxLogDebug(raLib::PrintLong(cards));
+	wxLogDebug(gmUtil::PrintLong(cards));
 #endif
 
-	initial = (int)bhLib::CountBitsSet(cards);
+	initial = (int)gmUtil::CountBitsSet(cards);
 	wxASSERT(initial <= 8);
 #ifdef raAI_LOG_GETBID
 	wxLogDebug(wxString::Format("initial is %d", initial));
@@ -82,7 +82,7 @@ bool raAIAgent::GetBid(unsigned long cards, int *bid, int *trump, int min, bool 
 	//Dealing the rest of the cards
 	//
 
-	for(sample = 0; sample < raBID_SAMPLE; sample++)
+	for(sample = 0; sample < aiBID_SAMPLE; sample++)
 	{
 		// Get the rest of the cards into undealt
 		k = 0;
@@ -91,7 +91,7 @@ bool raAIAgent::GetBid(unsigned long cards, int *bid, int *trump, int min, bool 
 				undealt[k++] = i;
 
 		//Shuffle the undealt
-		raLib::ShuffleArray(undealt, 32 - initial);
+		gmUtil::ShuffleArray(undealt, 32 - initial);
 
 		//Initialize the hands
 		memset(hands, 0, sizeof(hands));
@@ -108,7 +108,7 @@ bool raAIAgent::GetBid(unsigned long cards, int *bid, int *trump, int min, bool 
 
 #ifdef raAI_LOG_GETBID
 		wxLogDebug("#############################");
-		wxLogDebug(raLib::PrintHands(hands));
+		wxLogDebug(gmUtil::PrintHands(hands));
 #endif
 
 
@@ -119,7 +119,7 @@ bool raAIAgent::GetBid(unsigned long cards, int *bid, int *trump, int min, bool 
 		{
 			// Estimation done only if there is atleast one card
 			// belonging to the suit, in the initial hand
-			if(cards & raLib::m_suit_mask[trump_count])
+			if(cards & gmUtil::m_suit_mask[trump_count])
 			{
 				temp_trump = trump_count;
 				eval[0] = 0;
@@ -135,9 +135,9 @@ bool raAIAgent::GetBid(unsigned long cards, int *bid, int *trump, int min, bool 
 				{
 					wxLogDebug(wxString::Format("RRRooor %d %d", eval[0], eval[1]));
 					wxLogDebug(wxString::Format("%08X %08X %08X %08X", hands[0], hands[1], hands[2], hands[3]));
-					wxLogDebug(raLib::m_suits[trump_count].c_str());
+					wxLogDebug(gmUtil::m_suits[trump_count].c_str());
 				}
-				wxLogDebug(wxString::Format("%s : %d - %d", raLib::m_suits[trump_count].c_str(), eval[0], eval[1]));
+				wxLogDebug(wxString::Format("%s : %d - %d", gmUtil::m_suits[trump_count].c_str(), eval[0], eval[1]));
 #endif
 				data[trump_count][eval[0]]++;
 			}
@@ -150,7 +150,7 @@ bool raAIAgent::GetBid(unsigned long cards, int *bid, int *trump, int min, bool 
 	wxLogDebug("#############################");
 	for(i = 0; i < 4; i++)
 	{
-		wxLogDebug(_("Trump - ") + raLib::m_suits[i]);
+		wxLogDebug(_("Trump - ") + gmUtil::m_suits[i]);
 		for(k = 0; k < 29; k++)
 		{
 			wxLogDebug(wxString::Format("Bid - %d : %d", k, data[i][k]));
@@ -171,7 +171,7 @@ bool raAIAgent::GetBid(unsigned long cards, int *bid, int *trump, int min, bool 
 		{
 			sample += data[i][k];
 			// TODO : 70 might be an aggressive value fix it accordingly
-			if((((double)(sample) / raBID_SAMPLE) >= 0.67) && (k > *bid))
+			if((((double)(sample) / aiBID_SAMPLE) >= 0.67) && (k > *bid))
 			{
 				*bid = k;
 				*trump = i;
@@ -206,7 +206,7 @@ bool raAIAgent::GetBid(unsigned long cards, int *bid, int *trump, int min, bool 
 
 	return true;
 }
-bool raAIAgent::GetBid(int *bid, int *trump, int min, bool force_bid)
+bool aiAgent::GetBid(int *bid, int *trump, int min, bool force_bid)
 {
 	int ret_trump;
 	int ret_bid;
@@ -219,7 +219,7 @@ bool raAIAgent::GetBid(int *bid, int *trump, int min, bool force_bid)
 	wxASSERT(trump);
 	// TODO : Correct this check
 	// Check if the current Rule Engine state is auction
-	if(m_engine.GetStatus() == raSTATUS_NOT_STARTED)
+	if(m_engine.GetStatus() == gmSTATUS_NOT_STARTED)
 	{
 		return false;
 	}
@@ -227,52 +227,52 @@ bool raAIAgent::GetBid(int *bid, int *trump, int min, bool force_bid)
 	m_engine.GetHands(hands);
 #ifdef raAI_LOG_GETBID
 	wxLogDebug(wxString::Format("Estimated bid for %d", m_loc));
-	wxLogDebug(raLib::PrintLong(hands[m_loc]));
+	wxLogDebug(gmUtil::PrintLong(hands[m_loc]));
 #endif
 
 	cards = hands[m_loc];
 	wxASSERT(cards);
 
-	max_bidder = raPLAYER_INVALID;
+	max_bidder = gmPLAYER_INVALID;
 	m_engine.GetMaxBid(NULL, &max_bidder);
-	wxASSERT((max_bidder >= raPLAYER_INVALID) && (max_bidder < raTOTAL_PLAYERS));
+	wxASSERT((max_bidder >= gmPLAYER_INVALID) && (max_bidder < gmTOTAL_PLAYERS));
 
 	if(max_bidder == m_loc)
 	{
 		trump_card = m_engine.GetTrumpCard();
-		wxASSERT((trump_card >= 0) && (trump_card < raTOTAL_CARDS));
+		wxASSERT((trump_card >= 0) && (trump_card < gmTOTAL_CARDS));
 		cards |= (1 << trump_card);
 	}
 
-	wxASSERT(bhLib::CountBitsSet(cards) <= 8);
+	wxASSERT(gmUtil::CountBitsSet(cards) <= 8);
 
 	if(!GetBid(cards, &ret_bid, &ret_trump, min, force_bid))
 	{
-		wxLogDebug(wxString::Format("GetBid failed. File - %s Line - %d", __FILE__, __LINE__));
+		wxLogDebug(wxString::Format(wxT("GetBid failed. File - %s Line - %d"), wxT(__FILE__), __LINE__));
 		return false;
 	}
-	wxASSERT((ret_bid == raBID_ALL) || (ret_bid == raBID_PASS) || (ret_bid >= min));
+	wxASSERT((ret_bid == gmBID_ALL) || (ret_bid == gmBID_PASS) || (ret_bid >= min));
 	 *bid = ret_bid;
 	 *trump = ret_trump;
 
 	return true;
 }
-bool raAIAgent::SetRuleEngineData(raRuleEngineData *data)
+bool aiAgent::SetRuleEngineData(gmEngineData *data)
 {
 	m_engine.SetData(data, false);
 	return true;
 }
 
-int raAIAgent::GetTrump()
+int aiAgent::GetTrump()
 {
 	int bid;
 	int trump;
-	unsigned long hands[raTOTAL_PLAYERS];
-	//int ret_val = raCARD_INVALID;
+	unsigned long hands[gmTOTAL_PLAYERS];
+	//int ret_val = gmCARD_INVALID;
 
 	m_engine.GetHands(hands);
 	//wxLogDebug(wxString::Format("Estimated bid for %d", m_loc));
-	//wxLogDebug(raLib::PrintLong(hands[m_loc]));
+	//wxLogDebug(gmUtil::PrintLong(hands[m_loc]));
 
 	GetBid(&bid, &trump, 14, true);
 
@@ -283,20 +283,20 @@ int raAIAgent::GetTrump()
 // -1, for show trump
 // -2 or other negative values in case of error
 
-int raAIAgent::GetTrump(unsigned long hand, int suit)
+int aiAgent::GetTrump(unsigned long hand, int suit)
 {
 	int i;
 	unsigned long trump_cards;
-	int ret_val = raCARD_INVALID;
+	int ret_val = gmCARD_INVALID;
 
 	wxASSERT(hand);
-	wxASSERT((suit > raSUIT_INVALID) && (suit <= raTOTAL_SUITS));
+	wxASSERT((suit > gmSUIT_INVALID) && (suit <= gmTOTAL_SUITS));
 
-	trump_cards = (hand & raLib::m_suit_mask[suit]) >> raLib::m_suit_rs[suit];
+	trump_cards = (hand & gmUtil::m_suit_mask[suit]) >> gmUtil::m_suit_rs[suit];
 
 	// If there are two cards with points
 	// select smallest as the trump
-	if((bhLib::CountBitsSet(trump_cards & 0x0000000F0)) >= 2)
+	if((gmUtil::CountBitsSet(trump_cards & 0x0000000F0)) >= 2)
 	{
 		for(i = 4; i < 8; i++)
 			if(trump_cards & (1 << i))
@@ -307,14 +307,14 @@ int raAIAgent::GetTrump(unsigned long hand, int suit)
 	}
 	// Else, if you have at least on card
 	// with no points select the highest as the trump
-	else if(bhLib::CountBitsSet(trump_cards & 0x0000000F) > 0)
+	else if(gmUtil::CountBitsSet(trump_cards & 0x0000000F) > 0)
 	{
-		ret_val = (suit * 8) + bhLib::HighestBitSet(trump_cards & 0x0000000F);
+		ret_val = (suit * 8) + gmUtil::HighestBitSet(trump_cards & 0x0000000F);
 	}
 	// Else, select the highest card as trump
 	else
 	{
-		ret_val = (suit * 8) + bhLib::HighestBitSet(trump_cards);
+		ret_val = (suit * 8) + gmUtil::HighestBitSet(trump_cards);
 	}
 
 	// Make sure that the trump card selected exists in the hand
@@ -322,20 +322,20 @@ int raAIAgent::GetTrump(unsigned long hand, int suit)
 	return ret_val;
 }
 
-int raAIAgent::GetPlay(unsigned long mask)
+int aiAgent::GetPlay(unsigned long mask)
 {
-	raRuleEngineData data, work_data, bkp_data;
-	raRuleEngine rule_engine;
+	gmEngineData data, work_data, bkp_data;
+	gmEngine rule_engine;
 	//slProblem problem;
 	//slSolution solution;
 	unsigned long **deal_hands = NULL;
 	int i, j, k;
-	raAIEval evals[raTOTAL_VALUES];
-	//raAIEval evals_trump[raTOTAL_SUITS][raTOTAL_VALUES];
-	raAIEval eval_trump, avg_eval_trump;
+	aiEval evals[gmTOTAL_VALUES];
+	//aiEval evals_trump[gmTOTAL_SUITS][gmTOTAL_VALUES];
+	aiEval eval_trump, avg_eval_trump;
 
-	raAIMove moves[raTOTAL_VALUES];
-	raAIMove moves_trump[raTOTAL_VALUES];
+	aiMove moves[gmTOTAL_VALUES];
+	aiMove moves_trump[gmTOTAL_VALUES];
 	int move_count, move_trump_count;
 	int depth = -1;
 	int eval;
@@ -348,28 +348,28 @@ int raAIAgent::GetPlay(unsigned long mask)
 
 #ifdef raAI_LOG_GET_PLAY
 	wxLogDebug("**********Entering GetPlay()*****************");
-	wxLogDebug(wxString::Format("Location - %s", raLib::m_long_locs[m_loc].c_str()));
+	wxLogDebug(wxString::Format("Location - %s", gmUtil::m_long_locs[m_loc].c_str()));
 #endif
 
 	if(!m_engine.GetData(&data))
 	{
 		wxLogError(wxString::Format(wxT("GetData() failed. %s:%d"), 
-			__FILE__, __LINE__));
+			wxT(__FILE__), __LINE__));
 		return -2;
 	}
 #ifdef raAI_LOG_GET_PLAY
 	wxLogDebug("Rule engine data :");
 	wxLogDebug(m_engine.GetLoggable());
 	wxLogDebug("Trump candidates :");
-	for(i = 0; i < raTOTAL_SUITS; i++)
+	for(i = 0; i < gmTOTAL_SUITS; i++)
 	{
 		if(m_trump_cards & (1 << i))
-			wxLogDebug(raLib::m_suits[i].c_str());
+			wxLogDebug(gmUtil::m_suits[i].c_str());
 	}
 #endif
 
 	wxASSERT((m_trump_cards >= 0) && (m_trump_cards <= 15));
-	//if((data.trump_shown) || (bhLib::CountBitsSet(m_trump_cards) == 1))
+	//if((data.trump_shown) || (gmUtil::CountBitsSet(m_trump_cards) == 1))
 	//	trump_known = true;
 
 	// Create the array to hold the random deals
@@ -377,17 +377,17 @@ int raAIAgent::GetPlay(unsigned long mask)
 	if(!deal_hands)
 	{
 		wxLogError(wxString::Format(wxT("Memory allocation failed. %s:%d"), 
-			__FILE__, __LINE__));
+			wxT(__FILE__), __LINE__));
 		return -2;
 	}
 	memset(deal_hands, 0, sizeof(deal_hands));
 	for(i = 0; i < 30; i++)
 	{
-		deal_hands[i] = new unsigned long[raTOTAL_PLAYERS];
+		deal_hands[i] = new unsigned long[gmTOTAL_PLAYERS];
 		if(!deal_hands[i])
 		{
 			wxLogError(wxString::Format(wxT("Memory allocation failed. %s:%d"), 
-				__FILE__, __LINE__));
+				wxT(__FILE__), __LINE__));
 			return -2;
 		}
 		memset(deal_hands[i], 0, sizeof(unsigned long));
@@ -399,8 +399,8 @@ int raAIAgent::GetPlay(unsigned long mask)
 
 	memset(&evals, 0, sizeof(evals));
 	//memset(&evals_trump, 0, sizeof(evals_trump));
-	memcpy(&work_data, &data, sizeof(raRuleEngineData));
-	memcpy(&bkp_data, &work_data, sizeof(raRuleEngineData));
+	memcpy(&work_data, &data, sizeof(gmEngineData));
+	memcpy(&bkp_data, &work_data, sizeof(gmEngineData));
 
 	rule_engine.SetData(&work_data, false);
 
@@ -425,10 +425,10 @@ int raAIAgent::GetPlay(unsigned long mask)
 			wxLogDebug("Trump known as m_loc is the max bidder");
 #endif
 		// Generate possible moves which do not ask for trump
-		if(!GenerateMoves(&rule_engine, moves, &move_count, raAI_GENMV_NOTRUMP))
+		if(!GenerateMoves(&rule_engine, moves, &move_count, aiGENMV_NOTRUMP))
 		{
 			wxLogError(wxString::Format(wxT("GenerateMoves() failed. %s:%d"), 
-				__FILE__, __LINE__));
+				wxT(__FILE__), __LINE__));
 			return -2;
 		}
 		wxASSERT(move_count > 0);
@@ -439,10 +439,10 @@ int raAIAgent::GetPlay(unsigned long mask)
 #endif
 
 		// Generate moves which ask for trump
-		if(!GenerateMoves(&rule_engine, moves_trump, &move_trump_count, raAI_GENMV_TRUMP))
+		if(!GenerateMoves(&rule_engine, moves_trump, &move_trump_count, aiGENMV_TRUMP))
 		{
 			wxLogError(wxString::Format(wxT("GenerateMoves() failed. %s:%d"), 
-				__FILE__, __LINE__));
+				wxT(__FILE__), __LINE__));
 			return -2;
 		}
 		wxASSERT(move_trump_count >= 0);
@@ -456,7 +456,7 @@ int raAIAgent::GetPlay(unsigned long mask)
 		if(!GenerateDeals(&data, deal_hands, 30))
 		{
 			wxLogError(wxString::Format(wxT("GenerateDeals() failed. %s:%d"), 
-				__FILE__, __LINE__));
+				wxT(__FILE__), __LINE__));
 			return -2;
 		}
 		// For each random deal
@@ -481,7 +481,7 @@ int raAIAgent::GetPlay(unsigned long mask)
 				if(!MakeMoveAndEval(&rule_engine, &moves[j], depth, &eval))
 				{
 					wxLogError(wxString::Format(wxT("MakeMoveAndEval() failed. %s:%d"), 
-						__FILE__, __LINE__));
+						wxT(__FILE__), __LINE__));
 					return -2;
 				}
 				evals[j].eval += eval;
@@ -495,7 +495,7 @@ int raAIAgent::GetPlay(unsigned long mask)
 			}
 
 			eval_trump.count = 0;
-			eval_trump.eval = raAI_NEG_INFTY;
+			eval_trump.eval = aiNEG_INFTY;
 			eval_trump.valid = false;
 
 			for(j = 0; j < move_trump_count; j++)
@@ -513,7 +513,7 @@ int raAIAgent::GetPlay(unsigned long mask)
 				if(!MakeMoveAndEval(&rule_engine, &moves_trump[j], depth, &eval))
 				{
 					wxLogError(wxString::Format(wxT("MakeMoveAndEval() failed. %s:%d"), 
-						__FILE__, __LINE__));
+						wxT(__FILE__), __LINE__));
 					return -2;
 				}
 				//evals_trump[0][j].eval += eval;
@@ -542,18 +542,18 @@ int raAIAgent::GetPlay(unsigned long mask)
 			}
 			
 			// Update the statusbar
-			raLib::SetStatusText(wxString::Format(
-				"%s is thinking - %d%%", raLib::m_long_locs[m_loc].c_str(), 
+			gmUtil::SetStatusText(wxString::Format(
+				wxT("%s is thinking - %d%%"), gmUtil::m_long_locs[m_loc].c_str(), 
 				(i * 100) / 30 ), raSBARPOS_GEN);
 
 		}
 
-		raLib::SetStatusText("", raSBARPOS_GEN);
+		gmUtil::SetStatusText(wxT(""), raSBARPOS_GEN);
 
-		best_eval = (double)raAI_NEG_INFTY;
-		best_eval_trump = (double)raAI_NEG_INFTY;
-		best_play = raCARD_INVALID;
-		//best_play_trump = raCARD_INVALID;
+		best_eval = (double)aiNEG_INFTY;
+		best_eval_trump = (double)aiNEG_INFTY;
+		best_play = gmCARD_INVALID;
+		//best_play_trump = gmCARD_INVALID;
 
 #ifdef raAI_LOG_GET_PLAY
 		wxLogDebug("Average evals for each move :");
@@ -577,12 +577,12 @@ int raAIAgent::GetPlay(unsigned long mask)
 				}
 			}
 		}
-		wxASSERT(best_play != raCARD_INVALID);
+		wxASSERT(best_play != gmCARD_INVALID);
 
 #ifdef raAI_LOG_GET_PLAY
 		wxLogDebug(wxString::Format("Best play (only considering cases where trump is not asked) - %s%s", 
-			raLib::m_suits[raGetSuit(best_play)], 
-			raLib::m_values[raGetValue(best_play)]));
+			gmUtil::m_suits[gmGetSuit(best_play)], 
+			gmUtil::m_values[gmGetValue(best_play)]));
 #endif
 
 		// Find out the best play after asking for the trump
@@ -607,7 +607,7 @@ int raAIAgent::GetPlay(unsigned long mask)
 #ifdef raAI_LOG_GET_PLAY
 			wxLogDebug(wxString::Format("Best_eval_trump - %5.2f", best_eval_trump));
 #endif
-			//wxASSERT(best_play_trump != raCARD_INVALID);
+			//wxASSERT(best_play_trump != gmCARD_INVALID);
 			if(best_eval_trump > best_eval)
 			{
 #ifdef raAI_LOG_GET_PLAY
@@ -628,10 +628,10 @@ int raAIAgent::GetPlay(unsigned long mask)
 		wxLogDebug("Trump is not known");
 #endif
 		// Generate possible moves which do not ask for trump
-		if(!GenerateMoves(&rule_engine, moves, &move_count, raAI_GENMV_NOTRUMP))
+		if(!GenerateMoves(&rule_engine, moves, &move_count, aiGENMV_NOTRUMP))
 		{
 			wxLogError(wxString::Format(wxT("GenerateMoves() failed. %s:%d"), 
-				__FILE__, __LINE__));
+				wxT(__FILE__), __LINE__));
 			return -2;
 		}
 		wxASSERT(move_count > 0);
@@ -642,7 +642,7 @@ int raAIAgent::GetPlay(unsigned long mask)
 		wxLogDebug("Moves generated (without asking for trump) :");
 		wxLogDebug(PrintMoves(moves, move_count));
 #endif
-		for(k = 0; k < raTOTAL_SUITS; k++)
+		for(k = 0; k < gmTOTAL_SUITS; k++)
 		{
 			// If the trump is not possible ignore 
 			if(!(m_trump_cards & (1 << k)))
@@ -652,16 +652,16 @@ int raAIAgent::GetPlay(unsigned long mask)
 			rule_engine.SetData(&work_data, false);
 
 			// Generate moves which ask for trump
-			if(!GenerateMoves(&rule_engine, moves_trump, &move_trump_count, raAI_GENMV_TRUMP))
+			if(!GenerateMoves(&rule_engine, moves_trump, &move_trump_count, aiGENMV_TRUMP))
 			{
 				wxLogError(wxString::Format(wxT("GenerateMoves() failed. %s:%d"), 
-					__FILE__, __LINE__));
+					wxT(__FILE__), __LINE__));
 				return -2;
 			}
 			wxASSERT(move_trump_count >= 0);
 
 #ifdef raAI_LOG_GET_PLAY
-			wxLogDebug(wxString::Format("Trump - %s", raLib::m_suits[k].c_str()));
+			wxLogDebug(wxString::Format("Trump - %s", gmUtil::m_suits[k].c_str()));
 			wxLogDebug("Moves generated (asking for trump) :");
 			wxLogDebug(PrintMoves(moves_trump, move_trump_count));
 #endif
@@ -670,7 +670,7 @@ int raAIAgent::GetPlay(unsigned long mask)
 			if(!GenerateDeals(&work_data, deal_hands, 30, k))
 			{
 				wxLogError(wxString::Format(wxT("GenerateDeals() failed. %s:%d"), 
-					__FILE__, __LINE__));
+					wxT(__FILE__), __LINE__));
 				return -2;
 			}
 			// For each random deal
@@ -684,7 +684,7 @@ int raAIAgent::GetPlay(unsigned long mask)
 				// Set the trump card 
 				work_data.trump_card = GetTrump(work_data.hands[work_data.curr_max_bidder], work_data.trump_suit);
 
-				wxASSERT((work_data.trump_card > raCARD_INVALID) && (work_data.trump_card < raTOTAL_CARDS));
+				wxASSERT((work_data.trump_card > gmCARD_INVALID) && (work_data.trump_card < gmTOTAL_CARDS));
 				wxASSERT(work_data.hands[work_data.curr_max_bidder] & (1 << work_data.trump_card));
 
 				// Remove the trump card from the max bidder's hand
@@ -696,7 +696,7 @@ int raAIAgent::GetPlay(unsigned long mask)
 #ifdef raAI_LOG_GET_PLAY
 					wxLogDebug("----------------------------------------------");
 					wxLogDebug(wxString::Format("Random deal no : %d", i));
-					wxLogDebug(wxString::Format("Trump : %s", raLib::m_suits[k].c_str()));
+					wxLogDebug(wxString::Format("Trump : %s", gmUtil::m_suits[k].c_str()));
 					wxLogDebug(wxString::Format("Attempting move no : %d", j));
 					wxLogDebug(PrintMoves(&moves[j], 1));
 					wxLogDebug("Rule engine data dump :");
@@ -705,13 +705,13 @@ int raAIAgent::GetPlay(unsigned long mask)
 					if(!MakeMoveAndEval(&rule_engine, &moves[j], depth, &eval))
 					{
 						wxLogError(wxString::Format(wxT("MakeMoveAndEval() failed. %s:%d"), 
-							__FILE__, __LINE__));
+							wxT(__FILE__), __LINE__));
 						return -2;
 					}
 					//wxLogDebug(wxString::Format("Eval for %s%s - %d (Trump - %s)",
-					//	raLib::m_suits[raGetSuit(moves[j].card)].c_str(), 
-					//	raLib::m_values[raGetValue(moves[j].card)].c_str(), 
-					//	eval, raLib::m_suits[k].c_str()));
+					//	gmUtil::m_suits[gmGetSuit(moves[j].card)].c_str(), 
+					//	gmUtil::m_values[gmGetValue(moves[j].card)].c_str(), 
+					//	eval, gmUtil::m_suits[k].c_str()));
 					evals[j].eval += eval;
 					evals[j].count++;
 					evals[j].valid = true;
@@ -726,17 +726,17 @@ int raAIAgent::GetPlay(unsigned long mask)
 				// Generate moves which ask for trump
 				//wxLogDebug("Printing GetLoggable");
 				//wxLogDebug(rule_engine.GetLoggable());
-				if(!GenerateMoves(&rule_engine, moves_trump, &move_trump_count, raAI_GENMV_TRUMP))
+				if(!GenerateMoves(&rule_engine, moves_trump, &move_trump_count, aiGENMV_TRUMP))
 				{
 					wxLogError(wxString::Format(wxT("GenerateMoves() failed. %s:%d"), 
-						__FILE__, __LINE__));
+						wxT(__FILE__), __LINE__));
 					return -2;
 				}
 				//wxLogDebug(PrintMoves(moves_trump, move_trump_count));
 				wxASSERT(move_trump_count >= 0);
 
 				eval_trump.count = 0;
-				eval_trump.eval = raAI_NEG_INFTY;
+				eval_trump.eval = aiNEG_INFTY;
 				eval_trump.valid = false;
 
 				for(j = 0; j < move_trump_count; j++)
@@ -745,7 +745,7 @@ int raAIAgent::GetPlay(unsigned long mask)
 #ifdef raAI_LOG_GET_PLAY
 					wxLogDebug("----------------------------------------------");
 					wxLogDebug(wxString::Format("Random deal no : %d", i));
-					wxLogDebug(wxString::Format("Trump : %s", raLib::m_suits[k].c_str()));
+					wxLogDebug(wxString::Format("Trump : %s", gmUtil::m_suits[k].c_str()));
 					wxLogDebug(wxString::Format("Attempting move no : %d", j));
 					wxLogDebug(PrintMoves(&moves_trump[j], 1));
 					wxLogDebug("Rule engine data dump :");
@@ -754,7 +754,7 @@ int raAIAgent::GetPlay(unsigned long mask)
 					if(!MakeMoveAndEval(&rule_engine, &moves_trump[j], depth, &eval))
 					{
 						wxLogError(wxString::Format(wxT("MakeMoveAndEval() failed. %s:%d"), 
-							__FILE__, __LINE__));
+							wxT(__FILE__), __LINE__));
 						return -2;
 					}
 					if(eval > eval_trump.eval)
@@ -782,19 +782,19 @@ int raAIAgent::GetPlay(unsigned long mask)
 				}
 
 				// Update the statusbar
-				raLib::SetStatusText(wxString::Format(
-					"%s is thinking - %d%%", raLib::m_long_locs[m_loc].c_str(), 
-					(((k * 30) + i) * 100) / (raTOTAL_SUITS * 30) ), raSBARPOS_GEN);
+				gmUtil::SetStatusText(wxString::Format(
+					wxT("%s is thinking - %d%%"), gmUtil::m_long_locs[m_loc].c_str(), 
+					(((k * 30) + i) * 100) / (gmTOTAL_SUITS * 30) ), raSBARPOS_GEN);
 
 			}
 		}
 
-		raLib::SetStatusText("", raSBARPOS_GEN);
+		gmUtil::SetStatusText(wxT(""), raSBARPOS_GEN);
 
-		best_eval = (double)raAI_NEG_INFTY;
-		best_eval_trump = (double)raAI_NEG_INFTY;
-		best_play = raCARD_INVALID;
-		//best_play_trump = raCARD_INVALID;
+		best_eval = (double)aiNEG_INFTY;
+		best_eval_trump = (double)aiNEG_INFTY;
+		best_play = gmCARD_INVALID;
+		//best_play_trump = gmCARD_INVALID;
 #ifdef raAI_LOG_GET_PLAY
 		wxLogDebug("Average evals for each move :");
 #endif
@@ -815,11 +815,11 @@ int raAIAgent::GetPlay(unsigned long mask)
 				}
 			}
 		}
-		wxASSERT(best_play != raCARD_INVALID);
+		wxASSERT(best_play != gmCARD_INVALID);
 #ifdef raAI_LOG_GET_PLAY
 		wxLogDebug(wxString::Format("Best play (only considering cases where trump is not asked) - %s%s", 
-			raLib::m_suits[raGetSuit(best_play)], 
-			raLib::m_values[raGetValue(best_play)]));
+			gmUtil::m_suits[gmGetSuit(best_play)], 
+			gmUtil::m_values[gmGetValue(best_play)]));
 #endif
 
 		// Compare the options - 
@@ -853,7 +853,7 @@ int raAIAgent::GetPlay(unsigned long mask)
 	delete[] deal_hands;
 	deal_hands = NULL;
 
-	wxASSERT((best_play == -1) || ((best_play > raCARD_INVALID) && (best_play < raTOTAL_CARDS)));
+	wxASSERT((best_play == -1) || ((best_play > gmCARD_INVALID) && (best_play < gmTOTAL_CARDS)));
 
 #ifdef raAI_LOG_GET_PLAY
 	wxLogDebug("**********Exiting GetPlay()*****************");
@@ -861,7 +861,7 @@ int raAIAgent::GetPlay(unsigned long mask)
 
 	return best_play;
 }
-bool raAIAgent::GenerateSLProblem(raRuleEngineData *data, slProblem *problem, int trump)
+bool aiAgent::GenerateSLProblem(gmEngineData *data, slProblem *problem, int trump)
 {
 	unsigned long cards_played = 0;
 	int i, j;
@@ -869,13 +869,13 @@ bool raAIAgent::GenerateSLProblem(raRuleEngineData *data, slProblem *problem, in
 
 #ifdef raAI_LOG_GENERATESLPROBLEM
 	wxLogDebug("Inside GenerateSLProblem");
-	wxLogDebug(wxString::Format("m_loc - %s", raLib::m_short_locs[m_loc].c_str()));
+	wxLogDebug(wxString::Format("m_loc - %s", gmUtil::m_short_locs[m_loc].c_str()));
 #endif
 
 	wxASSERT(data);
 
 	if((!data->trump_shown) && (data->curr_max_bidder != m_loc))
-		wxASSERT(trump != raSUIT_INVALID);
+		wxASSERT(trump != gmSUIT_INVALID);
 
 	if((data->trump_shown) || (data->curr_max_bidder == m_loc))
 		trump = data->trump_suit;
@@ -884,17 +884,17 @@ bool raAIAgent::GenerateSLProblem(raRuleEngineData *data, slProblem *problem, in
 	// should have at least one trump
 
 	// Set the hand lengths
-	for(i = 0; i < raTOTAL_PLAYERS; i++)
+	for(i = 0; i < gmTOTAL_PLAYERS; i++)
 	{
-		problem->hand_total_length[i] = 8 - (bhLib::CountBitsSet(data->played_cards[i]));
+		problem->hand_total_length[i] = 8 - (gmUtil::CountBitsSet(data->played_cards[i]));
 		sum_hands += problem->hand_total_length[i]; 
 		cards_played |= data->played_cards[i];
 	}
 
 	// Set suit lengths
-	for(i = 0; i < raTOTAL_SUITS; i++)
+	for(i = 0; i < gmTOTAL_SUITS; i++)
 	{
-		problem->suit_total_length[i] = 8 - bhLib::CountBitsSet(cards_played & raLib::m_suit_mask[i]);
+		problem->suit_total_length[i] = 8 - gmUtil::CountBitsSet(cards_played & gmUtil::m_suit_mask[i]);
 		sum_suts += problem->suit_total_length[i];
 	}
 
@@ -913,12 +913,12 @@ bool raAIAgent::GenerateSLProblem(raRuleEngineData *data, slProblem *problem, in
 	}
 
 	// Set the cases where the suit length is null
-	for(i = 0; i < raTOTAL_PLAYERS; i++)
+	for(i = 0; i < gmTOTAL_PLAYERS; i++)
 	{
-		for(j = 0; j < raTOTAL_SUITS; j++)
+		for(j = 0; j < gmTOTAL_SUITS; j++)
 		{
 			problem->cells[i][j].max =
-				raMin(problem->hand_total_length[i], problem->suit_total_length[j]);
+				gmMin(problem->hand_total_length[i], problem->suit_total_length[j]);
 			if(m_nulls[i] & (1 << j))
 			{
 				problem->cells[i][j].min = 0;
@@ -928,9 +928,9 @@ bool raAIAgent::GenerateSLProblem(raRuleEngineData *data, slProblem *problem, in
 	}
 
 	// Set the cells for self
-	for(i = 0; i < raTOTAL_SUITS; i++)
+	for(i = 0; i < gmTOTAL_SUITS; i++)
 	{
-		problem->cells[m_loc][i].min = bhLib::CountBitsSet(data->hands[m_loc] & raLib::m_suit_mask[i]);
+		problem->cells[m_loc][i].min = gmUtil::CountBitsSet(data->hands[m_loc] & gmUtil::m_suit_mask[i]);
 		problem->cells[m_loc][i].max = problem->cells[m_loc][i].min;
 	}
 	// If self is the max bidder and if trump is not shown, 
@@ -945,12 +945,12 @@ bool raAIAgent::GenerateSLProblem(raRuleEngineData *data, slProblem *problem, in
 
 #ifdef raAI_LOG_GENERATESLPROBLEM
 	wxString out;
-	wxLogDebug(slSolver::PrintProblem(problem));
-	for(i = 0; i < raTOTAL_PLAYERS; i++)
+	wxLogDebug(aiSuitLengthSolver::PrintProblem(problem));
+	for(i = 0; i < gmTOTAL_PLAYERS; i++)
 	{
 		out.Empty();
-		out.Append(wxString::Format("%s - ", raLib::m_short_locs[i].c_str()));
-		for(j = 0; j < raTOTAL_SUITS; j++)
+		out.Append(wxString::Format("%s - ", gmUtil::m_short_locs[i].c_str()));
+		for(j = 0; j < gmTOTAL_SUITS; j++)
 		{
 			out.Append(wxString::Format("%d/%d ", 
 				problem->cells[i][j].min,
@@ -964,30 +964,30 @@ bool raAIAgent::GenerateSLProblem(raRuleEngineData *data, slProblem *problem, in
 
 	return true;
 }
-//bool raAIAgent::GenerateSLSolution(slProblem *problem, slSolution *solution)
+//bool aiAgent::GenerateSLSolution(slProblem *problem, slSolution *solution)
 //{
-//	slSolver solver;
+//	aiSuitLengthSolver solver;
 //
 //	wxASSERT(problem);
 //	wxASSERT(solution);
 //
 //	solver.SetProblem(problem);
 //	solver.GetRandomSolution(solution);
-//	wxLogDebug(slSolver::PrintSolution(solution));
+//	wxLogDebug(aiSuitLengthSolver::PrintSolution(solution));
 //
 //	return true;
 //}
-bool raAIAgent::GenerateDeals(raRuleEngineData *data, unsigned long **deals, int count, int trump)
+bool aiAgent::GenerateDeals(gmEngineData *data, unsigned long **deals, int count, int trump)
 {
 	int i, j, k, l;
 	slProblem problem;
 	slSolution solution;
-	slSolver solver;
-	int to_deal[raTOTAL_SUITS][raTOTAL_VALUES];
-	int to_deal_count[raTOTAL_SUITS];
+	aiSuitLengthSolver solver;
+	int to_deal[gmTOTAL_SUITS][gmTOTAL_VALUES];
+	int to_deal_count[gmTOTAL_SUITS];
 	unsigned long cards_played = 0;
 	unsigned long temp;
-	unsigned long known_alloc[raTOTAL_PLAYERS];
+	unsigned long known_alloc[gmTOTAL_PLAYERS];
 	
 
 	wxASSERT(data);
@@ -1012,26 +1012,26 @@ bool raAIAgent::GenerateDeals(raRuleEngineData *data, unsigned long **deals, int
 		known_alloc[data->curr_max_bidder] |= (1 << data->trump_card);
 
 	// Consider the allocated cards as played
-	for(i = 0; i < raTOTAL_PLAYERS; i++)
+	for(i = 0; i < gmTOTAL_PLAYERS; i++)
 	{
 		cards_played |= known_alloc[i];
 	}
 
 	// Get the list of cards to be dealt for each suit
-	for(i = 0; i < raTOTAL_SUITS; i++)
+	for(i = 0; i < gmTOTAL_SUITS; i++)
 	{
 		cards_played |= data->played_cards[i];
 		to_deal_count[i] = 0;
 	}
 
 	// For each suit, create an array of the cards to be dealt
-	for(i = 0; i < raTOTAL_SUITS; i++)
+	for(i = 0; i < gmTOTAL_SUITS; i++)
 	{
-		temp = (~cards_played) & raLib::m_suit_mask[i];
+		temp = (~cards_played) & gmUtil::m_suit_mask[i];
 		j = 0;
 		while(temp)
 		{
-			to_deal[i][j] = bhLib::HighestBitSet(temp);
+			to_deal[i][j] = gmUtil::HighestBitSet(temp);
 			temp &= ~(1 << to_deal[i][j]);
 			j++;
 		}
@@ -1043,14 +1043,14 @@ bool raAIAgent::GenerateDeals(raRuleEngineData *data, unsigned long **deals, int
 	if(!GenerateSLProblem(data, &problem, trump))
 	{
 		wxLogError(wxString::Format(wxT("GetData() failed. %s:%d"), 
-			__FILE__, __LINE__));
+			wxT(__FILE__), __LINE__));
 		return false;
 	}
 	
 #ifdef raAI_LOG_GENERATEDEALS
 	wxLogError(wxString::Format(wxT("Logged from. %s:%d"), 
-		__FILE__, __LINE__));
-	wxLogDebug(slSolver::PrintProblem(&problem));
+		wxT(__FILE__), __LINE__));
+	wxLogDebug(aiSuitLengthSolver::PrintProblem(&problem));
 #endif
 
 	// 
@@ -1067,23 +1067,23 @@ bool raAIAgent::GenerateDeals(raRuleEngineData *data, unsigned long **deals, int
 		memcpy(deals[i], known_alloc, sizeof(known_alloc));
 
 		// For each array shuffle the cards to be dealt
-		for(j = 0; j < raTOTAL_SUITS; j++)
+		for(j = 0; j < gmTOTAL_SUITS; j++)
 		{
-			raLib::ShuffleArray(to_deal[j], to_deal_count[j]);
+			gmUtil::ShuffleArray(to_deal[j], to_deal_count[j]);
 		}
-		//wxLogDebug(slSolver::PrintSolution(&solution));
+		//wxLogDebug(aiSuitLengthSolver::PrintSolution(&solution));
 
 		// For each player deal the undealt cards
-		for(k = 0; k < raTOTAL_SUITS; k++)
+		for(k = 0; k < gmTOTAL_SUITS; k++)
 		{
 			l = 0;
-			for(j = 0; j < raTOTAL_PLAYERS; j++)
+			for(j = 0; j < gmTOTAL_PLAYERS; j++)
 			{
 				//wxLogDebug(wxString::Format("Compare with solution %d %d",
-				//	(int)bhLib::CountBitsSet(deals[i][j] & raLib::m_suit_mask[k]),
+				//	(int)gmUtil::CountBitsSet(deals[i][j] & gmUtil::m_suit_mask[k]),
 				//	solution.suit_length[j][k]));
-				wxASSERT((int)bhLib::CountBitsSet(deals[i][j] & raLib::m_suit_mask[k]) <= solution.suit_length[j][k]);
-				while((int)bhLib::CountBitsSet(deals[i][j] & raLib::m_suit_mask[k]) < solution.suit_length[j][k])
+				wxASSERT((int)gmUtil::CountBitsSet(deals[i][j] & gmUtil::m_suit_mask[k]) <= solution.suit_length[j][k]);
+				while((int)gmUtil::CountBitsSet(deals[i][j] & gmUtil::m_suit_mask[k]) < solution.suit_length[j][k])
 				{
 					wxASSERT(l < to_deal_count[k]);
 					deals[i][j] |= (1 << to_deal[k][l]);
@@ -1091,34 +1091,34 @@ bool raAIAgent::GenerateDeals(raRuleEngineData *data, unsigned long **deals, int
 				}
 			}
 		}
-		//wxLogDebug(raLib::PrintHands(deals[i]));
+		//wxLogDebug(gmUtil::PrintHands(deals[i]));
 
 	}
 
 
 	return true;
 }
-wxString raAIAgent::PrintMoves(raAIMove *moves, int move_count)
+wxString aiAgent::PrintMoves(aiMove *moves, int move_count)
 {
 	wxString out;
 	int i;
 	wxASSERT(move_count >= 0);
-	out.Append(wxString::Format("%d moves - ", move_count));
+	out.Append(wxString::Format(wxT("%d moves - "), move_count));
 	for(i = 0; i < move_count; i++)
 	{
 		if(moves[i].ask_trump)
 		{
-			out.Append(wxString::Format("?%s%s(%d),",
-				raLib::m_suits[raGetSuit(moves[i].card)].c_str(),
-				raLib::m_values[raGetValue(moves[i].card)].c_str(),
+			out.Append(wxString::Format(wxT("?%s%s(%d),"),
+				gmUtil::m_suits[gmGetSuit(moves[i].card)].c_str(),
+				gmUtil::m_values[gmGetValue(moves[i].card)].c_str(),
 				moves[i].rank
 				));
 		}
 		else
 		{
-			out.Append(wxString::Format("%s%s(%d),",
-				raLib::m_suits[raGetSuit(moves[i].card)].c_str(),
-				raLib::m_values[raGetValue(moves[i].card)].c_str(),
+			out.Append(wxString::Format(wxT("%s%s(%d),"),
+				gmUtil::m_suits[gmGetSuit(moves[i].card)].c_str(),
+				gmUtil::m_values[gmGetValue(moves[i].card)].c_str(),
 				moves[i].rank
 				));
 		}
@@ -1126,21 +1126,21 @@ wxString raAIAgent::PrintMoves(raAIMove *moves, int move_count)
 	return out;
 }
 
-bool raAIAgent::PostPlayUpdate(raRuleEngineData *data, int card)
+bool aiAgent::PostPlayUpdate(gmEngineData *data, int card)
 {
 	int cards_left = 0;
 	unsigned long cards_played = 0;
 	int i;
 	int suit;
 
-	wxASSERT(card != raCARD_INVALID);
-	wxASSERT(data->status == raSTATUS_TRICKS);
+	wxASSERT(card != gmCARD_INVALID);
+	wxASSERT(data->status == gmSTATUS_TRICKS);
 
 	// If the input card is valid
-	if(card != raCARD_INVALID)
+	if(card != gmCARD_INVALID)
 	{
 
-		suit = raGetSuit(card);
+		suit = gmGetSuit(card);
 
 		// If trump is not shown and if the player is the max bidder and
 		// if it is the first card in the trick then the suit is not trump, 
@@ -1155,13 +1155,13 @@ bool raAIAgent::PostPlayUpdate(raRuleEngineData *data, int card)
 			{
 				// Get the count of cards belonging to the suit
 				// already played
-				for(i = 0; i < raTOTAL_PLAYERS; i++)
+				for(i = 0; i < gmTOTAL_PLAYERS; i++)
 				{
-					cards_left += bhLib::CountBitsSet(data->played_cards[i] & raLib::m_suit_mask[suit]);
+					cards_left += gmUtil::CountBitsSet(data->played_cards[i] & gmUtil::m_suit_mask[suit]);
 				}
 				// Add to that the number of cards held by the AI player
 				// belonging to the suit
-				cards_left += bhLib::CountBitsSet(data->hands[m_loc] & raLib::m_suit_mask[suit]);
+				cards_left += gmUtil::CountBitsSet(data->hands[m_loc] & gmUtil::m_suit_mask[suit]);
 				// Consider the card being played
 				cards_left++;
 
@@ -1171,7 +1171,7 @@ bool raAIAgent::PostPlayUpdate(raRuleEngineData *data, int card)
 				// (8 - data->trick_round) > (8 - cards_left)
 				if(data->trick_round < cards_left)
 				{
-					//wxLogDebug(wxString::Format("%s is not the trump", raLib::m_suits[suit].c_str()));
+					//wxLogDebug(wxString::Format("%s is not the trump", gmUtil::m_suits[suit].c_str()));
 					m_trump_cards &= ~(1 << suit);
 				}
 				else
@@ -1184,7 +1184,7 @@ bool raAIAgent::PostPlayUpdate(raRuleEngineData *data, int card)
 			// which is not any of the suspects, the suspicion is valid
 			if(m_notrump_suspects)
 			{
-				for(i = 0; i < raTOTAL_SUITS; i++)
+				for(i = 0; i < gmTOTAL_SUITS; i++)
 				{
 					//if((m_notrump_suspects & (1 << suit)) && (i != suit))
 					if((m_notrump_suspects & (1 << i)) && (i != suit))
@@ -1233,7 +1233,7 @@ bool raAIAgent::PostPlayUpdate(raRuleEngineData *data, int card)
 	// for those
 	if((data->trump_shown) && (m_mb_null_susp))
 	{
-		for(i = 0; i < raTOTAL_SUITS; i++)	
+		for(i = 0; i < gmTOTAL_SUITS; i++)	
 		{
 			if((m_mb_null_susp & (1 << i)) && (i != data->trump_suit))
 			{
@@ -1254,28 +1254,28 @@ bool raAIAgent::PostPlayUpdate(raRuleEngineData *data, int card)
 		cards_played = 0;
 
 		// Add the card that is being played first
-		if(card != raCARD_INVALID)
+		if(card != gmCARD_INVALID)
 		{
 			cards_played |= (1 << card);
 		}
 
 		// Add the cards played so far (previous tricks and the current one)
-		for(i = 0; i < raTOTAL_PLAYERS; i++)	
+		for(i = 0; i < gmTOTAL_PLAYERS; i++)	
 		{
 			cards_played |= data->played_cards[i];
-			if(data->tricks[data->trick_round].cards[i] != raCARD_INVALID)
+			if(data->tricks[data->trick_round].cards[i] != gmCARD_INVALID)
 				cards_played |= (1 << data->tricks[data->trick_round].cards[i]);
 		}
 
 		//wxLogDebug("Here");
-		//wxLogDebug(raLib::PrintHands(data->played_cards));
-		for(i = 0; i < raTOTAL_SUITS; i++)	
+		//wxLogDebug(gmUtil::PrintHands(data->played_cards));
+		for(i = 0; i < gmTOTAL_SUITS; i++)	
 		{
 			//wxLogDebug(wxString::Format("Debug count - %d", 
-			//	bhLib::CountBitsSet((cards_played | data->hands[m_loc]) & 
-			//	raLib::m_suit_mask[i])));
-			if(bhLib::CountBitsSet((cards_played | data->hands[m_loc]) & 
-				raLib::m_suit_mask[i])>= raTOTAL_VALUES)
+			//	gmUtil::CountBitsSet((cards_played | data->hands[m_loc]) & 
+			//	gmUtil::m_suit_mask[i])));
+			if(gmUtil::CountBitsSet((cards_played | data->hands[m_loc]) & 
+				gmUtil::m_suit_mask[i])>= gmTOTAL_VALUES)
 			{
 				m_trump_cards &= ~(1 << i);
 			}
@@ -1284,28 +1284,28 @@ bool raAIAgent::PostPlayUpdate(raRuleEngineData *data, int card)
 
 	/*
 	wxLogDebug("---------------------------------");
-	wxLogDebug(wxString::Format("Logged from %s AI", raLib::m_short_locs[m_loc].c_str()));
-	for(i = 0; i < raTOTAL_SUITS; i++)
+	wxLogDebug(wxString::Format("Logged from %s AI", gmUtil::m_short_locs[m_loc].c_str()));
+	for(i = 0; i < gmTOTAL_SUITS; i++)
 	{
 		if(m_trump_cards & (1 << i))
 		{
-			wxLogDebug(wxString::Format("%s can be trump", raLib::m_suits[i].c_str()));
+			wxLogDebug(wxString::Format("%s can be trump", gmUtil::m_suits[i].c_str()));
 		}
 		else
 		{
-			wxLogDebug(wxString::Format("%s cannot be trump", raLib::m_suits[i].c_str()));
+			wxLogDebug(wxString::Format("%s cannot be trump", gmUtil::m_suits[i].c_str()));
 		}
 	}
 	int j;
-	for(j = 0; j < raTOTAL_PLAYERS; j++)
+	for(j = 0; j < gmTOTAL_PLAYERS; j++)
 	{
-		for(i = 0; i < raTOTAL_SUITS; i++)
+		for(i = 0; i < gmTOTAL_SUITS; i++)
 		{
 			if(m_nulls[j] & (1 << i))
 			{
 				wxLogDebug(wxString::Format("%s does not have %s", 
-					raLib::m_short_locs[j].c_str(),
-					raLib::m_suits[i].c_str()));
+					gmUtil::m_short_locs[j].c_str(),
+					gmUtil::m_suits[i].c_str()));
 			}
 		}
 	}
@@ -1314,34 +1314,34 @@ bool raAIAgent::PostPlayUpdate(raRuleEngineData *data, int card)
 
 	return true;
 }
-bool raAIAgent::CheckAssumptions(raRuleEngineData *data)
+bool aiAgent::CheckAssumptions(gmEngineData *data)
 {
 	int i;	
 
 #ifdef raAI_LOG_CHECKASSUMPTIONS
 #endif
-	for(i = 0; i < raTOTAL_SUITS; i++)
+	for(i = 0; i < gmTOTAL_SUITS; i++)
 	{
 		if(!(m_trump_cards & (1 << i)))
 		{
 			if(data->trump_suit == i)
 			{
-				wxLogDebug("Dummy");
+				wxLogDebug(wxT("Dummy"));
 			}
 			wxASSERT(data->trump_suit != i);
 		}
 	}
 	int j;
-	for(j = 0; j < raTOTAL_PLAYERS; j++)
+	for(j = 0; j < gmTOTAL_PLAYERS; j++)
 	{
-		for(i = 0; i < raTOTAL_SUITS; i++)
+		for(i = 0; i < gmTOTAL_SUITS; i++)
 		{
 			if(m_nulls[j] & (1 << i))
 			{
-				wxASSERT(!(data->hands[j] & raLib::m_suit_mask[i]));
+				wxASSERT(!(data->hands[j] & gmUtil::m_suit_mask[i]));
 				//wxLogDebug(wxString::Format("%s does not have %s", 
-				//	raLib::m_short_locs[j].c_str(),
-				//	raLib::m_suits[i].c_str()));
+				//	gmUtil::m_short_locs[j].c_str(),
+				//	gmUtil::m_suits[i].c_str()));
 			}
 		}
 	}
@@ -1349,22 +1349,22 @@ bool raAIAgent::CheckAssumptions(raRuleEngineData *data)
 	return true;
 }
 
-bool raAIAgent::Reset()
+bool aiAgent::Reset()
 {
 	int i;
 
 	m_engine.Reset();
 	m_trump_cards = 0x0000000F;
-	for(i = 0; i < raTOTAL_PLAYERS; i++)
+	for(i = 0; i < gmTOTAL_PLAYERS; i++)
 		m_nulls[i] = 0;
 	m_notrump_suspects = 0;
 	m_mb_null_susp = 0;
 	return true;
 }
 
-void raAIAgent::SetRules(praRules rules)
+void aiAgent::SetRules(pgmRules rules)
 {
-	raRuleEngineData data;
+	gmEngineData data;
 	if(rules)
 	{
 		m_engine.GetData(&data);
@@ -1373,9 +1373,9 @@ void raAIAgent::SetRules(praRules rules)
 	}
 }
 
-bool raAIAgent::SetClockwise(bool flag)
+bool aiAgent::SetClockwise(bool flag)
 {
-	raRuleEngineData data;
+	gmEngineData data;
 	m_engine.GetData(&data);
 	if(flag)
 		data.rules.rot_addn = 1;
@@ -1385,9 +1385,9 @@ bool raAIAgent::SetClockwise(bool flag)
 
 	return true;
 }
-bool raAIAgent::GetClockwise()
+bool aiAgent::GetClockwise()
 {
-	raRuleEngineData data;
+	gmEngineData data;
 	m_engine.GetData(&data);
 	switch(data.rules.rot_addn)
 	{
@@ -1404,7 +1404,7 @@ bool raAIAgent::GetClockwise()
 
 	return false;
 }
-bool raAIAgent::AbandonGame(bool *flag)
+bool aiAgent::AbandonGame(bool *flag)
 {
 	wxASSERT(flag);
 	// TODO : Add more intelligent logic
@@ -1416,7 +1416,7 @@ bool raAIAgent::AbandonGame(bool *flag)
 //
 // Private method/s
 //
-bool raAIAgent::EstimateTricks(unsigned long *p_hands, int trump, int *eval)
+bool aiAgent::EstimateTricks(unsigned long *p_hands, int trump, int *eval)
 {
 	int i, j, k; // Multi-purpose counters
 	unsigned long combined[2];
@@ -1437,21 +1437,21 @@ bool raAIAgent::EstimateTricks(unsigned long *p_hands, int trump, int *eval)
 #ifdef raAI_LOG_ESTIMATE_TRICKS
 	wxLogDebug("----------------------------------------------------");
 
-	wxLogDebug(raLib::PrintHands(p_hands));
-	wxLogDebug(_("Trump is ") + raLib::m_suits[trump]);
+	wxLogDebug(gmUtil::PrintHands(p_hands));
+	wxLogDebug(_("Trump is ") + gmUtil::m_suits[trump]);
 	wxLogDebug("Combined hands :");
-	wxLogDebug(_("N/S - ") + raLib::PrintLong(combined[0]));
-	wxLogDebug(_("E/W - ") + raLib::PrintLong(combined[1]));
+	wxLogDebug(_("N/S - ") + gmUtil::PrintLong(combined[0]));
+	wxLogDebug(_("E/W - ") + gmUtil::PrintLong(combined[1]));
 #endif
 
 	// Loop though each of the suits
 	for(i = 0; i < 4; i++)
 	{
-		suit[0] = (combined[0] & raLib::m_suit_mask[i]) >> raLib::m_suit_rs[i];
-		suit[1] = (combined[1] & raLib::m_suit_mask[i]) >> raLib::m_suit_rs[i];
+		suit[0] = (combined[0] & gmUtil::m_suit_mask[i]) >> gmUtil::m_suit_rs[i];
+		suit[1] = (combined[1] & gmUtil::m_suit_mask[i]) >> gmUtil::m_suit_rs[i];
 #ifdef raAI_LOG_ESTIMATE_TRICKS
 		wxLogDebug("-----------------------");
-		wxLogDebug(_("Evaluating suit - ") + raLib::m_suits[i]);
+		wxLogDebug(_("Evaluating suit - ") + gmUtil::m_suits[i]);
 #endif
 		if(suit[0] > suit[1])
 			j = 0;
@@ -1459,26 +1459,26 @@ bool raAIAgent::EstimateTricks(unsigned long *p_hands, int trump, int *eval)
 			j = 1;
 
 #ifdef raAI_LOG_ESTIMATE_TRICKS
-		wxLogDebug(_("Stronger team is - ") + raLib::m_short_teams[j]);
+		wxLogDebug(_("Stronger team is - ") + gmUtil::m_short_teams[j]);
 #endif
 
 		// Number of cards with the stronger team which are stronger than
 		// the strongest card in the weakest team
 
-		stronger = bhLib::CountBitsSet(
-			suit[j] & (0xFFFFFFFF << bhLib::HighestBitSet(suit[!j])));
+		stronger = gmUtil::CountBitsSet(
+			suit[j] & (0xFFFFFFFF << gmUtil::HighestBitSet(suit[!j])));
 #ifdef raAI_LOG_ESTIMATE_TRICKS
 		wxLogDebug(wxString::Format("Number of stronger cards - %d", stronger));
 #endif
 
 		suit_count[!j] =
-			bhLib::CountBitsSet(p_hands[!j] & raLib::m_suit_mask[i]);
+			gmUtil::CountBitsSet(p_hands[!j] & gmUtil::m_suit_mask[i]);
 		suit_count[(!j) + 2] =
-			bhLib::CountBitsSet(p_hands[(!j) + 2] & raLib::m_suit_mask[i]);
+			gmUtil::CountBitsSet(p_hands[(!j) + 2] & gmUtil::m_suit_mask[i]);
 #ifdef raAI_LOG_ESTIMATE_TRICKS
-		wxLogDebug(_("Individual counts of cards with opposition ") + raLib::m_short_teams[!j]);
-		wxLogDebug(wxString::Format("%s - %d", raLib::m_long_locs[!j].c_str(), suit_count[!j]));
-		wxLogDebug(wxString::Format("%s - %d", raLib::m_long_locs[(!j) + 2].c_str(), suit_count[(!j) + 2]));
+		wxLogDebug(_("Individual counts of cards with opposition ") + gmUtil::m_short_teams[!j]);
+		wxLogDebug(wxString::Format("%s - %d", gmUtil::m_long_locs[!j].c_str(), suit_count[!j]));
+		wxLogDebug(wxString::Format("%s - %d", gmUtil::m_long_locs[(!j) + 2].c_str(), suit_count[(!j) + 2]));
 #endif
 
 		// If the suit is not the trump suit,
@@ -1493,15 +1493,15 @@ bool raAIAgent::EstimateTricks(unsigned long *p_hands, int trump, int *eval)
 		if(i == trump)
 		{
 			suit_count[j] =
-				bhLib::CountBitsSet(p_hands[j] & raLib::m_suit_mask[i]);
+				gmUtil::CountBitsSet(p_hands[j] & gmUtil::m_suit_mask[i]);
 			suit_count[j + 2] =
-				bhLib::CountBitsSet(p_hands[j + 2] & raLib::m_suit_mask[i]);
+				gmUtil::CountBitsSet(p_hands[j + 2] & gmUtil::m_suit_mask[i]);
 
 #ifdef raAI_LOG_ESTIMATE_TRICKS
 			wxLogDebug(_("Tricks expected - ") +
-				wxString::Format("%d", raMin(stronger, raMax(suit_count[j], suit_count[j + 2]))));
+				wxString::Format("%d", gmMin(stronger, gmMax(suit_count[j], suit_count[j + 2]))));
 #endif
-			tricks[j] += raMin(stronger, raMax(suit_count[j], suit_count[j + 2]));
+			tricks[j] += gmMin(stronger, gmMax(suit_count[j], suit_count[j + 2]));
 
 			//
 			// Calculating trump advantage
@@ -1517,10 +1517,10 @@ bool raAIAgent::EstimateTricks(unsigned long *p_hands, int trump, int *eval)
 					suit_count[k] = 0;
 			}
 
-			trump_adv = raMax(suit_count[j], suit_count[j + 2])
-				- raMax(suit_count[!j], suit_count[(!j) + 2]);
+			trump_adv = gmMax(suit_count[j], suit_count[j + 2])
+				- gmMax(suit_count[!j], suit_count[(!j) + 2]);
 #ifdef raAI_LOG_ESTIMATE_TRICKS
-			wxLogDebug(_("Trump advantage for ") + raLib::m_short_teams[j].c_str() + _(" is ") + wxString::Format("%d", trump_adv));
+			wxLogDebug(_("Trump advantage for ") + gmUtil::m_short_teams[j].c_str() + _(" is ") + wxString::Format("%d", trump_adv));
 #endif
 			if(trump_adv > 0)
 				tricks[j] += trump_adv;
@@ -1531,9 +1531,9 @@ bool raAIAgent::EstimateTricks(unsigned long *p_hands, int trump, int *eval)
 		{
 #ifdef raAI_LOG_ESTIMATE_TRICKS
 			wxLogDebug(_("Tricks expected - ") +
-				wxString::Format("%d", raMin(raMin(suit_count[!j], suit_count[(!j) + 2]), stronger)));
+				wxString::Format("%d", gmMin(gmMin(suit_count[!j], suit_count[(!j) + 2]), stronger)));
 #endif
-			tricks[j] += raMin(raMin(suit_count[!j], suit_count[(!j) + 2]), stronger);
+			tricks[j] += gmMin(gmMin(suit_count[!j], suit_count[(!j) + 2]), stronger);
 		}
 	}
 	// If either is greater that 8 correct
@@ -1550,7 +1550,7 @@ bool raAIAgent::EstimateTricks(unsigned long *p_hands, int trump, int *eval)
 	eval[1] = tricks[1];
 	return true;
 }
-bool raAIAgent::EstimatePoints(unsigned long *hands, int trump, int trick_no, int *eval)
+bool aiAgent::EstimatePoints(unsigned long *hands, int trump, int trick_no, int *eval)
 {
 	int trick_count[2];
 	unsigned long all_cards = 0;
@@ -1560,7 +1560,7 @@ bool raAIAgent::EstimatePoints(unsigned long *hands, int trump, int trick_no, in
 	memset(eval, 0, 2 * sizeof(int));
 
 	all_cards =  hands[0] | hands[1] | hands[2] | hands[3];
-	total_pts = raTotalPoints(all_cards);
+	total_pts = gmTotalPoints(all_cards);
 
 	EstimateTricks(hands, trump, trick_count);
 
@@ -1584,14 +1584,14 @@ bool raAIAgent::EstimatePoints(unsigned long *hands, int trump, int trick_no, in
 	return true;
 }
 
-bool raAIAgent::GenerateMoves(raRuleEngine *node, raAIMove *moves, int *count, int type)
+bool aiAgent::GenerateMoves(gmEngine *node, aiMove *moves, int *count, int type)
 {
-	raInputTrickInfo trick_info;
+	gmInputTrickInfo trick_info;
 	int i = 0;
 	unsigned long cards_left;
-	unsigned long hands[raTOTAL_PLAYERS];
-	raRuleEngine rule_engine;
-	raRuleEngineData re_data;
+	unsigned long hands[gmTOTAL_PLAYERS];
+	gmEngine rule_engine;
+	gmEngineData re_data;
 #ifdef raAI_LOG_GENERATEMOVES
 	wxString out;
 #endif
@@ -1601,10 +1601,10 @@ bool raAIAgent::GenerateMoves(raRuleEngine *node, raAIMove *moves, int *count, i
 
 	// Check whether the rule engine is expecting a
 	// card to be played
-	if(node->GetPendingInputType() != raINPUT_TRICK)
+	if(node->GetPendingInputType() != gmINPUT_TRICK)
 	{
 		wxLogError(wxString::Format(wxT("Trick not expected. %s:%d"),
-			__FILE__, __LINE__));
+			wxT(__FILE__), __LINE__));
 		return false;
 	}
 
@@ -1612,14 +1612,14 @@ bool raAIAgent::GenerateMoves(raRuleEngine *node, raAIMove *moves, int *count, i
 	if(!node->GetPendingInputCriteria(NULL, &trick_info))
 	{
 		wxLogError(wxString::Format(wxT("GetPendingInputCriteria failed. %s:%d"),
-			__FILE__, __LINE__));
+			wxT(__FILE__), __LINE__));
 		return false;
 	}
 
 	// Depending on the type passed, generate 
 	// moves which do not ask for the trump
 
-	if(type & raAI_GENMV_NOTRUMP)
+	if(type & aiGENMV_NOTRUMP)
 	{
 		// Get the cards in the hand and generate all possible card plays
 		// which can be played without asking for trump
@@ -1630,7 +1630,7 @@ bool raAIAgent::GenerateMoves(raRuleEngine *node, raAIMove *moves, int *count, i
 		while(cards_left)
 		{
 			moves[i].ask_trump = false;
-			moves[i].card = bhLib::HighestBitSet(cards_left);
+			moves[i].card = gmUtil::HighestBitSet(cards_left);
 			moves[i].rank = -100;
 			cards_left &= ~(1 << moves[i].card);
 			i++;
@@ -1638,7 +1638,7 @@ bool raAIAgent::GenerateMoves(raRuleEngine *node, raAIMove *moves, int *count, i
 	}
 	// Depending on the type passed, generate moves
 	// that ask for the trump
-	if(type & raAI_GENMV_TRUMP)
+	if(type & aiGENMV_TRUMP)
 	{
 		// If trump can be asked, generate all possible card plays
 		// than can be made after asking for the trump
@@ -1649,18 +1649,18 @@ bool raAIAgent::GenerateMoves(raRuleEngine *node, raAIMove *moves, int *count, i
 			rule_engine.SetData(&re_data, false);
 
 			trick_info.ask_trump = true;
-			if(rule_engine.PostInputMessage(raINPUT_TRICK, &trick_info))
+			if(rule_engine.PostInputMessage(gmINPUT_TRICK, &trick_info))
 			{
 				wxLogError(wxString::Format(wxT("PostInputMessage failed. %s:%d"),
-					__FILE__, __LINE__));
+					wxT(__FILE__), __LINE__));
 				return false;
 			}
 			while(rule_engine.Continue());
 
-			if(rule_engine.GetPendingInputType() != raINPUT_TRICK)
+			if(rule_engine.GetPendingInputType() != gmINPUT_TRICK)
 			{
 				wxLogError(wxString::Format(wxT("Trick not expected. %s:%d"),
-					__FILE__, __LINE__));
+					wxT(__FILE__), __LINE__));
 				return false;
 			}
 
@@ -1668,20 +1668,20 @@ bool raAIAgent::GenerateMoves(raRuleEngine *node, raAIMove *moves, int *count, i
 			if(!rule_engine.GetPendingInputCriteria(NULL, &trick_info))
 			{
 				wxLogError(wxString::Format(wxT("GetPendingInputCriteria failed. %s:%d"),
-					__FILE__, __LINE__));
+					wxT(__FILE__), __LINE__));
 				return false;
 			}
 
 			rule_engine.GetHands(hands);
 			cards_left = hands[trick_info.player];
 			cards_left &= trick_info.mask;
-			//wxLogDebug(wxString::Format("Trump - %s", raLib::m_suits[rule_engine.GetTrump()].c_str()));
+			//wxLogDebug(wxString::Format("Trump - %s", gmUtil::m_suits[rule_engine.GetTrump()].c_str()));
 			//wxLogDebug(wxString::Format("Mask is %0X", trick_info.mask));
 
 			while(cards_left)
 			{
 				moves[i].ask_trump = true;
-				moves[i].card = bhLib::HighestBitSet(cards_left);
+				moves[i].card = gmUtil::HighestBitSet(cards_left);
 				moves[i].rank = -100;
 				cards_left &= ~(1 << moves[i].card);
 				i++;
@@ -1690,7 +1690,7 @@ bool raAIAgent::GenerateMoves(raRuleEngine *node, raAIMove *moves, int *count, i
 		}
 	}
 
-	wxASSERT(i <= raAI_MAX_MOVES);
+	wxASSERT(i <= aiMAX_MOVES);
 	*count = i;
 
 	// TODO : Use PrintMoves()
@@ -1701,15 +1701,15 @@ bool raAIAgent::GenerateMoves(raRuleEngine *node, raAIMove *moves, int *count, i
 		if(moves[i].ask_trump)
 		{
 			out.Append(wxString::Format("?%s%s,",
-				raLib::m_suits[raGetSuit(moves[i].card)].c_str(),
-				raLib::m_values[raGetValue(moves[i].card)].c_str()
+				gmUtil::m_suits[gmGetSuit(moves[i].card)].c_str(),
+				gmUtil::m_values[gmGetValue(moves[i].card)].c_str()
 				));
 		}
 		else
 		{
 			out.Append(wxString::Format("%s%s,",
-				raLib::m_suits[raGetSuit(moves[i].card)].c_str(),
-				raLib::m_values[raGetValue(moves[i].card)].c_str()
+				gmUtil::m_suits[gmGetSuit(moves[i].card)].c_str(),
+				gmUtil::m_values[gmGetValue(moves[i].card)].c_str()
 				));
 		}
 	}
@@ -1718,10 +1718,10 @@ bool raAIAgent::GenerateMoves(raRuleEngine *node, raAIMove *moves, int *count, i
 
 	return true;
 }
-bool raAIAgent::OrderMoves(raRuleEngine *node, raAIMove *moves, int count)
+bool aiAgent::OrderMoves(gmEngine *node, aiMove *moves, int count)
 {
 	int i;
-	raRuleEngineData data;
+	gmEngineData data;
 
 	node->GetData(&data);
 
@@ -1729,7 +1729,7 @@ bool raAIAgent::OrderMoves(raRuleEngine *node, raAIMove *moves, int count)
 	for(i = 0; i < count; i++)
 		RankMove(&data, &moves[i]);
 
-	qsort(moves, count, sizeof(raAIMove), CompareMoves);
+	qsort(moves, count, sizeof(aiMove), CompareMoves);
 
 	//wxLogDebug("***************From OrderMoves********************");
 	//wxLogDebug(node->GetLoggable());
@@ -1740,18 +1740,18 @@ bool raAIAgent::OrderMoves(raRuleEngine *node, raAIMove *moves, int count)
 	//}
 	return true;
 }
-bool raAIAgent::RankMove(raRuleEngineData *data, raAIMove *move)
+bool aiAgent::RankMove(gmEngineData *data, aiMove *move)
 {
-	//raRuleEngineData data;
-	int next_to_play = raPLAYER_INVALID;
+	//gmEngineData data;
+	int next_to_play = gmPLAYER_INVALID;
 	unsigned long trick_cards = 0;
 	int i;
-	raTrick *trick;
+	gmTrick *trick;
 	int suit;
 	int value;
 	int lead_suit;
 
-	//int opp_one = raPLAYER_INVALID, opp_two = raPLAYER_INVALID;
+	//int opp_one = gmPLAYER_INVALID, opp_two = gmPLAYER_INVALID;
 	unsigned long opp1_cards_suit = 0, opp2_cards_suit = 0, partner_cards_suit = 0;
 	unsigned long opp1_cards_trump = 0, opp2_cards_trump = 0, partner_cards_trump = 0;
 	unsigned long ucard;
@@ -1764,14 +1764,14 @@ bool raAIAgent::RankMove(raRuleEngineData *data, raAIMove *move)
 	//node->GetData(&data);
 
 
-	wxASSERT(data->status == raSTATUS_TRICKS);
+	wxASSERT(data->status == gmSTATUS_TRICKS);
 	next_to_play = data->in_trick_info.player;
-	wxASSERT((next_to_play > raPLAYER_INVALID) && (next_to_play < raTOTAL_PLAYERS));
+	wxASSERT((next_to_play > gmPLAYER_INVALID) && (next_to_play < gmTOTAL_PLAYERS));
 	trick = &data->tricks[data->trick_round];
 	wxASSERT(trick);
-	suit = raGetSuit(move->card);
-	wxASSERT((suit > raSUIT_INVALID) && (suit < raTOTAL_SUITS));
-	value = raGetValue(move->card);
+	suit = gmGetSuit(move->card);
+	wxASSERT((suit > gmSUIT_INVALID) && (suit < gmTOTAL_SUITS));
+	value = gmGetValue(move->card);
 	ucard = (unsigned long)(1 << move->card);
 	wxASSERT(ucard);
 
@@ -1780,37 +1780,37 @@ bool raAIAgent::RankMove(raRuleEngineData *data, raAIMove *move)
 	else
 		lead_suit = trick->lead_suit;
 
-	opp1_cards_suit = data->hands[raGetOpponentOne(next_to_play)] &
-		raLib::m_suit_mask[lead_suit];
-	opp2_cards_suit = data->hands[raGetOpponentTwo(next_to_play)] &
-		raLib::m_suit_mask[lead_suit];
-	opp1_cards_trump = data->hands[raGetOpponentOne(next_to_play)] &
-		raLib::m_suit_mask[data->trump_suit];
-	opp2_cards_trump = data->hands[raGetOpponentTwo(next_to_play)] &
-		raLib::m_suit_mask[data->trump_suit];
+	opp1_cards_suit = data->hands[gmGetOpponentOne(next_to_play)] &
+		gmUtil::m_suit_mask[lead_suit];
+	opp2_cards_suit = data->hands[gmGetOpponentTwo(next_to_play)] &
+		gmUtil::m_suit_mask[lead_suit];
+	opp1_cards_trump = data->hands[gmGetOpponentOne(next_to_play)] &
+		gmUtil::m_suit_mask[data->trump_suit];
+	opp2_cards_trump = data->hands[gmGetOpponentTwo(next_to_play)] &
+		gmUtil::m_suit_mask[data->trump_suit];
 
-	partner_cards_suit = data->hands[raGetPartner(next_to_play)] &
-		raLib::m_suit_mask[lead_suit];
-	partner_cards_trump = data->hands[raGetPartner(next_to_play)] &
-		raLib::m_suit_mask[data->trump_suit];
+	partner_cards_suit = data->hands[gmGetPartner(next_to_play)] &
+		gmUtil::m_suit_mask[lead_suit];
+	partner_cards_trump = data->hands[gmGetPartner(next_to_play)] &
+		gmUtil::m_suit_mask[data->trump_suit];
 
 	// Combine all the cards played so far in the trick
-	for(i = 0; i < raTOTAL_PLAYERS; i++)
+	for(i = 0; i < gmTOTAL_PLAYERS; i++)
 	{
-		if(trick->cards[i] != raCARD_INVALID)
+		if(trick->cards[i] != gmCARD_INVALID)
 		{
 			trick_cards |= (1 << trick->cards[i]);
 		}
 	}
 
-	trick_cards_suit = trick_cards & raLib::m_suit_mask[lead_suit];
-	trick_cards_trump = trick_cards & raLib::m_suit_mask[data->trump_suit];
+	trick_cards_suit = trick_cards & gmUtil::m_suit_mask[lead_suit];
+	trick_cards_trump = trick_cards & gmUtil::m_suit_mask[data->trump_suit];
 
-	if(trick->cards[raGetPartner(next_to_play)] != raCARD_INVALID)
+	if(trick->cards[gmGetPartner(next_to_play)] != gmCARD_INVALID)
 		partner_played = true;
-	if(trick->cards[raGetOpponentOne(next_to_play)] != raCARD_INVALID)
+	if(trick->cards[gmGetOpponentOne(next_to_play)] != gmCARD_INVALID)
 		opp1_played = true;
-	if(trick->cards[raGetOpponentTwo(next_to_play)] != raCARD_INVALID)
+	if(trick->cards[gmGetOpponentTwo(next_to_play)] != gmCARD_INVALID)
 		opp2_played = true;
 
 	// Is the move the highest card possible for the suit
@@ -1840,10 +1840,10 @@ bool raAIAgent::RankMove(raRuleEngineData *data, raAIMove *move)
 			(opp2_played || (!opp2_played && ((opp2_cards_suit && (opp2_cards_suit < ucard)) || (!opp2_cards_suit && !opp2_cards_trump))))
 			)
 		{
-			move->rank = 400 + raLib::m_points[value];
+			move->rank = 400 + gmUtil::m_points[value];
 			/*
 			wxLogDebug("***************From RankMove********************");
-			wxLogDebug(raRuleEngine::PrintRuleEngineData(data));
+			wxLogDebug(gmEngine::PrintRuleEngineData(data));
 			wxLogDebug(PrintMoves(move, 1));
 
 			wxLogDebug(wxString::Format("suit - %d", suit));
@@ -1869,11 +1869,11 @@ bool raAIAgent::RankMove(raRuleEngineData *data, raAIMove *move)
 			wxLogDebug(wxString::Format("opp1_cards_suit %08X, opp1_cards_trump %08X", opp1_cards_suit, opp1_cards_trump));
 			wxLogDebug(wxString::Format("opp2_cards_suit %08X, opp2_cards_trump %08X", opp2_cards_suit, opp2_cards_trump));
 
-			wxLogDebug(wxString("ucard - ") + raLib::PrintLong(ucard));
-			wxLogDebug(wxString("opp1_cards_suit - ") + raLib::PrintLong(opp1_cards_suit));
-			wxLogDebug(wxString("opp2_cards_suit - ") + raLib::PrintLong(opp2_cards_suit));
-			wxLogDebug(wxString("opp1_cards_trump - ") + raLib::PrintLong(opp1_cards_trump));
-			wxLogDebug(wxString("opp2_cards_trump - ") + raLib::PrintLong(opp2_cards_trump));
+			wxLogDebug(wxString("ucard - ") + gmUtil::PrintLong(ucard));
+			wxLogDebug(wxString("opp1_cards_suit - ") + gmUtil::PrintLong(opp1_cards_suit));
+			wxLogDebug(wxString("opp2_cards_suit - ") + gmUtil::PrintLong(opp2_cards_suit));
+			wxLogDebug(wxString("opp1_cards_trump - ") + gmUtil::PrintLong(opp1_cards_trump));
+			wxLogDebug(wxString("opp2_cards_trump - ") + gmUtil::PrintLong(opp2_cards_trump));
 
 			wxLogDebug(wxString::Format("Rank - %d", move->rank));
 			wxLogDebug("************************************************");
@@ -1885,7 +1885,7 @@ bool raAIAgent::RankMove(raRuleEngineData *data, raAIMove *move)
 		else if (
 			// And if the card played is higher than the cards played
 			// in the trick belonging to the same suit
-			((trick->winner == raGetPartner(next_to_play)) || (!partner_played && (partner_cards_suit > trick_cards_suit))) &&
+			((trick->winner == gmGetPartner(next_to_play)) || (!partner_played && (partner_cards_suit > trick_cards_suit))) &&
 			// And if the move is not the trump card 
 			// TODO : Implement - wisely!
 			// And if opponent has not played yet and the opponent has the suit but no higher cards
@@ -1894,10 +1894,10 @@ bool raAIAgent::RankMove(raRuleEngineData *data, raAIMove *move)
 			(opp2_played || (!opp2_played && ((opp2_cards_suit && (opp2_cards_suit < partner_cards_suit)) || (!opp2_cards_suit && !opp2_cards_trump))))
 			) 
 		{
-			move->rank = 300 + raLib::m_points[value];
+			move->rank = 300 + gmUtil::m_points[value];
 			/*
 			wxLogDebug("***************From RankMove********************");
-			wxLogDebug(raRuleEngine::PrintRuleEngineData(data));
+			wxLogDebug(gmEngine::PrintRuleEngineData(data));
 			wxLogDebug(PrintMoves(move, 1));
 
 			wxLogDebug(wxString::Format("suit - %d", suit));
@@ -1924,11 +1924,11 @@ bool raAIAgent::RankMove(raRuleEngineData *data, raAIMove *move)
 			wxLogDebug(wxString::Format("opp2_cards_suit %08X, opp2_cards_trump %08X", opp2_cards_suit, opp2_cards_trump));
 			wxLogDebug(wxString::Format("partner_cards_suit %08X, opp1_cards_trump %08X", partner_cards_suit, 0));
 
-			wxLogDebug(wxString("ucard - ") + raLib::PrintLong(ucard));
-			wxLogDebug(wxString("opp1_cards_suit - ") + raLib::PrintLong(opp1_cards_suit));
-			wxLogDebug(wxString("opp2_cards_suit - ") + raLib::PrintLong(opp2_cards_suit));
-			wxLogDebug(wxString("opp1_cards_trump - ") + raLib::PrintLong(opp1_cards_trump));
-			wxLogDebug(wxString("opp2_cards_trump - ") + raLib::PrintLong(opp2_cards_trump));
+			wxLogDebug(wxString("ucard - ") + gmUtil::PrintLong(ucard));
+			wxLogDebug(wxString("opp1_cards_suit - ") + gmUtil::PrintLong(opp1_cards_suit));
+			wxLogDebug(wxString("opp2_cards_suit - ") + gmUtil::PrintLong(opp2_cards_suit));
+			wxLogDebug(wxString("opp1_cards_trump - ") + gmUtil::PrintLong(opp1_cards_trump));
+			wxLogDebug(wxString("opp2_cards_trump - ") + gmUtil::PrintLong(opp2_cards_trump));
 
 			wxLogDebug(wxString::Format("Rank - %d", move->rank));
 			wxLogDebug("************************************************");
@@ -1948,11 +1948,11 @@ bool raAIAgent::RankMove(raRuleEngineData *data, raAIMove *move)
 		(opp2_played || (!opp2_played && (opp2_cards_suit || (!opp2_cards_suit && (opp2_cards_trump < ucard)))))
 		)
 	{
-		move->rank = 200 - raLib::m_points[value];
+		move->rank = 200 - gmUtil::m_points[value];
 		/*
 		wxLogDebug("***************From RankMove********************");
-		wxLogDebug(wxT("Trump - ") + raLib::m_suits[data->trump_suit]);
-		wxLogDebug(raRuleEngine::PrintRuleEngineData(data));
+		wxLogDebug(wxT("Trump - ") + gmUtil::m_suits[data->trump_suit]);
+		wxLogDebug(gmEngine::PrintRuleEngineData(data));
 		wxLogDebug(PrintMoves(move, 1));
 
 		wxLogDebug(wxString::Format("suit - %d", suit));
@@ -1979,11 +1979,11 @@ bool raAIAgent::RankMove(raRuleEngineData *data, raAIMove *move)
 		wxLogDebug(wxString::Format("opp2_cards_suit %08X, opp2_cards_trump %08X", opp2_cards_suit, opp2_cards_trump));
 		wxLogDebug(wxString::Format("partner_cards_suit %08X, opp1_cards_trump %08X", partner_cards_suit, 0));
 
-		wxLogDebug(wxString("ucard - ") + raLib::PrintLong(ucard));
-		wxLogDebug(wxString("opp1_cards_suit - ") + raLib::PrintLong(opp1_cards_suit));
-		wxLogDebug(wxString("opp2_cards_suit - ") + raLib::PrintLong(opp2_cards_suit));
-		wxLogDebug(wxString("opp1_cards_trump - ") + raLib::PrintLong(opp1_cards_trump));
-		wxLogDebug(wxString("opp2_cards_trump - ") + raLib::PrintLong(opp2_cards_trump));
+		wxLogDebug(wxString("ucard - ") + gmUtil::PrintLong(ucard));
+		wxLogDebug(wxString("opp1_cards_suit - ") + gmUtil::PrintLong(opp1_cards_suit));
+		wxLogDebug(wxString("opp2_cards_suit - ") + gmUtil::PrintLong(opp2_cards_suit));
+		wxLogDebug(wxString("opp1_cards_trump - ") + gmUtil::PrintLong(opp1_cards_trump));
+		wxLogDebug(wxString("opp2_cards_trump - ") + gmUtil::PrintLong(opp2_cards_trump));
 
 		wxLogDebug(wxString::Format("Rank - %d", move->rank));
 		wxLogDebug("************************************************");
@@ -1994,7 +1994,7 @@ bool raAIAgent::RankMove(raRuleEngineData *data, raAIMove *move)
 	bool partner_trumps = false;
 	// If partner has already trumped and the opponents cannot over-trump
 	if(
-		trick->trumped && (trick->winner == raGetPartner(next_to_play))
+		trick->trumped && (trick->winner == gmGetPartner(next_to_play))
 		)
 	{
 		if(
@@ -2026,11 +2026,11 @@ bool raAIAgent::RankMove(raRuleEngineData *data, raAIMove *move)
 
 	if(partner_trumps)
 	{
-		move->rank = 100 + raLib::m_points[value];
+		move->rank = 100 + gmUtil::m_points[value];
 		/*
 		wxLogDebug("***************From RankMove********************");
-		wxLogDebug(wxT("Trump - ") + raLib::m_suits[data->trump_suit]);
-		wxLogDebug(raRuleEngine::PrintRuleEngineData(data));
+		wxLogDebug(wxT("Trump - ") + gmUtil::m_suits[data->trump_suit]);
+		wxLogDebug(gmEngine::PrintRuleEngineData(data));
 		wxLogDebug(PrintMoves(move, 1));
 
 		wxLogDebug(wxString::Format("suit - %d", suit));
@@ -2057,11 +2057,11 @@ bool raAIAgent::RankMove(raRuleEngineData *data, raAIMove *move)
 		wxLogDebug(wxString::Format("opp2_cards_suit %08X, opp2_cards_trump %08X", opp2_cards_suit, opp2_cards_trump));
 		wxLogDebug(wxString::Format("partner_cards_suit %08X, opp1_cards_trump %08X", partner_cards_suit, 0));
 
-		wxLogDebug(wxString("ucard - ") + raLib::PrintLong(ucard));
-		wxLogDebug(wxString("opp1_cards_suit - ") + raLib::PrintLong(opp1_cards_suit));
-		wxLogDebug(wxString("opp2_cards_suit - ") + raLib::PrintLong(opp2_cards_suit));
-		wxLogDebug(wxString("opp1_cards_trump - ") + raLib::PrintLong(opp1_cards_trump));
-		wxLogDebug(wxString("opp2_cards_trump - ") + raLib::PrintLong(opp2_cards_trump));
+		wxLogDebug(wxString("ucard - ") + gmUtil::PrintLong(ucard));
+		wxLogDebug(wxString("opp1_cards_suit - ") + gmUtil::PrintLong(opp1_cards_suit));
+		wxLogDebug(wxString("opp2_cards_suit - ") + gmUtil::PrintLong(opp2_cards_suit));
+		wxLogDebug(wxString("opp1_cards_trump - ") + gmUtil::PrintLong(opp1_cards_trump));
+		wxLogDebug(wxString("opp2_cards_trump - ") + gmUtil::PrintLong(opp2_cards_trump));
 
 		wxLogDebug(wxString::Format("Rank - %d", move->rank));
 		wxLogDebug("************************************************");
@@ -2069,7 +2069,7 @@ bool raAIAgent::RankMove(raRuleEngineData *data, raAIMove *move)
 		return true;
 	}
 
-	move->rank = 0 - raLib::m_points[value];
+	move->rank = 0 - gmUtil::m_points[value];
 	return true;
 }
 
@@ -2094,14 +2094,14 @@ evaluate (node, alpha, beta)
 			return alpha
 *
 */
-int raAIAgent::Evaluate(raRuleEngine *node, int alpha, int beta, int depth, bool *ret_val)
+int aiAgent::Evaluate(gmEngine *node, int alpha, int beta, int depth, bool *ret_val)
 {
 	int eval;
-	raRuleEngineData old_node;
+	gmEngineData old_node;
 	int i;
 	int trick_round;
-	raInputTrickInfo trick_info;
-	raAIMove moves[raAI_MAX_MOVES];
+	gmInputTrickInfo trick_info;
+	aiMove moves[aiMAX_MOVES];
 	int move_count;
 	int ret_heur;
 
@@ -2113,7 +2113,7 @@ int raAIAgent::Evaluate(raRuleEngine *node, int alpha, int beta, int depth, bool
 
 #ifdef raAI_LOG_EVALUATE
 	wxLogDebug(wxString::Format(wxT("Evaluating round %d. %s:%d"),
-		trick_round, __FILE__, __LINE__));
+		trick_round, wxT(__FILE__), __LINE__));
 #endif
 
 	// If node is leaf, estimate heuristic
@@ -2133,10 +2133,10 @@ int raAIAgent::Evaluate(raRuleEngine *node, int alpha, int beta, int depth, bool
 	// Backup the current state of the rule engine
 	node->GetData(&old_node);
 
-	if(node->GetPendingInputType() != raINPUT_TRICK)
+	if(node->GetPendingInputType() != gmINPUT_TRICK)
 	{
 		wxLogError(wxString::Format(wxT("Unexpected input type. %s:%d"),
-			__FILE__, __LINE__));
+			wxT(__FILE__), __LINE__));
 		*ret_val = false;
 		return 0;
 	}
@@ -2144,7 +2144,7 @@ int raAIAgent::Evaluate(raRuleEngine *node, int alpha, int beta, int depth, bool
 	if(!node->GetPendingInputCriteria(NULL, &trick_info))
 	{
 		wxLogError(wxString::Format(wxT("GetPendingInputCriteria failed. %s:%d"),
-			__FILE__, __LINE__));
+			wxT(__FILE__), __LINE__));
 		*ret_val = false;
 		return 0;
 	}
@@ -2173,7 +2173,7 @@ int raAIAgent::Evaluate(raRuleEngine *node, int alpha, int beta, int depth, bool
 			if(!MakeMove(node, &moves[i]))
 			{
 				wxLogError(wxString::Format(wxT("MakeMove failed. %s:%d"),
-					__FILE__, __LINE__));
+					wxT(__FILE__), __LINE__));
 				*ret_val = false;
 				return 0;
 			}
@@ -2182,10 +2182,10 @@ int raAIAgent::Evaluate(raRuleEngine *node, int alpha, int beta, int depth, bool
 			if(!*ret_val)
 			{
 				wxLogError(wxString::Format(wxT("Evaluate failed. %s:%d"),
-					__FILE__, __LINE__));
+					wxT(__FILE__), __LINE__));
 				return 0;
 			}
-			beta = raMin(beta, eval);
+			beta = gmMin(beta, eval);
 			node->SetData(&old_node, false);
 			//if beta <= alpha
 			//	return alpha
@@ -2222,7 +2222,7 @@ int raAIAgent::Evaluate(raRuleEngine *node, int alpha, int beta, int depth, bool
 			if(!MakeMove(node, &moves[i]))
 			{
 				wxLogError(wxString::Format(wxT("MakeMove failed. %s:%d"),
-					__FILE__, __LINE__));
+					wxT(__FILE__), __LINE__));
 				*ret_val = false;
 				return 0;
 			}
@@ -2231,10 +2231,10 @@ int raAIAgent::Evaluate(raRuleEngine *node, int alpha, int beta, int depth, bool
 			if(!*ret_val)
 			{
 				wxLogError(wxString::Format(wxT("Evaluate failed. %s:%d"),
-					__FILE__, __LINE__));
+					wxT(__FILE__), __LINE__));
 				return 0;
 			}
-			alpha = raMax(alpha, eval);
+			alpha = gmMax(alpha, eval);
 			node->SetData(&old_node, false);
 			//if beta <= alpha
 			//    return beta
@@ -2250,7 +2250,7 @@ int raAIAgent::Evaluate(raRuleEngine *node, int alpha, int beta, int depth, bool
 	return 0;
 }
 
-int raAIAgent::EstimateHeuristic(raRuleEngine *state)
+int aiAgent::EstimateHeuristic(gmEngine *state)
 {
 	int pts[2];
 	int estimated[2];
@@ -2258,8 +2258,8 @@ int raAIAgent::EstimateHeuristic(raRuleEngine *state)
 	int bid;
 	int loc;
 
-	//unsigned long played_cards[raTOTAL_PLAYERS];
-	unsigned long hands[raTOTAL_PLAYERS];
+	//unsigned long played_cards[gmTOTAL_PLAYERS];
+	unsigned long hands[gmTOTAL_PLAYERS];
 
 	trick_no = state->GetTrickRound();
 	state->GetMaxBid(&bid, &loc);
@@ -2295,23 +2295,23 @@ int raAIAgent::EstimateHeuristic(raRuleEngine *state)
 	return 0;
 }
 
-bool raAIAgent::MakeMove(raRuleEngine *node, raAIMove *move)
+bool aiAgent::MakeMove(gmEngine *node, aiMove *move)
 {
-	raInputTrickInfo trick_info;
+	gmInputTrickInfo trick_info;
 
 	// Obtain the current input criteria and verify
 
-	if(node->GetPendingInputType() != raINPUT_TRICK)
+	if(node->GetPendingInputType() != gmINPUT_TRICK)
 	{
 		wxLogError(wxString::Format(wxT("GetPendingInputCriteria failed. %s:%d"),
-			__FILE__, __LINE__));
+			wxT(__FILE__), __LINE__));
 		return false;
 	}
 
 	if(!node->GetPendingInputCriteria(NULL, &trick_info))
 	{
 		wxLogError(wxString::Format(wxT("GetPendingInputCriteria failed. %s:%d"),
-			__FILE__, __LINE__));
+			wxT(__FILE__), __LINE__));
 		return false;
 	}
 
@@ -2320,25 +2320,25 @@ bool raAIAgent::MakeMove(raRuleEngine *node, raAIMove *move)
 	{
 		wxASSERT(trick_info.can_ask_trump);
 		trick_info.ask_trump = true;
-		if(node->PostInputMessage(raINPUT_TRICK, &trick_info))
+		if(node->PostInputMessage(gmINPUT_TRICK, &trick_info))
 		{
 			wxLogError(wxString::Format(wxT("PostInputMessage failed. %s:%d"),
-				__FILE__, __LINE__));
+				wxT(__FILE__), __LINE__));
 			return false;
 		}
 		while(node->Continue());
 
-		if(node->GetPendingInputType() != raINPUT_TRICK)
+		if(node->GetPendingInputType() != gmINPUT_TRICK)
 		{
 			wxLogError(wxString::Format(wxT("GetPendingInputCriteria failed. %s:%d"),
-				__FILE__, __LINE__));
+				wxT(__FILE__), __LINE__));
 			return false;
 		}
 
 		if(!node->GetPendingInputCriteria(NULL, &trick_info))
 		{
 			wxLogError(wxString::Format(wxT("GetPendingInputCriteria failed. %s:%d"),
-				__FILE__, __LINE__));
+				wxT(__FILE__), __LINE__));
 			return false;
 		}
 	}
@@ -2348,21 +2348,21 @@ bool raAIAgent::MakeMove(raRuleEngine *node, raAIMove *move)
 
 #ifdef raAI_LOG_MAKEMOVE
 	wxLogDebug(wxString::Format(wxT("%s making a move %s%s. %s:%d"),
-		raLib::m_short_locs[trick_info.player].c_str(),
-		raLib::m_suits[raGetSuit(move->card)].c_str(),
-		raLib::m_values[raGetValue(move->card)].c_str(),
-		__FILE__, __LINE__));
+		gmUtil::m_short_locs[trick_info.player].c_str(),
+		gmUtil::m_suits[gmGetSuit(move->card)].c_str(),
+		gmUtil::m_values[gmGetValue(move->card)].c_str(),
+		wxT(__FILE__), __LINE__));
 #endif
-	if(node->PostInputMessage(raINPUT_TRICK, &trick_info))
+	if(node->PostInputMessage(gmINPUT_TRICK, &trick_info))
 	{
-		node->PostInputMessage(raINPUT_TRICK, &trick_info);
-		wxLogDebug(wxString::Format("Player %s Card %s%s", 
-			raLib::m_short_locs[trick_info.player].c_str(),
-			raLib::m_suits[raGetSuit(trick_info.card)].c_str(),
-			raLib::m_values[raGetValue(trick_info.card)].c_str()
+		node->PostInputMessage(gmINPUT_TRICK, &trick_info);
+		wxLogDebug(wxString::Format(wxT("Player %s Card %s%s"), 
+			gmUtil::m_short_locs[trick_info.player].c_str(),
+			gmUtil::m_suits[gmGetSuit(trick_info.card)].c_str(),
+			gmUtil::m_values[gmGetValue(trick_info.card)].c_str()
 			));
 		wxLogError(wxString::Format(wxT("PostInputMessage failed. %s:%d"),
-			__FILE__, __LINE__));
+			wxT(__FILE__), __LINE__));
 		return false;
 	}
 
@@ -2372,7 +2372,7 @@ bool raAIAgent::MakeMove(raRuleEngine *node, raAIMove *move)
 	return true;
 }
 
-bool raAIAgent::MakeMoveAndEval(raRuleEngine *node, raAIMove *move, int depth, int *eval)
+bool aiAgent::MakeMoveAndEval(gmEngine *node, aiMove *move, int depth, int *eval)
 {
 	bool eval_ret;
 	int temp;
@@ -2385,33 +2385,33 @@ bool raAIAgent::MakeMoveAndEval(raRuleEngine *node, raAIMove *move, int depth, i
 	if(!MakeMove(node, move))
 	{
 		wxLogError(wxString::Format(wxT("MakeMove failed. %s:%d"),
-			__FILE__, __LINE__));
+			wxT(__FILE__), __LINE__));
 		wxLogError(node->GetLoggable());
 		if(move->ask_trump)
 		{
-			wxLogError(wxString::Format("Move attempted ?%s%s",
-				raLib::m_suits[raGetSuit(move->card)].c_str(),
-				raLib::m_values[raGetValue(move->card)].c_str()
+			wxLogError(wxString::Format(wxT("Move attempted ?%s%s"),
+				gmUtil::m_suits[gmGetSuit(move->card)].c_str(),
+				gmUtil::m_values[gmGetValue(move->card)].c_str()
 				));
 		}
 		else
 		{
-			wxLogError(wxString::Format("Move attempted %s%s",
-				raLib::m_suits[raGetSuit(move->card)].c_str(),
-				raLib::m_values[raGetValue(move->card)].c_str()
+			wxLogError(wxString::Format(wxT("Move attempted %s%s"),
+				gmUtil::m_suits[gmGetSuit(move->card)].c_str(),
+				gmUtil::m_values[gmGetValue(move->card)].c_str()
 				));
 		}
 		return false;
 	}
 
 	eval_ret = false;
-	temp = raAI_NEG_INFTY;
-	temp = Evaluate(node, raAI_NEG_INFTY, raAI_POS_INFTY, depth, &eval_ret);
-	wxASSERT(temp != raAI_NEG_INFTY);
+	temp = aiNEG_INFTY;
+	temp = Evaluate(node, aiNEG_INFTY, aiPOS_INFTY, depth, &eval_ret);
+	wxASSERT(temp != aiNEG_INFTY);
 	if(!eval_ret)
 	{
 		wxLogError(wxString::Format(wxT("Evaluate failed. %s:%d"),
-			__FILE__, __LINE__));
+			wxT(__FILE__), __LINE__));
 		return false;
 	}
 
@@ -2420,11 +2420,11 @@ bool raAIAgent::MakeMoveAndEval(raRuleEngine *node, raAIMove *move, int depth, i
 	return true;
 }
 
-int raAIAgent::CompareMoves(const void *elem1, const void *elem2)
+int aiAgent::CompareMoves(const void *elem1, const void *elem2)
 {
-	raAIMove *move1, *move2;
-	move1 = (raAIMove *)elem1;
-	move2 = (raAIMove *)elem2;
+	aiMove *move1, *move2;
+	move1 = (aiMove *)elem1;
+	move2 = (aiMove *)elem2;
 	if(move1->rank > move2->rank)
 		return -1;
 	else if(move1->rank == move2->rank)
