@@ -89,6 +89,9 @@ private:
 	slData m_saved, m_working;
 	int m_suit_sum_of_min[slTOTAL_SUITS];
 	int m_hand_sum_of_min[slTOTAL_HANDS];
+	// Disallow copy constructor/assignment operators
+	aiSuitLengthSolver(const aiSuitLengthSolver &);
+    aiSuitLengthSolver & operator=(const aiSuitLengthSolver &);
 	bool SetCell(slData *data, int i, int j, int min, int max = slLENGTH_INVALID);
 	bool RecalcAffectedCellsMax(slData *data, int hand, int suit);
 	bool RecalcCellMax(slData *data, int hand, int suit);

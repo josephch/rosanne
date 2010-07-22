@@ -36,7 +36,7 @@
 // --------------------
 //
 // If in the matrix given above, one or more c(x,y) are unknown,
-// and if these have to filled in randomly.
+// and these have to filled in randomly.
 //
 // Let sum(h(x)) be (c(n,1) + c(n,2) + c(n,3) + c(n,4)), the sum of cards in hand h(x).
 // Similary let sum(s(y)) be the sum of cards in suit s(y)
