@@ -1,21 +1,18 @@
-// Rosanne : Twenty Eight (28) Card Game
-// Copyright (C) 2006-2009 Vipin Cherian
+// Rosanne : Trump card game popularly known as Twenty Eight (28)
+// Copyright (C) 2006-2010 Vipin Cherian
 //
-// This program is free software; you can redistribute it and/or modify
+// This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, 
-// Boston, MA  02110-1301, USA
-
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef _GMENGINE_H_
 #define _GMENGINE_H_
 
@@ -82,7 +79,7 @@ enum{
 #define	gmRULE_3 4
 #define	gmRULE_4 8
 // Sluffing of jacks
-#define	gmRULE_5 16 
+#define	gmRULE_5 16
 
 #define gmDEAL_ROUND_1 0
 #define gmDEAL_ROUND_2 1
@@ -253,8 +250,8 @@ public:
 	void GetHands(unsigned long *hands);
 	void GetCardsPlayed(unsigned long *cards);
 	// TODO : Try to implement one method with trick_round as default variable
-	void GetTrick(int trick_round, gmTrick *trick); 
-	void GetTrick(gmTrick *trick); 
+	void GetTrick(int trick_round, gmTrick *trick);
+	void GetTrick(gmTrick *trick);
 	int GetTrickRound();
 	int GetPoints(int team);
 	void GetPoints(int *pts);

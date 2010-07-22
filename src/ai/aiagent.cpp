@@ -1,24 +1,22 @@
-// Rosanne : Twenty Eight (28) Card Game
-// Copyright (C) 2006-2009 Vipin Cherian
+// Rosanne : Trump card game popularly known as Twenty Eight (28)
+// Copyright (C) 2006-2010 Vipin Cherian
 //
-// This program is free software; you can redistribute it and/or modify
+// This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, 
-// Boston, MA  02110-1301, USA
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "ai/aiagent.h"
 
-#define raAI_ORDERMOVES  
+#define raAI_ORDERMOVES
 
 //const int aiAgent::s_depths[] = {2, 3, 5, 7, 8, 8, 8, 8};
 const int aiAgent::s_depths[] = {2, 3, 4, 6, 7, 8, 8, 8};
@@ -353,7 +351,7 @@ int aiAgent::GetPlay(unsigned long mask)
 
 	if(!m_engine.GetData(&data))
 	{
-		wxLogError(wxString::Format(wxT("GetData() failed. %s:%d"), 
+		wxLogError(wxString::Format(wxT("GetData() failed. %s:%d"),
 			wxT(__FILE__), __LINE__));
 		return -2;
 	}
@@ -376,7 +374,7 @@ int aiAgent::GetPlay(unsigned long mask)
 	deal_hands = new unsigned long *[30];
 	if(!deal_hands)
 	{
-		wxLogError(wxString::Format(wxT("Memory allocation failed. %s:%d"), 
+		wxLogError(wxString::Format(wxT("Memory allocation failed. %s:%d"),
 			wxT(__FILE__), __LINE__));
 		return -2;
 	}
@@ -386,7 +384,7 @@ int aiAgent::GetPlay(unsigned long mask)
 		deal_hands[i] = new unsigned long[gmTOTAL_PLAYERS];
 		if(!deal_hands[i])
 		{
-			wxLogError(wxString::Format(wxT("Memory allocation failed. %s:%d"), 
+			wxLogError(wxString::Format(wxT("Memory allocation failed. %s:%d"),
 				wxT(__FILE__), __LINE__));
 			return -2;
 		}
@@ -408,14 +406,14 @@ int aiAgent::GetPlay(unsigned long mask)
 #ifdef raAI_LOG_GET_PLAY
 	wxLogDebug(wxString::Format("Depth of search - %d", depth));
 #endif
-	
+
 	avg_eval_trump.count = 0;
 	avg_eval_trump.eval = 0;
 	avg_eval_trump.valid = false;
 
 
 	// If trump is shown or if self is the max bidder
-	// then trump is known. 
+	// then trump is known.
 	if(data.trump_shown || (m_loc == data.curr_max_bidder))
 	{
 #ifdef raAI_LOG_GET_PLAY
@@ -427,7 +425,7 @@ int aiAgent::GetPlay(unsigned long mask)
 		// Generate possible moves which do not ask for trump
 		if(!GenerateMoves(&rule_engine, moves, &move_count, aiGENMV_NOTRUMP))
 		{
-			wxLogError(wxString::Format(wxT("GenerateMoves() failed. %s:%d"), 
+			wxLogError(wxString::Format(wxT("GenerateMoves() failed. %s:%d"),
 				wxT(__FILE__), __LINE__));
 			return -2;
 		}
@@ -441,7 +439,7 @@ int aiAgent::GetPlay(unsigned long mask)
 		// Generate moves which ask for trump
 		if(!GenerateMoves(&rule_engine, moves_trump, &move_trump_count, aiGENMV_TRUMP))
 		{
-			wxLogError(wxString::Format(wxT("GenerateMoves() failed. %s:%d"), 
+			wxLogError(wxString::Format(wxT("GenerateMoves() failed. %s:%d"),
 				wxT(__FILE__), __LINE__));
 			return -2;
 		}
@@ -455,7 +453,7 @@ int aiAgent::GetPlay(unsigned long mask)
 		// Generate random deals
 		if(!GenerateDeals(&data, deal_hands, 30))
 		{
-			wxLogError(wxString::Format(wxT("GenerateDeals() failed. %s:%d"), 
+			wxLogError(wxString::Format(wxT("GenerateDeals() failed. %s:%d"),
 				wxT(__FILE__), __LINE__));
 			return -2;
 		}
@@ -480,7 +478,7 @@ int aiAgent::GetPlay(unsigned long mask)
 #endif
 				if(!MakeMoveAndEval(&rule_engine, &moves[j], depth, &eval))
 				{
-					wxLogError(wxString::Format(wxT("MakeMoveAndEval() failed. %s:%d"), 
+					wxLogError(wxString::Format(wxT("MakeMoveAndEval() failed. %s:%d"),
 						wxT(__FILE__), __LINE__));
 					return -2;
 				}
@@ -512,7 +510,7 @@ int aiAgent::GetPlay(unsigned long mask)
 #endif
 				if(!MakeMoveAndEval(&rule_engine, &moves_trump[j], depth, &eval))
 				{
-					wxLogError(wxString::Format(wxT("MakeMoveAndEval() failed. %s:%d"), 
+					wxLogError(wxString::Format(wxT("MakeMoveAndEval() failed. %s:%d"),
 						wxT(__FILE__), __LINE__));
 					return -2;
 				}
@@ -540,10 +538,10 @@ int aiAgent::GetPlay(unsigned long mask)
 				wxLogDebug(wxString::Format("avg_eval_trump.eval - %d",avg_eval_trump.eval));
 #endif
 			}
-			
+
 			// Update the statusbar
 			gmUtil::SetStatusText(wxString::Format(
-				wxT("%s is thinking - %d%%"), gmUtil::m_long_locs[m_loc].c_str(), 
+				wxT("%s is thinking - %d%%"), gmUtil::m_long_locs[m_loc].c_str(),
 				(i * 100) / 30 ), raSBARPOS_GEN);
 
 		}
@@ -580,8 +578,8 @@ int aiAgent::GetPlay(unsigned long mask)
 		wxASSERT(best_play != gmCARD_INVALID);
 
 #ifdef raAI_LOG_GET_PLAY
-		wxLogDebug(wxString::Format("Best play (only considering cases where trump is not asked) - %s%s", 
-			gmUtil::m_suits[gmGetSuit(best_play)], 
+		wxLogDebug(wxString::Format("Best play (only considering cases where trump is not asked) - %s%s",
+			gmUtil::m_suits[gmGetSuit(best_play)],
 			gmUtil::m_values[gmGetValue(best_play)]));
 #endif
 
@@ -599,7 +597,7 @@ int aiAgent::GetPlay(unsigned long mask)
 			}
 		}*/
 
-		// Compare the options - 
+		// Compare the options -
 		// Ask for trump or play without asking for trump
 		if(avg_eval_trump.count > 0)
 		{
@@ -630,7 +628,7 @@ int aiAgent::GetPlay(unsigned long mask)
 		// Generate possible moves which do not ask for trump
 		if(!GenerateMoves(&rule_engine, moves, &move_count, aiGENMV_NOTRUMP))
 		{
-			wxLogError(wxString::Format(wxT("GenerateMoves() failed. %s:%d"), 
+			wxLogError(wxString::Format(wxT("GenerateMoves() failed. %s:%d"),
 				wxT(__FILE__), __LINE__));
 			return -2;
 		}
@@ -644,7 +642,7 @@ int aiAgent::GetPlay(unsigned long mask)
 #endif
 		for(k = 0; k < gmTOTAL_SUITS; k++)
 		{
-			// If the trump is not possible ignore 
+			// If the trump is not possible ignore
 			if(!(m_trump_cards & (1 << k)))
 				continue;
 
@@ -654,7 +652,7 @@ int aiAgent::GetPlay(unsigned long mask)
 			// Generate moves which ask for trump
 			if(!GenerateMoves(&rule_engine, moves_trump, &move_trump_count, aiGENMV_TRUMP))
 			{
-				wxLogError(wxString::Format(wxT("GenerateMoves() failed. %s:%d"), 
+				wxLogError(wxString::Format(wxT("GenerateMoves() failed. %s:%d"),
 					wxT(__FILE__), __LINE__));
 				return -2;
 			}
@@ -669,7 +667,7 @@ int aiAgent::GetPlay(unsigned long mask)
 			// Generate random deals
 			if(!GenerateDeals(&work_data, deal_hands, 30, k))
 			{
-				wxLogError(wxString::Format(wxT("GenerateDeals() failed. %s:%d"), 
+				wxLogError(wxString::Format(wxT("GenerateDeals() failed. %s:%d"),
 					wxT(__FILE__), __LINE__));
 				return -2;
 			}
@@ -681,7 +679,7 @@ int aiAgent::GetPlay(unsigned long mask)
 				wxLogDebug(wxString::Format("Random deal no : %d", i));
 #endif
 
-				// Set the trump card 
+				// Set the trump card
 				work_data.trump_card = GetTrump(work_data.hands[work_data.curr_max_bidder], work_data.trump_suit);
 
 				wxASSERT((work_data.trump_card > gmCARD_INVALID) && (work_data.trump_card < gmTOTAL_CARDS));
@@ -704,13 +702,13 @@ int aiAgent::GetPlay(unsigned long mask)
 #endif
 					if(!MakeMoveAndEval(&rule_engine, &moves[j], depth, &eval))
 					{
-						wxLogError(wxString::Format(wxT("MakeMoveAndEval() failed. %s:%d"), 
+						wxLogError(wxString::Format(wxT("MakeMoveAndEval() failed. %s:%d"),
 							wxT(__FILE__), __LINE__));
 						return -2;
 					}
 					//wxLogDebug(wxString::Format("Eval for %s%s - %d (Trump - %s)",
-					//	gmUtil::m_suits[gmGetSuit(moves[j].card)].c_str(), 
-					//	gmUtil::m_values[gmGetValue(moves[j].card)].c_str(), 
+					//	gmUtil::m_suits[gmGetSuit(moves[j].card)].c_str(),
+					//	gmUtil::m_values[gmGetValue(moves[j].card)].c_str(),
 					//	eval, gmUtil::m_suits[k].c_str()));
 					evals[j].eval += eval;
 					evals[j].count++;
@@ -728,7 +726,7 @@ int aiAgent::GetPlay(unsigned long mask)
 				//wxLogDebug(rule_engine.GetLoggable());
 				if(!GenerateMoves(&rule_engine, moves_trump, &move_trump_count, aiGENMV_TRUMP))
 				{
-					wxLogError(wxString::Format(wxT("GenerateMoves() failed. %s:%d"), 
+					wxLogError(wxString::Format(wxT("GenerateMoves() failed. %s:%d"),
 						wxT(__FILE__), __LINE__));
 					return -2;
 				}
@@ -753,7 +751,7 @@ int aiAgent::GetPlay(unsigned long mask)
 #endif
 					if(!MakeMoveAndEval(&rule_engine, &moves_trump[j], depth, &eval))
 					{
-						wxLogError(wxString::Format(wxT("MakeMoveAndEval() failed. %s:%d"), 
+						wxLogError(wxString::Format(wxT("MakeMoveAndEval() failed. %s:%d"),
 							wxT(__FILE__), __LINE__));
 						return -2;
 					}
@@ -783,7 +781,7 @@ int aiAgent::GetPlay(unsigned long mask)
 
 				// Update the statusbar
 				gmUtil::SetStatusText(wxString::Format(
-					wxT("%s is thinking - %d%%"), gmUtil::m_long_locs[m_loc].c_str(), 
+					wxT("%s is thinking - %d%%"), gmUtil::m_long_locs[m_loc].c_str(),
 					(((k * 30) + i) * 100) / (gmTOTAL_SUITS * 30) ), raSBARPOS_GEN);
 
 			}
@@ -817,12 +815,12 @@ int aiAgent::GetPlay(unsigned long mask)
 		}
 		wxASSERT(best_play != gmCARD_INVALID);
 #ifdef raAI_LOG_GET_PLAY
-		wxLogDebug(wxString::Format("Best play (only considering cases where trump is not asked) - %s%s", 
-			gmUtil::m_suits[gmGetSuit(best_play)], 
+		wxLogDebug(wxString::Format("Best play (only considering cases where trump is not asked) - %s%s",
+			gmUtil::m_suits[gmGetSuit(best_play)],
 			gmUtil::m_values[gmGetValue(best_play)]));
 #endif
 
-		// Compare the options - 
+		// Compare the options -
 		// Ask for trump or play without asking for trump
 		//wxLogDebug("Best evals %f, %f", best_eval, best_eval_trump);
 		if(avg_eval_trump.count > 0)
@@ -887,7 +885,7 @@ bool aiAgent::GenerateSLProblem(gmEngineData *data, slProblem *problem, int trum
 	for(i = 0; i < gmTOTAL_PLAYERS; i++)
 	{
 		problem->hand_total_length[i] = 8 - (gmUtil::CountBitsSet(data->played_cards[i]));
-		sum_hands += problem->hand_total_length[i]; 
+		sum_hands += problem->hand_total_length[i];
 		cards_played |= data->played_cards[i];
 	}
 
@@ -902,7 +900,7 @@ bool aiAgent::GenerateSLProblem(gmEngineData *data, slProblem *problem, int trum
 	if(!data->trump_shown)
 		problem->cells[data->curr_max_bidder][trump].min = 1;
 
-	// If the trump is shown, but if the max bidder is yet to play the 
+	// If the trump is shown, but if the max bidder is yet to play the
 	// card that was set as the trump then the minimum suit length is 1
 	if(data->trump_shown)
 	{
@@ -933,7 +931,7 @@ bool aiAgent::GenerateSLProblem(gmEngineData *data, slProblem *problem, int trum
 		problem->cells[m_loc][i].min = gmUtil::CountBitsSet(data->hands[m_loc] & gmUtil::m_suit_mask[i]);
 		problem->cells[m_loc][i].max = problem->cells[m_loc][i].min;
 	}
-	// If self is the max bidder and if trump is not shown, 
+	// If self is the max bidder and if trump is not shown,
 	// add one to the suit length to accommodate the card kept as trump
 	if((!data->trump_shown) && (m_loc == data->curr_max_bidder))
 	{
@@ -952,7 +950,7 @@ bool aiAgent::GenerateSLProblem(gmEngineData *data, slProblem *problem, int trum
 		out.Append(wxString::Format("%s - ", gmUtil::m_short_locs[i].c_str()));
 		for(j = 0; j < gmTOTAL_SUITS; j++)
 		{
-			out.Append(wxString::Format("%d/%d ", 
+			out.Append(wxString::Format("%d/%d ",
 				problem->cells[i][j].min,
 				problem->cells[i][j].max
 				));
@@ -988,7 +986,7 @@ bool aiAgent::GenerateDeals(gmEngineData *data, unsigned long **deals, int count
 	unsigned long cards_played = 0;
 	unsigned long temp;
 	unsigned long known_alloc[gmTOTAL_PLAYERS];
-	
+
 
 	wxASSERT(data);
 	//wxASSERT(deals);
@@ -1042,18 +1040,18 @@ bool aiAgent::GenerateDeals(gmEngineData *data, unsigned long **deals, int count
 	memset(&problem, 0, sizeof(problem));
 	if(!GenerateSLProblem(data, &problem, trump))
 	{
-		wxLogError(wxString::Format(wxT("GetData() failed. %s:%d"), 
+		wxLogError(wxString::Format(wxT("GetData() failed. %s:%d"),
 			wxT(__FILE__), __LINE__));
 		return false;
 	}
-	
+
 #ifdef raAI_LOG_GENERATEDEALS
-	wxLogError(wxString::Format(wxT("Logged from. %s:%d"), 
+	wxLogError(wxString::Format(wxT("Logged from. %s:%d"),
 		wxT(__FILE__), __LINE__));
 	wxLogDebug(aiSuitLengthSolver::PrintProblem(&problem));
 #endif
 
-	// 
+	//
 	// Generate random deals
 	//
 
@@ -1143,7 +1141,7 @@ bool aiAgent::PostPlayUpdate(gmEngineData *data, int card)
 		suit = gmGetSuit(card);
 
 		// If trump is not shown and if the player is the max bidder and
-		// if it is the first card in the trick then the suit is not trump, 
+		// if it is the first card in the trick then the suit is not trump,
 		// provided the max bidder has a choice of another suit
 		if(
 			!data->trump_shown &&
@@ -1208,7 +1206,7 @@ bool aiAgent::PostPlayUpdate(gmEngineData *data, int card)
 		{
 			// If the current player is the max bidder
 			// we can safely assume that either the suit is the trump
-			// and the max bidder has only one card of the suit left and 
+			// and the max bidder has only one card of the suit left and
 			// that is kept as the trump. Otherwise the suit length is zero.
 			// This can be confirmed only after the trump is shown
 			if(
@@ -1228,12 +1226,12 @@ bool aiAgent::PostPlayUpdate(gmEngineData *data, int card)
 		}
 	}
 
-	// If trump is shown and if any of the null suspects is not 
+	// If trump is shown and if any of the null suspects is not
 	// the trump set the suit length in max bidders hand to zero
 	// for those
 	if((data->trump_shown) && (m_mb_null_susp))
 	{
-		for(i = 0; i < gmTOTAL_SUITS; i++)	
+		for(i = 0; i < gmTOTAL_SUITS; i++)
 		{
 			if((m_mb_null_susp & (1 << i)) && (i != data->trump_suit))
 			{
@@ -1260,7 +1258,7 @@ bool aiAgent::PostPlayUpdate(gmEngineData *data, int card)
 		}
 
 		// Add the cards played so far (previous tricks and the current one)
-		for(i = 0; i < gmTOTAL_PLAYERS; i++)	
+		for(i = 0; i < gmTOTAL_PLAYERS; i++)
 		{
 			cards_played |= data->played_cards[i];
 			if(data->tricks[data->trick_round].cards[i] != gmCARD_INVALID)
@@ -1269,12 +1267,12 @@ bool aiAgent::PostPlayUpdate(gmEngineData *data, int card)
 
 		//wxLogDebug("Here");
 		//wxLogDebug(gmUtil::PrintHands(data->played_cards));
-		for(i = 0; i < gmTOTAL_SUITS; i++)	
+		for(i = 0; i < gmTOTAL_SUITS; i++)
 		{
-			//wxLogDebug(wxString::Format("Debug count - %d", 
-			//	gmUtil::CountBitsSet((cards_played | data->hands[m_loc]) & 
+			//wxLogDebug(wxString::Format("Debug count - %d",
+			//	gmUtil::CountBitsSet((cards_played | data->hands[m_loc]) &
 			//	gmUtil::m_suit_mask[i])));
-			if(gmUtil::CountBitsSet((cards_played | data->hands[m_loc]) & 
+			if(gmUtil::CountBitsSet((cards_played | data->hands[m_loc]) &
 				gmUtil::m_suit_mask[i])>= gmTOTAL_VALUES)
 			{
 				m_trump_cards &= ~(1 << i);
@@ -1303,7 +1301,7 @@ bool aiAgent::PostPlayUpdate(gmEngineData *data, int card)
 		{
 			if(m_nulls[j] & (1 << i))
 			{
-				wxLogDebug(wxString::Format("%s does not have %s", 
+				wxLogDebug(wxString::Format("%s does not have %s",
 					gmUtil::m_short_locs[j].c_str(),
 					gmUtil::m_suits[i].c_str()));
 			}
@@ -1316,7 +1314,7 @@ bool aiAgent::PostPlayUpdate(gmEngineData *data, int card)
 }
 bool aiAgent::CheckAssumptions(gmEngineData *data)
 {
-	int i;	
+	int i;
 
 #ifdef raAI_LOG_CHECKASSUMPTIONS
 #endif
@@ -1339,7 +1337,7 @@ bool aiAgent::CheckAssumptions(gmEngineData *data)
 			if(m_nulls[j] & (1 << i))
 			{
 				wxASSERT(!(data->hands[j] & gmUtil::m_suit_mask[i]));
-				//wxLogDebug(wxString::Format("%s does not have %s", 
+				//wxLogDebug(wxString::Format("%s does not have %s",
 				//	gmUtil::m_short_locs[j].c_str(),
 				//	gmUtil::m_suits[i].c_str()));
 			}
@@ -1616,7 +1614,7 @@ bool aiAgent::GenerateMoves(gmEngine *node, aiMove *moves, int *count, int type)
 		return false;
 	}
 
-	// Depending on the type passed, generate 
+	// Depending on the type passed, generate
 	// moves which do not ask for the trump
 
 	if(type & aiGENMV_NOTRUMP)
@@ -1886,13 +1884,13 @@ bool aiAgent::RankMove(gmEngineData *data, aiMove *move)
 			// And if the card played is higher than the cards played
 			// in the trick belonging to the same suit
 			((trick->winner == gmGetPartner(next_to_play)) || (!partner_played && (partner_cards_suit > trick_cards_suit))) &&
-			// And if the move is not the trump card 
+			// And if the move is not the trump card
 			// TODO : Implement - wisely!
 			// And if opponent has not played yet and the opponent has the suit but no higher cards
 			// or if opponent one has no cards belonging to the suit but no trumps
 			(opp1_played || (!opp1_played && ((opp1_cards_suit && (opp1_cards_suit < partner_cards_suit)) || (!opp1_cards_suit && !opp1_cards_trump)))) &&
 			(opp2_played || (!opp2_played && ((opp2_cards_suit && (opp2_cards_suit < partner_cards_suit)) || (!opp2_cards_suit && !opp2_cards_trump))))
-			) 
+			)
 		{
 			move->rank = 300 + gmUtil::m_points[value];
 			/*
@@ -1999,7 +1997,7 @@ bool aiAgent::RankMove(gmEngineData *data, aiMove *move)
 	{
 		if(
 			(opp1_played || (!opp1_played && (opp1_cards_suit || (!opp1_cards_suit && (opp1_cards_trump < (unsigned long)(1 << trick->cards[trick->winner])))))) &&
-			(opp2_played || (!opp2_played && (opp2_cards_suit || (!opp2_cards_suit && (opp2_cards_trump < (unsigned long)(1 << trick->cards[trick->winner])))))) 
+			(opp2_played || (!opp2_played && (opp2_cards_suit || (!opp2_cards_suit && (opp2_cards_trump < (unsigned long)(1 << trick->cards[trick->winner]))))))
 			)
 		{
 			partner_trumps = true;
@@ -2356,7 +2354,7 @@ bool aiAgent::MakeMove(gmEngine *node, aiMove *move)
 	if(node->PostInputMessage(gmINPUT_TRICK, &trick_info))
 	{
 		node->PostInputMessage(gmINPUT_TRICK, &trick_info);
-		wxLogDebug(wxString::Format(wxT("Player %s Card %s%s"), 
+		wxLogDebug(wxString::Format(wxT("Player %s Card %s%s"),
 			gmUtil::m_short_locs[trick_info.player].c_str(),
 			gmUtil::m_suits[gmGetSuit(trick_info.card)].c_str(),
 			gmUtil::m_values[gmGetValue(trick_info.card)].c_str()

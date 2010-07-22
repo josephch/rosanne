@@ -1,20 +1,18 @@
-// Rosanne : Twenty Eight (28) Card Game
-// Copyright (C) 2006-2009 Vipin Cherian
+// Rosanne : Trump card game popularly known as Twenty Eight (28)
+// Copyright (C) 2006-2010 Vipin Cherian
 //
-// This program is free software; you can redistribute it and/or modify
+// This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, 
-// Boston, MA  02110-1301, USA
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "gg/ggpanel.h"
 
@@ -140,9 +138,9 @@ bool ggPanel::RefreshScreen()
 
 	return true;
 }
-bool ggPanel::BlitToBack(wxCoord xdest, wxCoord ydest, 
-	wxCoord width, wxCoord height, wxDC* source, wxCoord xsrc, 
-	wxCoord ysrc, int logicalFunc, bool useMask, 
+bool ggPanel::BlitToBack(wxCoord xdest, wxCoord ydest,
+	wxCoord width, wxCoord height, wxDC* source, wxCoord xsrc,
+	wxCoord ysrc, int logicalFunc, bool useMask,
 	wxCoord xsrcMask, wxCoord ysrcMask)
 {
 	int x, y;
@@ -173,9 +171,9 @@ bool ggPanel::BlitToBack(wxCoord xdest, wxCoord ydest,
 	return true;
 
 }
-bool ggPanel::BlitToFront(wxCoord xdest, wxCoord ydest, 
-	wxCoord width, wxCoord height, wxDC* source, wxCoord xsrc, 
-	wxCoord ysrc, int logicalFunc, bool useMask, 
+bool ggPanel::BlitToFront(wxCoord xdest, wxCoord ydest,
+	wxCoord width, wxCoord height, wxDC* source, wxCoord xsrc,
+	wxCoord ysrc, int logicalFunc, bool useMask,
 	wxCoord xsrcMask, wxCoord ysrcMask)
 {
 	wxMemoryDC wdc;
@@ -245,7 +243,7 @@ bool ggPanel::ClearDifference()
 	if(!wdc.Ok())
 		return false;
 
-	if(!wdc.Blit(m_rect_diff.x, m_rect_diff.y, m_rect_diff.GetWidth(), m_rect_diff.GetHeight(), 
+	if(!wdc.Blit(m_rect_diff.x, m_rect_diff.y, m_rect_diff.GetWidth(), m_rect_diff.GetHeight(),
 		&bdc, m_rect_diff.x, m_rect_diff.y))
 		return false;
 

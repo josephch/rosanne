@@ -1,20 +1,18 @@
-// Rosanne : Twenty Eight (28) Card Game
-// Copyright (C) 2006-2009 Vipin Cherian
+// Rosanne : Trump card game popularly known as Twenty Eight (28)
+// Copyright (C) 2006-2010 Vipin Cherian
 //
-// This program is free software; you can redistribute it and/or modify
+// This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, 
-// Boston, MA  02110-1301, USA
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "ra/rabid.h"
 #include "ra/ragamepanel.h"
@@ -75,7 +73,7 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 #ifdef __WXMSW__
 	m_main_panel->SetWindowStyle(wxSUNKEN_BORDER);
 #endif
-	
+
 	m_main_panel->SetBackgroundColour(*wxWHITE);
 	m_main_sizer = new wxGridSizer(0, 0, 0, 0);
 
@@ -94,7 +92,7 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 
 	m_head_panel_sizer = new wxGridSizer(0, 0, 0, 0);
 	m_head_panel_text = new wxStaticText(m_head_panel, -1, wxT("Enter Bid"));
-	m_head_panel_sizer->Add(m_head_panel_text, 0, 
+	m_head_panel_sizer->Add(m_head_panel_text, 0,
 		wxALIGN_CENTER_HORIZONTAL| wxALIGN_CENTER_VERTICAL|wxALL, 2);
 
 	m_head_panel->SetSizer(m_head_panel_sizer);
@@ -107,11 +105,11 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	{
 		for(j = 0; j < raBID_BTN_COLS; j++)
 		{
-			m_buttons[(i * raBID_BTN_COLS) + j] = new wxButton(m_bidbtn_panel, 
-				raBID_BTN_ID_START + (i * raBID_BTN_COLS) + j, 
+			m_buttons[(i * raBID_BTN_COLS) + j] = new wxButton(m_bidbtn_panel,
+				raBID_BTN_ID_START + (i * raBID_BTN_COLS) + j,
 				wxString::Format(wxT("%d"), (i * raBID_BTN_COLS) + j + 14),
 				wxDefaultPosition, wxSize(best_width, -1));
-			m_bidbtn_panel_sizer->Add(m_buttons[(i * raBID_BTN_COLS) + j], 0, 
+			m_bidbtn_panel_sizer->Add(m_buttons[(i * raBID_BTN_COLS) + j], 0,
 				wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND|wxALL, 1);
 			//m_buttons[(i * raBID_BTN_COLS) + j]->SetSize(10, 20);
 			//m_buttons[(i * raBID_BTN_COLS) + j]->SetWindowStyle(wxNO_BORDER);
@@ -122,7 +120,7 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	m_bidbtn_panel->SetSizer(m_bidbtn_panel_sizer);
 	m_bidbtn_panel_sizer->Fit(m_bidbtn_panel);
 
-	// Create panel, assosiated sizer to hold the buttons 
+	// Create panel, assosiated sizer to hold the buttons
 	// to bid "All" and "Pass"
 
 	m_btns_panel = new wxPanel(m_main_panel);
@@ -135,13 +133,13 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 
 	//m_button_all->SetWindowStyle(wxNO_BORDER);
 	//m_button_pass->SetWindowStyle(wxNO_BORDER);
-	
+
 	m_button_all->SetEventHandler(this->GetEventHandler());
 	m_button_pass->SetEventHandler(this->GetEventHandler());
 
-	m_btns_panel_sizer->Add(m_button_all, 0, 
+	m_btns_panel_sizer->Add(m_button_all, 0,
 		wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND|wxALL, 1);
-	m_btns_panel_sizer->Add(m_button_pass, 0, 
+	m_btns_panel_sizer->Add(m_button_pass, 0,
 		wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND|wxALL, 1);
 
 	m_btns_panel->SetSizer(m_btns_panel_sizer);
@@ -163,7 +161,7 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	this->SetSizer(m_main_sizer);
 	m_main_sizer->Fit(this);
 
-	this->GetEventHandler()->Connect(raBID_BTN_ID_START, raBID_BTN_ID_START + raBID_TOTAL_BTNS - 1, 
+	this->GetEventHandler()->Connect(raBID_BTN_ID_START, raBID_BTN_ID_START + raBID_TOTAL_BTNS - 1,
 		wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(raBid::OnButtonClick));
 }
 
@@ -171,7 +169,7 @@ raBid::~raBid()
 {
 }
 
-// 
+//
 // Public method/s
 //
 bool raBid::SetGamePanel(raGamePanel *game_panel)
@@ -198,7 +196,7 @@ bool raBid::SetMinimumBid(int min_bid)
 
 	// Disable all the bid buttons less than the minimum bid
 	// and enable the rest
-	
+
 	for(i = 0; i < raBID_TOTAL_BTNS; i++)
 		m_buttons[i]->Enable(!(i < (min_bid - 14)));
 

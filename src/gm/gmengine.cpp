@@ -1,20 +1,18 @@
-// Rosanne : Twenty Eight (28) Card Game
-// Copyright (C) 2006-2009 Vipin Cherian
+// Rosanne : Trump card game popularly known as Twenty Eight (28)
+// Copyright (C) 2006-2010 Vipin Cherian
 //
-// This program is free software; you can redistribute it and/or modify
+// This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, 
-// Boston, MA  02110-1301, USA
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "gm/gmengine.h"
 
@@ -63,7 +61,7 @@ bool gmEngine::Reset(gmEngineData *data)
 	int i, j;
 	//TODO : Reduce the number of loops
 
-	data->status = gmSTATUS_NOT_STARTED; 
+	data->status = gmSTATUS_NOT_STARTED;
 	data->dealer = 0;
 
 	// Filling m_shuffled with values for all the 32 cards
@@ -131,7 +129,7 @@ bool gmEngine::Shuffle()
 
 	// If required set the shuffled card as per the
 	// deal read from the test data input file
-#ifdef raREAD_DEAL_FROM_FILE 
+#ifdef raREAD_DEAL_FROM_FILE
 
 	if(::wxFileExists(raTEST_DATA_FILE))
 	{
@@ -175,10 +173,10 @@ bool gmEngine::Shuffle()
 					else
 					{
 						wxLogDebug(wxString::Format(
-							"Cards to be dealt to %s are %s", 
+							"Cards to be dealt to %s are %s",
 							gmUtil::m_short_locs[i].c_str(), str_cards_read.c_str()));
 
-						// Get each str_card from the list of str_cards to be 
+						// Get each str_card from the list of str_cards to be
 						// dealt to the location
 						while(!str_cards_read.IsEmpty())
 						{
@@ -214,7 +212,7 @@ bool gmEngine::Shuffle()
 			// Print the cards to be dealt for each player
 			for(i = 0; i < gmTOTAL_PLAYERS; i++)
 			{
-				wxLogDebug(wxString::Format("Cards for %s - %s", 
+				wxLogDebug(wxString::Format("Cards for %s - %s",
 					gmUtil::m_short_locs[i].c_str(),
 					gmUtil::PrintLong(cards_read[k - 1][i]).c_str()));
 			}
@@ -231,7 +229,7 @@ bool gmEngine::Shuffle()
 		if((int)gmUtil::CountBitsSet(all_read) != count_read)
 		{
 			wxLogError(wxString::Format(
-				"Duplicate cards. From all read %d count read %d", 
+				"Duplicate cards. From all read %d count read %d",
 				(int)gmUtil::CountBitsSet(all_read), count_read));
 		}
 		else
@@ -281,7 +279,7 @@ bool gmEngine::Shuffle()
 			for(i = 0; i < gmTOTAL_CARDS; i++)
 			{
 				wxASSERT(flags[i]);
-				//wxLogDebug(wxString::Format("%d - %s%s", 
+				//wxLogDebug(wxString::Format("%d - %s%s",
 				//	i,
 				//	gmUtil::m_suits[gmGetSuit(m_data.shuffled[i])],
 				//	gmUtil::m_values[gmGetValue(m_data.shuffled[i])]
@@ -293,12 +291,12 @@ bool gmEngine::Shuffle()
 			return true;
 		}
 		wxLogDebug("----------------------------------------------");
-	}	
+	}
 #endif
 
 	// Sorting, for full replication
 	// can be removed, functionality will not be affected.
-	for (i = 0; i < gmTOTAL_CARDS; i++) 
+	for (i = 0; i < gmTOTAL_CARDS; i++)
 		m_data.shuffled[i] = i;
 
 	for (i = 0; i < gmTOTAL_CARDS - 1; i++) {
@@ -317,7 +315,7 @@ bool gmEngine::Continue()
 	unsigned long rules;
 
 	// Cannot continue if input is pending
-	if(m_data.input_pending)	
+	if(m_data.input_pending)
 		return false;
 
 	// Cannot continue if output is pending
@@ -352,7 +350,7 @@ bool gmEngine::Continue()
 		{
 			m_data.out_deal_info.round = gmDEAL_ROUND_1;
 			//TODO : Is this memcpy correct?
-			memcpy(&m_data.out_deal_info.hands, &m_data.hands, 
+			memcpy(&m_data.out_deal_info.hands, &m_data.hands,
 				sizeof(m_data.hands));
 
 			// Set output pending
@@ -372,12 +370,12 @@ bool gmEngine::Continue()
 		}
 		// If no bids have been made yet, start with the player next to dealer
 		if(m_data.last_bidder == gmPLAYER_INVALID)
-			i = gmNext(m_data.dealer); 
+			i = gmNext(m_data.dealer);
 		// Otherwise, start with the player next to the last bidder
 		else
-			i = gmNext(m_data.last_bidder); 
+			i = gmNext(m_data.last_bidder);
 
-		// u will hold the list of players for which 
+		// u will hold the list of players for which
 		// it was checked as to whether the player can bid
 		u = 0;
 		while(u < 0x0000000F)
@@ -385,19 +383,19 @@ bool gmEngine::Continue()
 			// If the player has not already bid
 			// and the highest bid is not held by his partner
 			// then a bid is expected.
-			if(!m_data.bid_hist[0][i] && (gmPartner(i) 
+			if(!m_data.bid_hist[0][i] && (gmPartner(i)
 				!= m_data.curr_max_bidder))
-			{	
+			{
 				// Fill data in the input bid structure
 				m_data.in_bid_info.player = i;
 				m_data.in_bid_info.bid = 0;
 
 				if(m_data.last_bidder == gmPLAYER_INVALID)
-					m_data.in_bid_info.passable = false;  
+					m_data.in_bid_info.passable = false;
 				else
 					m_data.in_bid_info.passable = true;
 
-				// If no bid has been made yet, the minimum 
+				// If no bid has been made yet, the minimum
 				// that can be bid is the minimum for the first round.
 				// Otherwise the minimum bid that can be made
 				// is any bid greater than the highest bid made so far.
@@ -434,36 +432,36 @@ bool gmEngine::Continue()
 		// If no bids have been made yet in this round,
 		// start with the player next to dealer
 		if(m_data.last_bidder == gmPLAYER_INVALID)
-			i = gmNext(m_data.dealer); 
+			i = gmNext(m_data.dealer);
 		// Otherwise, start with the player next to the last bidder
 		else
 			i = gmNext(m_data.last_bidder);
 
-		// u will hold the list of players for which 
+		// u will hold the list of players for which
 		// it was checked as to whether the player can bid
 		u = 0;
 		while(u < 0x0000000F)
 		{
 			// If the player has not already bid
 			// and the highest bid is not by the player
-			// then a bid is expected and if the player 
+			// then a bid is expected and if the player
 			// had not passed in the first round
 			if(
-				!m_data.bid_hist[1][i] && 
+				!m_data.bid_hist[1][i] &&
 				(i != m_data.curr_max_bidder) &&
 				!(m_data.passed_round1 & (1 << i))
 				)
-			{	
+			{
 				// Fill data in the input bid structure
 				m_data.in_bid_info.player = i;
 				m_data.in_bid_info.bid = 0;
 
-				m_data.in_bid_info.passable = true;  
+				m_data.in_bid_info.passable = true;
 
-				// The minimum bid that can be made is the 
+				// The minimum bid that can be made is the
 				// maximum of the current highest bid and the minimum allowed
 				// bid for the round.
-				m_data.in_bid_info.min = 
+				m_data.in_bid_info.min =
 					gmMax(m_data.rules.min_bid_2, (m_data.curr_max_bid + 1));
 				m_data.in_bid_info.round = 1;
 
@@ -493,12 +491,12 @@ bool gmEngine::Continue()
 		// If no bids have been made yet in this round,
 		// start with the player next to dealer
 		if(m_data.last_bidder == gmPLAYER_INVALID)
-			i = gmNext(m_data.dealer); 
+			i = gmNext(m_data.dealer);
 		// Otherwise, start with the player next to the last bidder
 		else
 			i = gmNext(m_data.last_bidder);
 
-		// u will hold the list of players for which 
+		// u will hold the list of players for which
 		// it was checked as to whether the player can bid
 		u = 0;
 		while(u < 0x0000000F)
@@ -506,17 +504,17 @@ bool gmEngine::Continue()
 			// If the player has not already bid
 			// then a bid is expected.
 			if(!m_data.bid_hist[2][i])
-			{	
+			{
 				// Fill data in the input bid structure
 				m_data.in_bid_info.player = i;
 				m_data.in_bid_info.bid = 0;
 
-				m_data.in_bid_info.passable = true;  
+				m_data.in_bid_info.passable = true;
 
-				// The minimum bid that can be made is the 
+				// The minimum bid that can be made is the
 				// maximum of the current highest bid and the minimum allowed
 				// bid for the round.
-				m_data.in_bid_info.min = 
+				m_data.in_bid_info.min =
 					gmMax(m_data.rules.min_bid_3, (m_data.curr_max_bid + 1));
 				m_data.in_bid_info.round = 2;
 
@@ -554,14 +552,14 @@ bool gmEngine::Continue()
 	case gmSTATUS_DEAL2:
 		// Deal round 1
 		for(i = 0; i < gmTOTAL_CARDS / 2; i++)
-			m_data.hands[i / 4] |= 
+			m_data.hands[i / 4] |=
 				(1 << m_data.shuffled[i + (gmTOTAL_CARDS / 2)]);
 
 		if(m_data.feedback)
 		{
 			m_data.out_deal_info.round = gmDEAL_ROUND_2;
 			// TODO : Is this memcpy correct?
-			memcpy(&m_data.out_deal_info.hands, 
+			memcpy(&m_data.out_deal_info.hands,
 				&m_data.hands, sizeof(m_data.hands));
 
 			// Set output pending
@@ -575,8 +573,8 @@ bool gmEngine::Continue()
 		{
 
 			m_data.in_trick_info.ask_trump = false;
-			
-			// A player can ask for the trump 
+
+			// A player can ask for the trump
 			// only if the bid is not for All tricks
 			if(m_data.curr_max_bid != gmBID_ALL)
 			{
@@ -586,12 +584,12 @@ bool gmEngine::Continue()
 				// 3. Player does not have any lead suit
 				m_data.in_trick_info.can_ask_trump = false;
 				if(
-					!m_data.trump_shown && 
+					!m_data.trump_shown &&
 					(m_data.tricks[m_data.trick_round].lead_suit != gmSUIT_INVALID)
 					)
 				{
 					if(
-						!(m_data.hands[gmTrickNext] & 
+						!(m_data.hands[gmTrickNext] &
 						gmUtil::m_suit_mask[m_data.tricks[m_data.trick_round].lead_suit])
 						)
 					{
@@ -613,15 +611,15 @@ bool gmEngine::Continue()
 			}
 
 			m_data.in_trick_info.card = gmCARD_INVALID;
-			
-			// Obtain the mask and the rules applicable 
+
+			// Obtain the mask and the rules applicable
 			// and set the same
 			rules = 0;
 			m_data.in_trick_info.mask = GenerateMask(&rules);
 			m_data.in_trick_info.rules = rules;
 			m_data.in_trick_info.player = gmTrickNext;
 
-			// If the player has no card which matches 
+			// If the player has no card which matches
 			// the mask, player can play any card
 			if(!(m_data.hands[m_data.in_trick_info.player] & m_data.in_trick_info.mask))
 			{
@@ -639,7 +637,7 @@ bool gmEngine::Continue()
 						}
 						m_data.in_trick_info.mask = gmALL_CARDS & ~(jacks);
 						m_data.in_trick_info.rules = gmRULE_5;
-					
+
 					}
 					// If after applying rule 5, no cards can be played
 					// reset the mask
@@ -864,8 +862,8 @@ int gmEngine::PostInputMessage(int input_type, void *input)
 			}
 			else
 			{
-				// Check if the player who asked for trump has 
-				// at least a single trump. If that is the case, 
+				// Check if the player who asked for trump has
+				// at least a single trump. If that is the case,
 				// then he should play trump. Set mask accordingly
 				if(m_data.hands[m_data.in_trick_info.player] & gmUtil::m_suit_mask[m_data.trump_suit])
 				{
@@ -899,7 +897,7 @@ int gmEngine::PostInputMessage(int input_type, void *input)
 			m_data.tricks[m_data.trick_round].lead_suit = gmGetSuit(in_trick_info->card);
 			m_data.tricks[m_data.trick_round].winner = exist_trick_info->player;
 
-			// If the trump has been shown and the first card 
+			// If the trump has been shown and the first card
 			// to be played is a trump then the trick is already trumped
 			if(m_data.trump_shown && (gmGetSuit(in_trick_info->card) == m_data.trump_suit))
 				m_data.tricks[m_data.trick_round].trumped = true;
@@ -920,7 +918,7 @@ int gmEngine::PostInputMessage(int input_type, void *input)
 					}
 				}
 				// If the trick is not trumped yet
-				// and the trump has been shown, 
+				// and the trump has been shown,
 				else if(m_data.trump_shown)
 				{
 					// The trick is being trumped
@@ -943,7 +941,7 @@ int gmEngine::PostInputMessage(int input_type, void *input)
 					}
 				}
 				// If the trick is not trumped yet
-				// and if the trump has not been shown 
+				// and if the trump has not been shown
 				// but if trump is the lead suit :)
 				// check if we have a new trump
 				else if(
@@ -988,9 +986,9 @@ int gmEngine::PostInputMessage(int input_type, void *input)
 		m_data.should_trump = false;
 
 		// To Remove
-		//wxLogDebug(wxString::Format("%s played card %s%s", 
-		//	gmUtil::m_long_locs[in_trick_info->player].c_str(), 
-		//	gmUtil::m_suits[gmGetSuit(in_trick_info->card)].c_str(), 
+		//wxLogDebug(wxString::Format("%s played card %s%s",
+		//	gmUtil::m_long_locs[in_trick_info->player].c_str(),
+		//	gmUtil::m_suits[gmGetSuit(in_trick_info->card)].c_str(),
 		//	gmUtil::m_values[gmGetValue(in_trick_info->card)].c_str()));
 
 		// If all 4 cards have been played, move to the next round
@@ -999,7 +997,7 @@ int gmEngine::PostInputMessage(int input_type, void *input)
 			m_data.trick_round++;
 			m_data.tricks[m_data.trick_round].lead_loc = m_data.tricks[m_data.trick_round - 1].winner;
 			// To Remove
-			//wxLogDebug(wxString::Format("Trick %d completed. Winner - %s.", 
+			//wxLogDebug(wxString::Format("Trick %d completed. Winner - %s.",
 			//	m_data.trick_round, gmUtil::m_long_locs[m_data.tricks[m_data.trick_round - 1].winner].c_str() ));
 
 			// Add points to the total of the winning team
@@ -1051,7 +1049,7 @@ void gmEngine::GetTrick(int trick_round, gmTrick *trick)
 	wxASSERT((trick_round >= 0) && (trick_round < gmTOTAL_TRICKS));
 	memcpy(trick, &m_data.tricks[trick_round], sizeof(gmTrick));
 }
-void gmEngine::GetTrick(gmTrick *trick) 
+void gmEngine::GetTrick(gmTrick *trick)
 {
 	GetTrick(m_data.trick_round, trick);
 }
@@ -1132,7 +1130,7 @@ wxString gmEngine::GetLoggable()
 	out.Append("\n");
 	if(m_data.trump_shown)
 	{
-		out.Append(wxString::Format("Trump - %s(%s)\n", 
+		out.Append(wxString::Format("Trump - %s(%s)\n",
 			gmUtil::m_suits[gmGetSuit(m_data.trump_card)].c_str(),
 			gmUtil::m_values[gmGetValue(m_data.trump_card)].c_str()
 			));
@@ -1148,7 +1146,7 @@ wxString gmEngine::GetLoggable()
 			out.Append("+");
 		if(m_data.tricks[i].winner == j)
 			out.Append("*");
-		out.Append(wxString::Format("%s%s ", 
+		out.Append(wxString::Format("%s%s ",
 			gmUtil::m_suits[gmGetSuit(m_data.tricks[i].cards[j])].c_str(),
 			gmUtil::m_values[gmGetValue(m_data.tricks[i].cards[j])].c_str()
 			));
@@ -1166,7 +1164,7 @@ wxString gmEngine::GetLoggable()
 			out.Append("+");
 		if(m_data.tricks[i].winner == j)
 			out.Append("*");
-		out.Append(wxString::Format("%s%s ", 
+		out.Append(wxString::Format("%s%s ",
 			gmUtil::m_suits[gmGetSuit(m_data.tricks[i].cards[j])].c_str(),
 			gmUtil::m_values[gmGetValue(m_data.tricks[i].cards[j])].c_str()
 			));
@@ -1186,7 +1184,7 @@ wxString gmEngine::PrintRuleEngineData(gmEngineData *data)
 	out.Append(wxT("\n"));
 	if(data->trump_shown)
 	{
-		out.Append(wxString::Format(wxT("Trump - %s(%s)\n"), 
+		out.Append(wxString::Format(wxT("Trump - %s(%s)\n"),
 			gmUtil::m_suits[gmGetSuit(data->trump_card)].c_str(),
 			gmUtil::m_values[gmGetValue(data->trump_card)].c_str()
 			));
@@ -1202,7 +1200,7 @@ wxString gmEngine::PrintRuleEngineData(gmEngineData *data)
 				out.Append(wxT("+"));
 			if(data->tricks[i].winner == j)
 				out.Append(wxT("*"));
-			out.Append(wxString::Format(wxT("%s%s "), 
+			out.Append(wxString::Format(wxT("%s%s "),
 				gmUtil::m_suits[gmGetSuit(data->tricks[i].cards[j])].c_str(),
 				gmUtil::m_values[gmGetValue(data->tricks[i].cards[j])].c_str()
 				));
@@ -1220,7 +1218,7 @@ wxString gmEngine::PrintRuleEngineData(gmEngineData *data)
 			out.Append(wxT("+"));
 		if(data->tricks[i].winner == j)
 			out.Append(wxT("*"));
-		out.Append(wxString::Format(wxT("%s%s "), 
+		out.Append(wxString::Format(wxT("%s%s "),
 			gmUtil::m_suits[gmGetSuit(data->tricks[i].cards[j])].c_str(),
 			gmUtil::m_values[gmGetValue(data->tricks[i].cards[j])].c_str()
 			));

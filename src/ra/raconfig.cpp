@@ -1,20 +1,18 @@
-// Rosanne : Twenty Eight (28) Card Game
-// Copyright (C) 2006-2009 Vipin Cherian
+// Rosanne : Trump card game popularly known as Twenty Eight (28)
+// Copyright (C) 2006-2010 Vipin Cherian
 //
-// This program is free software; you can redistribute it and/or modify
+// This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, 
-// Boston, MA  02110-1301, USA
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "ra/raconfig.h"
 
@@ -27,7 +25,7 @@ wxMutex raConfig::s_mutex;
 
 raConfig *raConfig::GetInstance()
 {
-	// Double checked locking before creating an instance 
+	// Double checked locking before creating an instance
 	if(!s_instance)
 	{
 		wxMutexLocker lock(s_mutex);
@@ -56,7 +54,7 @@ bool raConfig::Save()
 		wxLogError(wxString::Format(wxT("m_config->Write() failed. %s:%d"), wxT(__FILE__), __LINE__));
 		return false;
 	}
-	
+
 	if(!m_config->Write(raCONFPATH_APP_DATA_WIDTH, m_data.app_data.width))
 	{
 		wxLogError(wxString::Format(wxT("m_config->Write() failed. %s:%d"), wxT(__FILE__), __LINE__));
@@ -145,7 +143,7 @@ raConfig::raConfig()
 	memset(&m_data, 0, sizeof(m_data));
 	m_config = new wxConfig(RA_APP_NAME);
 
-	// If the application is being run for the first time, 
+	// If the application is being run for the first time,
 	// configuration data may not be present. Create it.
 
 	// Attempt to load the data from the configuration repository
@@ -212,7 +210,7 @@ bool raConfig::Load()
 		wxLogError(wxString::Format(wxT("m_config->Read failed. %s:%d"), wxT(__FILE__), __LINE__));
 		return false;
 	}
-	
+
 	if(!m_config->Read(raCONFPATH_APP_DATA_HEIGHT, &m_data.app_data.height))
 	{
 		wxLogError(wxString::Format(wxT("m_config->Read failed. %s:%d"), wxT(__FILE__), __LINE__));
@@ -224,7 +222,7 @@ bool raConfig::Load()
 		wxLogError(wxString::Format(wxT("m_config->Read failed. %s:%d"), wxT(__FILE__), __LINE__));
 		return false;
 	}
-	
+
 	if(!m_config->Read(raCONFPATH_GAME_DATA_CLOCK, &m_data.game_data.clockwise))
 	{
 		wxLogError(wxString::Format(wxT("m_config->Read failed. %s:%d"), wxT(__FILE__), __LINE__));

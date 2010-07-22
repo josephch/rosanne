@@ -1,20 +1,18 @@
-// Rosanne : Twenty Eight (28) Card Game
-// Copyright (C) 2006-2009 Vipin Cherian
+// Rosanne : Trump card game popularly known as Twenty Eight (28)
+// Copyright (C) 2006-2010 Vipin Cherian
 //
-// This program is free software; you can redistribute it and/or modify
+// This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, 
-// Boston, MA  02110-1301, USA
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "gg/ggcard.h"
 
@@ -114,7 +112,7 @@ ggCard::~ggCard()
 	}
 }
 
-// 
+//
 // Public methods
 //
 
@@ -164,7 +162,7 @@ bool ggCard::LoadFace(wxString res_name)
 		return false;
 	}
 
-	// The widths of mask and the xpm image are differt. 
+	// The widths of mask and the xpm image are differt.
 	// Hence create a new bitmap with correct dimensions and
 	// copy the data to the same.
 	if(!bmp_temp2.Create(GG_CARD_WIDTH, GG_CARD_HEIGHT, -1))
@@ -197,6 +195,6 @@ bool ggCard::LoadFace(wxString res_name)
 		wxLogError(wxString::Format(wxT("Creation of bitmap from image failed. %s:%d"), wxT(__FILE__), __LINE__));
 		return false;
 	}
-	
+
 	return true;
 }
