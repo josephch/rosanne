@@ -331,6 +331,8 @@ bool raGamePanel::NewDeal()
 	unsigned int rand_seed;
 
 	rand_seed = rand();
+	//rand_seed = 5754;
+	//dealer = 2;
 	srand(rand_seed);
 
 #ifdef raREAD_SEED_FROM_FILE

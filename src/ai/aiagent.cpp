@@ -859,27 +859,43 @@ int aiAgent::GetPlay(unsigned long mask)
 
 	return best_play;
 }
-bool aiAgent::GenerateSLProblem(gmEngineData *data, slProblem *problem, int trump)
+// Given the game engine data, generate the suit length problem.
+// This suit length problem is later on solved to create random deals staisfying
+// the existing constraints for Monte Carlo
+
+bool aiAgent::GenerateSLProblem(gmEngineData *data, slProblem *problem, int trump, bool *add_trump)
 {
 	unsigned long cards_played = 0;
 	int i, j;
-	int sum_hands = 0, sum_suts = 0;
+	int sum_hands = 0, sum_suits = 0;
 
-#ifdef raAI_LOG_GENERATESLPROBLEM
-	wxLogDebug("Inside GenerateSLProblem");
-	wxLogDebug(wxString::Format("m_loc - %s", gmUtil::m_short_locs[m_loc].c_str()));
+#ifdef aiLOG_GENERATESLPROBLEM
+	wxLogDebug(wxT("Inside GenerateSLProblem"));
+	wxLogDebug(wxString::Format(wxT("m_loc - %s"), gmUtil::m_short_locs[m_loc].c_str()));
 #endif
 
 	wxASSERT(data);
 
-	if((!data->trump_shown) && (data->curr_max_bidder != m_loc))
-		wxASSERT(trump != gmSUIT_INVALID);
+	*add_trump = false;
 
+    // TODO : Provide an appropriate comment
+	if((!data->trump_shown) && (data->curr_max_bidder != m_loc))
+	{
+	    wxASSERT(trump != gmSUIT_INVALID);
+	}
+
+    // TODO : Provide an appropriate comment
 	if((data->trump_shown) || (data->curr_max_bidder == m_loc))
-		trump = data->trump_suit;
+	{
+	    trump = data->trump_suit;
+	}
 
 	// TODO : Implement the case where the opponents of the max bidder
 	// should have at least one trump
+
+	// Initialize the problem. This will set all slots vacant and would default hand and suit total lengths
+
+	aiSuitLengthSolver::InitializeProblem(problem);
 
 	// Set the hand lengths
 	for(i = 0; i < gmTOTAL_PLAYERS; i++)
@@ -893,34 +909,60 @@ bool aiAgent::GenerateSLProblem(gmEngineData *data, slProblem *problem, int trum
 	for(i = 0; i < gmTOTAL_SUITS; i++)
 	{
 		problem->suit_total_length[i] = 8 - gmUtil::CountBitsSet(cards_played & gmUtil::m_suit_mask[i]);
-		sum_suts += problem->suit_total_length[i];
+		sum_suits += problem->suit_total_length[i];
 	}
 
-	// If the trump is not shown, max bidder should have at least one trump
-	if(!data->trump_shown)
-		problem->cells[data->curr_max_bidder][trump].min = 1;
+    // This is applicable only if self is not the max bidder.
+	// If the trump is not shown, max bidder should have at least one trump. This is fixed.
+	// Hence remove this from the total suit length for the max bidder and the trump suit.
+	// The suit length should be incremented manually for all solutions for the slot [max bidder][trump].
 
+	if((!data->trump_shown) && (m_loc != data->curr_max_bidder))
+	{
+	    --(problem->hand_total_length[data->curr_max_bidder]);
+	    --(problem->suit_total_length[trump]);
+	    *add_trump = true;
+
+	}
+	//if(!data->trump_shown)
+        //problem->cells[data->curr_max_bidder][trump].min = 1;
+
+    // This is applicable only if self is not the player who bid the contract (curr_max_bidder).
 	// If the trump is shown, but if the max bidder is yet to play the
-	// card that was set as the trump then the minimum suit length is 1
-	if(data->trump_shown)
+	// card that was set as the trump then, max bidder has at least one trump. This is fixed.
+	// Hence remove this from the total suit length for the max bidder and the trump suit.
+	// The suit length should be incremented manually for all solutions for the slot [max bidder][trump].
+
+	if((data->trump_shown) && (m_loc != data->curr_max_bidder))
 	{
 		if(!(data->played_cards[data->curr_max_bidder] & (1 << data->trump_card)))
 		{
-			problem->cells[data->curr_max_bidder][trump].min = 1;
+            --(problem->hand_total_length[data->curr_max_bidder]);
+            --(problem->suit_total_length[trump]);
+            *add_trump = true;
 		}
 	}
+
+//	if(data->trump_shown)
+//	{
+//		if(!(data->played_cards[data->curr_max_bidder] & (1 << data->trump_card)))
+//		{
+//			problem->cells[data->curr_max_bidder][trump].min = 1;
+//		}
+//	}
 
 	// Set the cases where the suit length is null
 	for(i = 0; i < gmTOTAL_PLAYERS; i++)
 	{
 		for(j = 0; j < gmTOTAL_SUITS; j++)
 		{
-			problem->cells[i][j].max =
-				gmMin(problem->hand_total_length[i], problem->suit_total_length[j]);
+			//problem->cells[i][j].max =
+				//gmMin(problem->hand_total_length[i], problem->suit_total_length[j]);
 			if(m_nulls[i] & (1 << j))
 			{
-				problem->cells[i][j].min = 0;
-				problem->cells[i][j].max = 0;
+				//problem->cells[i][j].min = 0;
+				//problem->cells[i][j].max = 0;
+				problem->suit_length[i][j] = 0;
 			}
 		}
 	}
@@ -928,36 +970,48 @@ bool aiAgent::GenerateSLProblem(gmEngineData *data, slProblem *problem, int trum
 	// Set the cells for self
 	for(i = 0; i < gmTOTAL_SUITS; i++)
 	{
-		problem->cells[m_loc][i].min = gmUtil::CountBitsSet(data->hands[m_loc] & gmUtil::m_suit_mask[i]);
-		problem->cells[m_loc][i].max = problem->cells[m_loc][i].min;
+	    problem->suit_length[m_loc][i] = gmUtil::CountBitsSet(data->hands[m_loc] & gmUtil::m_suit_mask[i]);
+	    //problem->suit_total_length[i] -= problem->suit_length[m_loc][i];
+		//problem->cells[m_loc][i].min = gmUtil::CountBitsSet(data->hands[m_loc] & gmUtil::m_suit_mask[i]);
+		//problem->cells[m_loc][i].max = problem->cells[m_loc][i].min;
 	}
 	// If self is the max bidder and if trump is not shown,
 	// add one to the suit length to accommodate the card kept as trump
 	if((!data->trump_shown) && (m_loc == data->curr_max_bidder))
 	{
-		problem->cells[m_loc][trump].min++;
-		problem->cells[m_loc][trump].max++;
+		//problem->cells[m_loc][trump].min++;
+		//problem->cells[m_loc][trump].max++;
+		++(problem->suit_length[m_loc][trump]);
+		//--(problem->suit_total_length[trump]);
 	}
 
-	wxASSERT(sum_suts == sum_hands);
+	// All cards of self are known.
+	//problem->hand_total_length[m_loc] = 0;
 
-#ifdef raAI_LOG_GENERATESLPROBLEM
+	wxASSERT(sum_suits == sum_hands);
+
+#ifdef aiLOG_GENERATESLPROBLEM
 	wxString out;
-	wxLogDebug(aiSuitLengthSolver::PrintProblem(problem));
+	//wxLogDebug(aiSuitLengthSolver::PrintProblem(problem));
 	for(i = 0; i < gmTOTAL_PLAYERS; i++)
 	{
 		out.Empty();
-		out.Append(wxString::Format("%s - ", gmUtil::m_short_locs[i].c_str()));
+		out.Append(wxString::Format(wxT("%s - "), gmUtil::m_short_locs[i].c_str()));
 		for(j = 0; j < gmTOTAL_SUITS; j++)
 		{
-			out.Append(wxString::Format("%d/%d ",
-				problem->cells[i][j].min,
-				problem->cells[i][j].max
-				));
+		    if(problem->suit_length[i][j] == slVACANT)
+		    {
+                out.Append(wxT("x "));
+		    }
+		    else
+		    {
+                out.Append(wxString::Format(wxT("%d "), problem->suit_length[i][j]));
+		    }
+
 		}
 		wxLogDebug(out);
 	}
-	wxLogDebug("Exiting GenerateSLProblem");
+	wxLogDebug(wxT("Exiting GenerateSLProblem"));
 #endif
 
 	return true;
@@ -979,6 +1033,7 @@ bool aiAgent::GenerateDeals(gmEngineData *data, unsigned long **deals, int count
 {
 	int i, j, k, l;
 	slProblem problem;
+	slPlayed played;
 	slSolution solution;
 	aiSuitLengthSolver solver;
 	int to_deal[gmTOTAL_SUITS][gmTOTAL_VALUES];
@@ -986,6 +1041,7 @@ bool aiAgent::GenerateDeals(gmEngineData *data, unsigned long **deals, int count
 	unsigned long cards_played = 0;
 	unsigned long temp;
 	unsigned long known_alloc[gmTOTAL_PLAYERS];
+	bool add_trump = false;
 
 
 	wxASSERT(data);
@@ -1038,30 +1094,47 @@ bool aiAgent::GenerateDeals(gmEngineData *data, unsigned long **deals, int count
 
 	// Generate the problem
 	memset(&problem, 0, sizeof(problem));
-	if(!GenerateSLProblem(data, &problem, trump))
+	if(!GenerateSLProblem(data, &problem, trump, &add_trump))
 	{
 		wxLogError(wxString::Format(wxT("GetData() failed. %s:%d"),
 			wxT(__FILE__), __LINE__));
 		return false;
 	}
 
-#ifdef raAI_LOG_GENERATEDEALS
-	wxLogError(wxString::Format(wxT("Logged from. %s:%d"),
-		wxT(__FILE__), __LINE__));
-	wxLogDebug(aiSuitLengthSolver::PrintProblem(&problem));
-#endif
-
 	//
 	// Generate random deals
 	//
 
 	// Set the problem
-	solver.SetProblem(&problem);
+	solver.SetProblem(&problem, played);
 	for(i = 0; i < count; i++)
 	{
 		// Get a random solution
 		memset(&solution, 0, sizeof(solution));
-		solver.GetRandomSolution(&solution);
+		solver.GenerateRandomSolution(solution);
+
+		// If the trump card needs to be added to the max bidders hand, do that
+		if(add_trump)
+		{
+		    ++(solution[data->curr_max_bidder][data->trump_suit]);
+		}
+
+#ifdef aiLOG_GENERATEDEALS
+
+        wxLogDebug(wxT("Final corrected solution"));
+        if(add_trump)
+        {
+            wxLogDebug(wxT("add_trump is true"));
+        }
+        else
+        {
+            wxLogDebug(wxT("add_trump is false"));
+        }
+        wxLogDebug(wxString::Format(wxT("1 added to slot %d, %d"), data->curr_max_bidder, trump));
+		wxLogDebug(aiSuitLengthSolver::PrintMatrix(solution));
+
+#endif
+
 		memcpy(deals[i], known_alloc, sizeof(known_alloc));
 
 		// For each array shuffle the cards to be dealt
@@ -1080,8 +1153,8 @@ bool aiAgent::GenerateDeals(gmEngineData *data, unsigned long **deals, int count
 				//wxLogDebug(wxString::Format("Compare with solution %d %d",
 				//	(int)gmUtil::CountBitsSet(deals[i][j] & gmUtil::m_suit_mask[k]),
 				//	solution.suit_length[j][k]));
-				wxASSERT((int)gmUtil::CountBitsSet(deals[i][j] & gmUtil::m_suit_mask[k]) <= solution.suit_length[j][k]);
-				while((int)gmUtil::CountBitsSet(deals[i][j] & gmUtil::m_suit_mask[k]) < solution.suit_length[j][k])
+				wxASSERT((int)gmUtil::CountBitsSet(deals[i][j] & gmUtil::m_suit_mask[k]) <= solution[j][k]);
+				while((int)gmUtil::CountBitsSet(deals[i][j] & gmUtil::m_suit_mask[k]) < solution[j][k])
 				{
 					wxASSERT(l < to_deal_count[k]);
 					deals[i][j] |= (1 << to_deal[k][l]);

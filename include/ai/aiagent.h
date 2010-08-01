@@ -32,6 +32,9 @@
 #define aiPOS_INFTY +10000
 #define aiNEG_INFTY -10000
 
+//#define aiLOG_GENERATESLPROBLEM 1
+//#define aiLOG_GENERATEDEALS 0
+
 typedef struct RA_AI_MOVE
 {
 	int card;
@@ -77,7 +80,7 @@ public:
 	int GetTrump();
 	static int GetTrump(unsigned long hand, int suit);
 	int GetPlay(unsigned long mask);
-	bool GenerateSLProblem(gmEngineData *data, slProblem *problem, int trump = gmSUIT_INVALID);
+	bool GenerateSLProblem(gmEngineData *data, slProblem *problem, int trump, bool *add_trump);
 	//bool GenerateSLSolution(slProblem *problem, slSolution *solution);
 	bool GenerateDeals(gmEngineData *data, unsigned long **deals, int count, int trump = gmSUIT_INVALID);
 	static wxString PrintMoves(aiMove *moves, int move_count);

@@ -17,10 +17,16 @@
 #include <stdio.h>
 #include <wx/log.h>
 
+#include "ai/aisuitlengthsolver.h"
+
 
 
 int main()
 {
+    int seed = 0;
+    int i = 0;
+    int j = 0;
+
     // Backup existing logger
     wxLog * old_logger;
     old_logger = wxLog::GetActiveTarget();
@@ -30,8 +36,52 @@ int main()
     wxLog::SetTimestamp(NULL);
     wxLog::SetActiveTarget(logger);
 
+    // Seeding the PRNG
+    srand(time(0));
+    seed = rand();
+    wxLogMessage(wxString::Format(wxT("Seed - %d"), seed));
+    wxLogMessage(wxString::Format(wxT("RAND_MAX - %d"), RAND_MAX));
+    //srand(29089);
+    srand(seed);
+
+
     ::wxLogMessage(wxT("Starting tests"));
 
+    aiSuitLengthSolver solver;
+    slProblem problem;
+    slPlayed played;
+    slSolution solution;
+    aiSuitLengthSolver::InitializeSuitLengthProblem(&problem);
+    aiSuitLengthSolver::InitializePlayed(played);
+
+    //problem.hand_total_length(8, 5, 8, 5);
+
+    problem.hand_total_length[0] = 8;
+    problem.hand_total_length[1] = 5;
+    problem.hand_total_length[2] = 8;
+    problem.hand_total_length[3] = 5;
+    problem.suit_total_length[0] = 6;
+    problem.suit_total_length[1] = 7;
+    problem.suit_total_length[2] = 7;
+    problem.suit_total_length[3] = 6;
+
+    played = {{0, 0, 0, 0}, {1, 0, 1, 1}, {0, 0, 0, 0}, {1, 1, 0, 1}};
+
+    if(solver.SetProblem(&problem, played) == false)
+    {
+        wxLogMessage(wxT("solver.SetProblem failed."));
+        goto end_test;
+    }
+
+    wxLogMessage(solver.PrintSavedData());
+    //for(i = 0; i < 100; i++)
+    //{
+        solver.GenerateRandomSolution(solution);
+        wxLogMessage(solver.PrintWorkingData());
+    //}
+    wxLogMessage(aiSuitLengthSolver::PrintMatrix(solution));
+
+end_test:
     ::wxLogMessage(wxT("Finished tests"));
 
     // Restore old logger and delete our custom logger

@@ -28,58 +28,70 @@
 #define slLENGTH_MAX 8
 #define slTOTAL_HANDS 4
 #define slTOTAL_SUITS 4
-#define slLENGTH_INVALID -1
+#define slVACANT -1
 
-/*
-#define slLOG_DEBUG_SETPROBLEM 0
-#define slLOG_DEBUG_SETCELL 0
-#define slLOG_DEBUG_RECALCCELL_MAX 0
-#define slLOG_DEBUG_RECALCCELL_MIN 0
-#define slLOG_DEBUG_GETRANDSOLN 0
-*/
-//#include "gsl/gsl_rng.h"
-//extern gsl_rng *g_rng;
+
+//#define slLOG_DEBUG_SETPROBLEM 0
+//#define slLOG_DEBUG_SETCELL 0
+//#define slLOG_DEBUG_RECALCCELL_MAX 0
+//#define slLOG_DEBUG_RECALCCELL_MIN 0
+//#define slLOG_DEBUG_GETRANDSOLN 0
+//#define slLOG_DEBUG_SETIMPCELLS 0
+
+
+// Super type for holding suit length for hands
+
+typedef int  slMatrix[slTOTAL_HANDS][slTOTAL_SUITS];
+
+// The data which represents played cards, which is provided as one of the inputs to the
+// suit length solver. The format is identical to that of slProblem
+
+typedef slMatrix slPlayed;
+
+// Solution to the problem
+
+typedef slMatrix slSolution;
+
+// The data which represents the problem which is provided as one of the inputs to the
+// suit length solver.
+
+typedef struct slPROBLEM
+{
+	slMatrix suit_length;
+	int suit_total_length[slTOTAL_SUITS];
+	int hand_total_length[slTOTAL_HANDS];
+}slProblem;
+
+// Working data for computing the solution.
+
+// Each cell will have
+// a) min - the minimum number of cards which must be allocated
+// b) max - the maximum number ofa cards that can be callocated
+// c) suit_length - number of cards allocated. If it is vacant, the value is slVACANT
 
 typedef struct slCELL
 {
 	int min;
 	int max;
-	int soft_space;
+	int suit_length;
 }slCell;
-
-typedef struct slCELL_INPUT
-{
-	int min;
-	int max;
-}slCellInput;
-
-typedef struct slPROBLEM
-{
-	slCellInput cells[slTOTAL_HANDS][slTOTAL_SUITS];
-	int suit_total_length[slTOTAL_SUITS];
-	int hand_total_length[slTOTAL_HANDS];
-}slProblem;
-
-typedef struct slSOLUTION
-{
-	int suit_length[slTOTAL_HANDS][slTOTAL_SUITS];
-}slSolution;
-
 typedef struct slDATA
 {
 	slCell cells[slTOTAL_HANDS][slTOTAL_SUITS];
+
 	int suit_total_length[slTOTAL_SUITS];
 	int hand_total_length[slTOTAL_HANDS];
-	int suit_sum_of_mins[slTOTAL_SUITS];
-	int hand_sum_of_mins[slTOTAL_HANDS];
+	int suit_allocated[slTOTAL_SUITS];
+	int hand_allocated[slTOTAL_HANDS];
+
 	int suit_sum_of_maxs[slTOTAL_SUITS];
 	int hand_sum_of_maxs[slTOTAL_HANDS];
-	// TODO : remove max of mins if it is not used
-	//int suit_max_of_mins[slTOTAL_SUITS];
-	//int hand_max_of_mins[slTOTAL_HANDS];
-	int hand_sum_of_softspaces[slTOTAL_HANDS];
-	int suit_available[slTOTAL_SUITS];
-	//bool cell_set;
+
+    // This is not really the sum of min values.
+    // It is the sum of min values of vacant cells
+	int suit_sum_of_vacant_mins[slTOTAL_SUITS];
+	int hand_sum_of_vacant_mins[slTOTAL_HANDS];
+
 }slData;
 
 class aiSuitLengthSolver
@@ -87,25 +99,35 @@ class aiSuitLengthSolver
 private:
 	slProblem m_problem;
 	slData m_saved, m_working;
+	slPlayed m_played;
 	int m_suit_sum_of_min[slTOTAL_SUITS];
 	int m_hand_sum_of_min[slTOTAL_HANDS];
 	// Disallow copy constructor/assignment operators
 	aiSuitLengthSolver(const aiSuitLengthSolver &);
     aiSuitLengthSolver & operator=(const aiSuitLengthSolver &);
-	bool SetCell(slData *data, int i, int j, int min, int max = slLENGTH_INVALID);
-	bool RecalcAffectedCellsMax(slData *data, int hand, int suit);
-	bool RecalcCellMax(slData *data, int hand, int suit);
-	bool RecalcAllCellMin(slData *data);
-	bool RecalcCellMin(slData *data, int hand, int suit);
+    inline void InitializeWorkingData(slData *data);
+    inline bool RecalcCellMax(slData *data, int hand, int suit);
+	inline bool SetCell(slData *data, int hand, int suit, int suit_length);
+	inline bool RecalcMaxForImpactedCells(slData *data, int hand, int suit);
+	inline bool RecalcMinForImpactedCells(slData *data, int hand, int suit);
+	//inline bool RecalcSumOfMaxForAllCells()
+	inline bool RecalcCellMin(slData *data, int hand, int suit);
+	inline bool RecalcMinForAllCells(slData *data, bool * changed = NULL);
+	inline bool RecalcMaxForAllCells(slData *data);
+
 public:
 	aiSuitLengthSolver();
 	~aiSuitLengthSolver();
-	bool SetProblem(slProblem *problem);
-	bool GetRandomSolution(slSolution *solution);
-	static bool ResetProblem(slProblem *problem);
-	static wxString PrintProblem(slProblem *problem);
+	static void InitializeProblem(slProblem *problem);
+	static void InitializePlayed(slPlayed played);
+	bool SetProblem(slProblem *problem, slPlayed played);
+	bool GenerateRandomSolution(slSolution solution);
+	//static wxString PrintProblem(slProblem *problem);
 	static wxString PrintData(slData *data);
-	static wxString PrintSolution(slSolution *solution);
+	static wxString PrintMatrix(slMatrix matrix);
+	wxString PrintSavedData();
+	wxString PrintWorkingData();
+	//static wxString PrintSolution(slSolution *solution);
 };
 
 
