@@ -18,7 +18,12 @@
 #include "SFMT.h"
 #include "SFMT-params.h"
 
-//#define raREAD_DEAL_FROM_FILE 0
+//#define gmREAD_DEAL_FROM_FILE 0
+
+#ifdef gmREAD_DEAL_FROM_FILE
+    #include <wx/wfstream.h>
+    #include <wx/fileconf.h>
+#endif
 
 //
 // Constructor
@@ -131,7 +136,7 @@ bool gmEngine::Shuffle()
 
 	// If required set the shuffled card as per the
 	// deal read from the test data input file
-#ifdef raREAD_DEAL_FROM_FILE
+#ifdef gmREAD_DEAL_FROM_FILE
 
 	if(::wxFileExists(raTEST_DATA_FILE))
 	{

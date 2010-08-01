@@ -44,6 +44,15 @@
 #define raGAME_ALL_HIGH_CARDS (0xF0F0F0F0)
 
 
+// For testing purposes
+#define raTEST_DATA_FILE wxT("ra_test_data.ini")
+#define raTEXT_SEED wxT("rand/seed")
+#define raTEXT_IDX wxT("rand/idx")
+#define raTEXT_DEALER wxT("deal/dealer")
+#define raTEXT_DEAL_ROUND wxT("deal_round")
+
+
+
 enum{
 	raHAND_VERTICAL = 0,
 	raHAND_HORIZONTAL

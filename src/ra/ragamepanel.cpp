@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 #include "ra/ragamepanel.h"
 #include "wx/sstream.h"
-#include "SFMT.h"
-#include "SFMT-params.h"
+#include "gm/gmrand.h"
 
 #include "images/red_arrow_top.xpm"
 #include "images/red_arrow_bottom.xpm"
@@ -47,6 +47,16 @@
 #define raGAME_HIDE_AI_HANDS 1
 //#define raREAD_SEED_FROM_FILE 0
 //#define raREAD_DEALER_FROM_FILE 0
+
+#if defined(raREAD_SEED_FROM_FILE) || defined(raREAD_DEALER_FROM_FILE)
+    #include <wx/wfstream.h>
+    #include <wx/fileconf.h>
+#endif
+
+//
+//extern uint32_t *psfmt32;
+//extern int idxof(int);
+//extern int idx;
 
 BEGIN_EVENT_TABLE(raGamePanel, ggPanel)
 	EVT_SIZE(raGamePanel::OnSize)
@@ -330,44 +340,84 @@ bool raGamePanel::NewGame(int dealer, bool immediate)
 bool raGamePanel::NewDeal()
 {
 	int dealer = gmPLAYER_INVALID;
-	uint32_t rand_seed;
-
-	rand_seed = gen_rand32();
-	//rand_seed = 5754;
-	//dealer = 2;
-	init_gen_rand(rand_seed);
 
 #ifdef raREAD_SEED_FROM_FILE
-	long seed_read;
+	//long seed_read;
+    int i = 0;
+    gmRandState rand_state;
+    wxString seed_text;
+    wxString in_txt;
+    unsigned long in_long;
+    bool status = true;
+
 	if(::wxFileExists(raTEST_DATA_FILE))
 	{
 		wxFFileInputStream in(raTEST_DATA_FILE);
 		wxFileConfig fcfg(in);
-		if(fcfg.Exists(raTEXT_SEED))
-		{
-			wxLogDebug(wxString::Format(
-				wxT("Reading seed from %s. %s:%d"),
-				raTEST_DATA_FILE, wxT(__FILE__), __LINE__));
 
-			seed_read = -1;
-			if(!fcfg.Read(raTEXT_SEED, &seed_read))
+        memset(&rand_state, 0, sizeof(gmRandState));
+        rand_state.idx = -2;
+        //seed_read = -1;
+
+        // Read the idx value
+        if(fcfg.Exists(raTEXT_IDX))
+        {
+            wxLogDebug(wxString::Format(wxT("Reading idx from %s. %s:%d"),
+				raTEST_DATA_FILE, wxT(__FILE__), __LINE__));
+			if(!fcfg.Read(raTEXT_IDX, &(rand_state.idx)))
 			{
 				wxLogError(wxString::Format(
-					wxT("Read failed. %s:%d"), wxT(__FILE__), __LINE__));
+					wxT("Read failed for %s. %s:%d"), raTEXT_IDX, wxT(__FILE__), __LINE__));
+                status = false;
+			}
+        }
+        else
+        {
+            wxLogError(wxString::Format(
+                wxT("Could not fine %s in %s . %s:%d"), raTEXT_IDX, raTEST_DATA_FILE, wxT(__FILE__), __LINE__));
+            status = false;
+        }
 
-			}
-			else
-			{
-				rand_seed = (uint32_t)seed_read;
-				init_gen_rand(rand_seed);
-			}
-		}
-		else
-		{
-			wxLogError(wxString::Format(
-				wxT("Could not find seed in %s. %s:%d"),
-				raTEST_DATA_FILE, wxT(__FILE__), __LINE__));
-		}
+        // Read the state array
+        if(status == true)
+        {
+            for(i = 0; i < N32; i++)
+            {
+                seed_text = wxString::Format(wxT("%s%02d"), raTEXT_SEED, i);
+                if(fcfg.Exists(seed_text))
+                {
+                    wxLogDebug(wxString::Format(
+                        wxT("Reading %s from %s. %s:%d"),
+                        seed_text.c_str(), raTEST_DATA_FILE, wxT(__FILE__), __LINE__));
+                    if(!fcfg.Read(seed_text, &in_txt))
+                    {
+                        wxLogError(wxString::Format(
+                            wxT("Read failed. %s:%d"), wxT(__FILE__), __LINE__));
+                        status = false;
+                        break;
+
+                    }
+                    wxLogDebug(wxString::Format(wxT("wxString data seed%d=%s"), i, in_txt.c_str()));
+                    in_txt.ToULong(&in_long, 16);
+                    rand_state.state_array[i] = (uint32_t)in_long;
+                    wxLogDebug(wxString::Format(wxT("uint32_t seed%02d=%08X"), i, rand_state.state_array[i]));
+                }
+                else
+                {
+                    wxLogError(wxString::Format(
+                        wxT("Could not find %s in %s. %s:%d"),
+                        seed_text.c_str(), raTEST_DATA_FILE, wxT(__FILE__), __LINE__));
+                    status = false;
+                    break;
+                }
+            }
+        }
+
+        if(status == true)
+        {
+            wxLogDebug(wxT("Complete state read. Setting state."));
+            gmRand::SetState(&rand_state);
+        }
 	}
 #endif
 
@@ -405,7 +455,8 @@ bool raGamePanel::NewDeal()
 	}
 #endif
 
-	wxLogMessage(wxString::Format(wxT("Deal ID - %u"), rand_seed));
+	wxLogMessage(gmRand::PrintState());
+
 
 	// Save the dealer information lest it gets reset
 	// while resetting the rule engine

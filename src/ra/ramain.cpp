@@ -13,11 +13,9 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+#include <wx/file.h>
 #include "ra/ramain.h"
-#include "SFMT.h"
-#include "SFMT-params.h"
-#include "SFMT.c"
+#include "gm/gmrand.h"
 #include <time.h>
 
 #include "images/main_icon_16.xpm"
@@ -77,8 +75,10 @@ bool raApp::OnInit()
 
 	// Randomizing the PRNG
 	//srand(time(NULL));
-	init_gen_rand(time(NULL));
-    wxLogMessage(wxString::Format(wxT("SMT PRNG initiated with MEXP = %d"), MEXP));
+	init_gen_rand(time(0));
+    wxLogMessage(wxT("SFMT PRNG initiated."));
+    wxLogMessage(wxString::Format(wxT("MEXP = %d"), MEXP));
+    wxLogMessage(wxString::Format(wxT("N32 = %d"), N32));
 
 	//For usage of sockets or derived classes such as wxFTP in a secondary thread
 	wxSocketBase::Initialize();
