@@ -18,12 +18,13 @@
 #include <wx/log.h>
 
 #include "ai/aisuitlengthsolver.h"
-
-
+#include "SFMT.h"
+#include "SFMT-params.h"
+#include "SFMT.c"
 
 int main()
 {
-    int seed = 0;
+    uint32_t seed = 0;
     int i = 0;
     int j = 0;
 
@@ -37,10 +38,10 @@ int main()
     wxLog::SetActiveTarget(logger);
 
     // Seeding the PRNG
-    srand(time(0));
-    seed = rand();
+    init_gen_rand(time(0));
+    seed = gen_rand32();
     wxLogMessage(wxString::Format(wxT("Seed - %d"), seed));
-    wxLogMessage(wxString::Format(wxT("RAND_MAX - %d"), RAND_MAX));
+    //wxLogMessage(wxString::Format(wxT("RAND_MAX - %d"), RAND_MAX));
     //srand(29089);
     srand(seed);
 
@@ -51,7 +52,7 @@ int main()
     slProblem problem;
     slPlayed played;
     slSolution solution;
-    aiSuitLengthSolver::InitializeSuitLengthProblem(&problem);
+    aiSuitLengthSolver::InitializeProblem(&problem);
     aiSuitLengthSolver::InitializePlayed(played);
 
     //problem.hand_total_length(8, 5, 8, 5);

@@ -19,7 +19,8 @@
 // http://graphics.stanford.edu/~seander/bithacks.html
 
 #include "gm/gmutil.h"
-
+#include "SFMT.h"
+#include "SFMT-params.h"
 
 //int gmUtil::m_value_trans[] = {5, -1, -1, -1, -1, -1, 0, 1, 6, 4, 7, 2, 3};
 int gmUtil::m_value_trans[] = {6, 7, 11, 12, 9, 0, 8, 10};
@@ -122,7 +123,7 @@ void gmUtil::ShuffleArray(int *array, unsigned long n)
 		unsigned long i;
 		for (i = n - 1; i >= 1; i--) {
 		    // TODO : Non linear distribution. To be corrected.
-			unsigned long j = ((unsigned long)rand()) % (i + 1);
+			unsigned long j = ((unsigned long)gen_rand32()) % (i + 1);
 			int t = array[j];
 			array[j] = array[i];
 			array[i] = t;

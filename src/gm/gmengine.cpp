@@ -15,6 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "gm/gmengine.h"
+#include "SFMT.h"
+#include "SFMT-params.h"
 
 //#define raREAD_DEAL_FROM_FILE 0
 
@@ -124,7 +126,7 @@ bool gmEngine::Reset()
 }
 bool gmEngine::Shuffle()
 {
-	int i, j;
+	int i = 0, j;
 	int t;
 
 	// If required set the shuffled card as per the
@@ -299,12 +301,7 @@ bool gmEngine::Shuffle()
 	for (i = 0; i < gmTOTAL_CARDS; i++)
 		m_data.shuffled[i] = i;
 
-	for (i = 0; i < gmTOTAL_CARDS - 1; i++) {
-		j = i + rand() / (RAND_MAX / (gmTOTAL_CARDS - i) + 1);
-		t = m_data.shuffled[j];
-		m_data.shuffled[j] = m_data.shuffled[i];
-		m_data.shuffled[i] = t;
-	}
+    gmUtil::ShuffleArray(m_data.shuffled, gmTOTAL_CARDS);
 
 	return true;
 }

@@ -130,6 +130,8 @@
 
 
 #include "ai/aisuitlengthsolver.h"
+#include "SFMT.h"
+#include "SFMT-params.h"
 
 aiSuitLengthSolver::aiSuitLengthSolver()
 {
@@ -679,7 +681,7 @@ bool aiSuitLengthSolver::GenerateRandomSolution(slSolution solution)
                 }
                 else
                 {
-                    fill = m_working.cells[i][j].min + (rand() % (m_working.cells[i][j].max - m_working.cells[i][j].min + 1));
+                    fill = m_working.cells[i][j].min + (gen_rand32() % (m_working.cells[i][j].max - m_working.cells[i][j].min + 1));
                 }
 #ifdef slLOG_DEBUG_GETRANDSOLN
                 ::wxLogDebug(wxString::Format(wxT("Attempting to fill (%d, %d) with %d"), i, j, fill));

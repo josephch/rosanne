@@ -16,6 +16,8 @@
 
 #include "ra/ragamepanel.h"
 #include "wx/sstream.h"
+#include "SFMT.h"
+#include "SFMT-params.h"
 
 #include "images/red_arrow_top.xpm"
 #include "images/red_arrow_bottom.xpm"
@@ -328,12 +330,12 @@ bool raGamePanel::NewGame(int dealer, bool immediate)
 bool raGamePanel::NewDeal()
 {
 	int dealer = gmPLAYER_INVALID;
-	unsigned int rand_seed;
+	uint32_t rand_seed;
 
-	rand_seed = rand();
+	rand_seed = gen_rand32();
 	//rand_seed = 5754;
 	//dealer = 2;
-	srand(rand_seed);
+	init_gen_rand(rand_seed);
 
 #ifdef raREAD_SEED_FROM_FILE
 	long seed_read;
@@ -356,8 +358,8 @@ bool raGamePanel::NewDeal()
 			}
 			else
 			{
-				rand_seed = (unsigned int)seed_read;
-				srand(rand_seed);
+				rand_seed = (uint32_t)seed_read;
+				init_gen_rand(rand_seed);
 			}
 		}
 		else

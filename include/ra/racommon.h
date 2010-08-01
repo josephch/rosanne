@@ -53,32 +53,8 @@
 
 #define ra_APP_URL wxT("http://rosanne.sourceforge.net")
 
-/*#define raTOTAL_CARDS 32
-#define raTOTAL_PLAYERS 4
-#define raTOTAL_BID_ROUNDS 3
-#define raPLAYER_INVALID -1
-#define raSUIT_INVALID -1
-#define raCARD_INVALID -1
-#define raPartner(X) ((X + 2) % raTOTAL_PLAYERS)
 #define raBID_INVALID -2
-#define raBID_PASS 0
-#define raBID_ALL 1000
-#define raTOTAL_SUITS 4
-#define raTOTAL_VALUES 8
-#define raTOTAL_TRICKS 8
-#define raTOTAL_TEAMS 2
-
-#define raGetSuit(X) (X / raTOTAL_VALUES)
-#define raGetValue(X) (X % raTOTAL_VALUES)
-#define raGetTeam(X) (X % raTOTAL_TEAMS)
-#define raGetOpponent(X) ((X + 1) % raTOTAL_TEAMS)
-#define raGetPartner(X) ((X + 2) % raTOTAL_PLAYERS)
-#define raGetOpponentOne(X) ((X + 1) % raTOTAL_PLAYERS)
-#define raGetOpponentTwo(X) ((X + 3) % raTOTAL_PLAYERS)
-#define raGetRandPlayer() (rand() % raTOTAL_PLAYERS)*/
-
-#define raBID_INVALID -2
-#define raGetRandPlayer() (rand() % gmTOTAL_PLAYERS)
+#define raGetRandPlayer() (gen_rand32() % gmTOTAL_PLAYERS)
 
 #if defined ( raREAD_DEALER_FROM_FILE )
 #include "wx/wfstream.h"
