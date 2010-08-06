@@ -69,6 +69,9 @@ public:
 	bool BlitTo(wxDC* dest, wxCoord xdest, wxCoord ydest, int logicalFunc = wxCOPY);
 	wxBitmap * GetFace();
 	void SelectToDC(wxMemoryDC *mdc);
+	// Disallow copy constructor/assignment operators
+	ggCard(const ggCard &);
+    ggCard & operator=(const ggCard &);
 private:
 	static bool s_init;
 	static wxMutex s_mutex;

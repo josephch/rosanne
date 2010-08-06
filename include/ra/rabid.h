@@ -40,6 +40,11 @@ class raBid: public wxPanel
 {
 private:
 	DECLARE_EVENT_TABLE()
+
+	// Disallow copy constructor/assignment operators
+	raBid(const raBid &);
+    raBid & operator=(const raBid &);
+
 	int m_min_bid;
 
 	wxPanel *m_main_panel;

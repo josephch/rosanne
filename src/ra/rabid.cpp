@@ -49,13 +49,13 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	{
 		this->GetTextExtent(wxString::Format(wxT("%d"), i + 14),
 			&temp_width, &temp_height);
-		best_width = gmMax(best_width, temp_width);
+		best_width = std::max(best_width, temp_width);
 	}
 
 	this->GetTextExtent(wxT("All"), &temp_width, &temp_height);
-	best_width = gmMax(best_width, temp_width);
+	best_width = std::max(best_width, temp_width);
 	this->GetTextExtent(wxT("Pass"), &temp_width, &temp_height);
-	best_width = gmMax(best_width, temp_width);
+	best_width = std::max(best_width, temp_width);
 
 	wxLogDebug(wxString::Format(wxT("Best width %d"), best_width));
 

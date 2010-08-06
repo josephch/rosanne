@@ -226,8 +226,20 @@ private:
 	void SetInput(int input_type);
 	unsigned long GenerateMask(unsigned long *rules = NULL);
 	bool SetDealEndOutput();
+	// Disallow copy constructor/assignment operators
+	gmEngine(const gmEngine &);
+    gmEngine & operator=(const gmEngine &);
 
 public:
+    // Initialization of the gmEngineData structure used by each gmEngine instance (m_data) is a costly affair
+    // because 1) the structure is huge 2) there are multiple loops to be run to initiate certian data elements.
+    // At one point of time, approx 30% of the entire run time was taken by gmEntine.Reset. To speed things up,
+    // a static m_init of type gmEngineData is created and is initiated manually when the first instance of gmEngine is
+    // called. Once this is done, all further initializations of this struct is done be a memcpy from m_init.
+    static gmEngineData m_init;
+    static void InitCache();
+    static bool m_init_ok;
+
 	gmEngine();
 	virtual ~gmEngine();
 	bool IsOk();

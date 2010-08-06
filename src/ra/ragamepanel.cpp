@@ -340,6 +340,35 @@ bool raGamePanel::NewGame(int dealer, bool immediate)
 bool raGamePanel::NewDeal()
 {
 	int dealer = gmPLAYER_INVALID;
+//	gmRandState rs;
+//
+//    rs.state_array[0]=0x9076251A;
+//    rs.state_array[1]=0xF4A30A9F;
+//    rs.state_array[2]=0xACE20BA7;
+//    rs.state_array[3]=0x62C0533A;
+//    rs.state_array[4]=0xDD296836;
+//    rs.state_array[5]=0xB3351062;
+//    rs.state_array[6]=0xA231279E;
+//    rs.state_array[7]=0x9F543675;
+//    rs.state_array[8]=0xCDDF4354;
+//    rs.state_array[9]=0x422D0262;
+//    rs.state_array[10]=0x41BD47A6;
+//    rs.state_array[11]=0x1DAE363B;
+//    rs.state_array[12]=0x6F4558F2;
+//    rs.state_array[13]=0x2D38925A;
+//    rs.state_array[14]=0xFF2EE03B;
+//    rs.state_array[15]=0xE9EDA6B6;
+//    rs.state_array[16]=0xB8341066;
+//    rs.state_array[17]=0x53B16599;
+//    rs.state_array[18]=0xB17473E9;
+//    rs.state_array[19]=0x485452D0;
+//
+//    rs.idx=1;
+//    gmRand::SetState(&rs);
+//
+//    dealer = 2;
+
+
 
 #ifdef raREAD_SEED_FROM_FILE
 	//long seed_read;
@@ -681,7 +710,7 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 	DrawTextOnBack(loc_text, wxPoint(x + 1, y + 1), *wxBLACK, m_font_bold);
 	DrawTextOnBack(loc_text, wxPoint(x, y), *wxWHITE, m_font_bold);
 
-	vert_pnl_relief = gmMax(vert_pnl_relief, text_height);
+	vert_pnl_relief = std::max(vert_pnl_relief, text_height);
 
 	//
 	// Draw the location text at the left
@@ -696,7 +725,7 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 	DrawTextOnBack(loc_text, wxPoint(x + 1, y + 1), *wxBLACK, m_font_bold);
 	DrawTextOnBack(loc_text, wxPoint(x, y), *wxWHITE, m_font_bold);
 
-	horz_pnl_relief = gmMax(horz_pnl_relief, text_width);
+	horz_pnl_relief = std::max(horz_pnl_relief, text_width);
 
 	//
 	// Draw the text for the location at top
@@ -711,7 +740,7 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 	DrawTextOnBack(loc_text, wxPoint(x + 1, y + 1), *wxBLACK, m_font_bold);
 	DrawTextOnBack(loc_text, wxPoint(x, y), *wxWHITE, m_font_bold);
 
-	vert_pnl_relief = gmMax(vert_pnl_relief, text_height);
+	vert_pnl_relief = std::max(vert_pnl_relief, text_height);
 
 	//
 	// Draw the location text at the right
@@ -726,7 +755,7 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 	DrawTextOnBack(loc_text, wxPoint(x + 1, y + 1), *wxBLACK, m_font_bold);
 	DrawTextOnBack(loc_text, wxPoint(x, y), *wxWHITE, m_font_bold);
 
-	horz_pnl_relief = gmMax(horz_pnl_relief, text_width);
+	horz_pnl_relief = std::max(horz_pnl_relief, text_width);
 
 	//
 	// Draw the hand to be shown at the bottom
@@ -736,7 +765,7 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 
 	// Calculate the starting position to draw
 	x = (wb - (GG_CARD_WIDTH + ((m_hands[i].count - 1) * raCARD_HORZ_RELIEF))) / 2;
-	y = hb - gmMax(raCARD_PANEL_RELIEF, vert_pnl_relief) - GG_CARD_HEIGHT;
+	y = hb - std::max(raCARD_PANEL_RELIEF, vert_pnl_relief) - GG_CARD_HEIGHT;
 
 	// Draw the hand at the calculated location
 	DrawHand(i, x, y);
@@ -750,7 +779,7 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 	// Calculate the starting position to draw
 	if(m_orientation == raGAME_ORIENT_ALL_HORZ)
 	{
-		x = gmMax(raCARD_PANEL_RELIEF, horz_pnl_relief);
+		x = std::max(raCARD_PANEL_RELIEF, horz_pnl_relief);
 		y = (hb - GG_CARD_HEIGHT) / 2;
 
 		// Draw the hand at the calculated location
@@ -758,7 +787,7 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 	}
 	else
 	{
-		x = gmMax(raCARD_PANEL_RELIEF, horz_pnl_relief);
+		x = std::max(raCARD_PANEL_RELIEF, horz_pnl_relief);
 		y = (hb - (GG_CARD_HEIGHT + ((m_hands[i].count - 1) * raCARD_VERT_RELIEF))) / 2;
 
 		// Draw the hand at the calculated location
@@ -773,7 +802,7 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 
 	// Calculate the starting position to draw
 	x = (wb - (GG_CARD_WIDTH + ((m_hands[i].count - 1) * raCARD_HORZ_RELIEF))) / 2;
-	y = gmMax(raCARD_PANEL_RELIEF, vert_pnl_relief);
+	y = std::max(raCARD_PANEL_RELIEF, vert_pnl_relief);
 
 	// Draw the hand at the calculated location
 	DrawHand(i, x, y);
@@ -787,7 +816,7 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 	// Calculate the starting position to draw
 	if(m_orientation == raGAME_ORIENT_ALL_HORZ)
 	{
-		x = (wb - gmMax(raCARD_PANEL_RELIEF, horz_pnl_relief) -
+		x = (wb - std::max(raCARD_PANEL_RELIEF, horz_pnl_relief) -
 			(GG_CARD_WIDTH + ((m_hands[i].count - 1) * raCARD_HORZ_RELIEF)));
 		y = (hb - GG_CARD_HEIGHT) / 2;
 		// Draw the hand at the calculated location
@@ -796,7 +825,7 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 	}
 	else
 	{
-		x = (wb - gmMax(raCARD_PANEL_RELIEF, horz_pnl_relief) - GG_CARD_WIDTH);
+		x = (wb - std::max(raCARD_PANEL_RELIEF, horz_pnl_relief) - GG_CARD_WIDTH);
 		y = (hb - (GG_CARD_HEIGHT + ((m_hands[i].count - 1) * raCARD_VERT_RELIEF))) / 2;
 		// Draw the hand at the calculated location
 		DrawHand(i, x, y, raHAND_VERTICAL);
@@ -884,8 +913,8 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 
 				// TODO : Remove hard coding of the relief
 
-				x = gmMax((u + 8), raBUBB_MIN_WIDTH);
-				y = gmMax((v + 8), raBUBB_MIN_HEIGHT);
+				x = std::max((u + 8), raBUBB_MIN_WIDTH);
+				y = std::max((v + 8), raBUBB_MIN_HEIGHT);
 
 				// Increment x and y to the equal or higher multiple of raBUBB_UNIT_MIN
 				x = ((x / raBUBB_UNIT_MIN) + (!!(x % raBUBB_UNIT_MIN))) * raBUBB_UNIT_MIN;
@@ -1184,7 +1213,7 @@ bool raGamePanel::DrawTrick()
 	// using the red arrow
 	if(m_trick.count == gmTOTAL_PLAYERS)
 	{
-		int x, y;
+		int x = 0, y = 0;
 
 		switch(m_trick.winner)
 		{

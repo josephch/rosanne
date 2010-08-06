@@ -14,6 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <wx/file.h>
+#include <wx/utils.h>
+#include <wx/filename.h>
+#include <wx/image.h>
+#include <wx/splitter.h>
+#include <wx/grid.h>
+#include <wx/socket.h>
+
 #include "ra/ramain.h"
 #include "gm/gmrand.h"
 #include <time.h>
@@ -51,13 +58,15 @@ bool raApp::OnInit()
 {
 	raConfig *config;
 	raConfData conf_data;
+	wxString log_file = raApp::GenerateLogFileName();
 
 	// Open the log file for writing
-	m_logfile = fopen(raLOG_FILE, "w+");
+
+	m_logfile = fopen(log_file.mb_str(), "w+");
 	if(m_logfile == NULL)
 	{
-		::wxMessageBox(wxString::Format(wxT("Failed to open log file \"%s\" for writing."), wxT(raLOG_FILE)),
-			wxT("Fatal Error!"), wxICON_ERROR);
+		::wxMessageBox(wxString::Format(wxT("Failed to open log file \"%s\" for writing.\nThe program will now terminate."),
+            log_file.c_str()), wxT("Fatal Error!"), wxICON_ERROR);
 		return false;
 	}
 
@@ -69,16 +78,24 @@ bool raApp::OnInit()
 	wxLog::SetActiveTarget(m_logger);
 	wxLogDebug(wxT("Logging opened."));
 
+	// Log details such as operating system, architecture etc which if required can be used later on
+	// for debugging
+
+	raApp::LogDetailsForDebug();
+
 	// Obtain the configuration data
+
 	config = raConfig::GetInstance();
 	config->GetData(&conf_data);
 
 	// Randomizing the PRNG
-	//srand(time(NULL));
+
 	init_gen_rand(time(0));
     wxLogMessage(wxT("SFMT PRNG initiated."));
     wxLogMessage(wxString::Format(wxT("MEXP = %d"), MEXP));
     wxLogMessage(wxString::Format(wxT("N32 = %d"), N32));
+    wxLogMessage(wxT(""));
+
 
 	//For usage of sockets or derived classes such as wxFTP in a secondary thread
 	wxSocketBase::Initialize();
@@ -183,6 +200,67 @@ int raApp::OnExit()
 	fclose(m_logfile);
 
 	return 0;
+}
+
+wxString raApp::GenerateLogFileName()
+{
+    wxString out;
+    wxDateTime now = wxDateTime::Now();
+
+    out.Empty();
+
+    out.Append(raLOG_DIR);
+    out.Append(wxFileName::GetPathSeparator());
+    out.Append(raLOG_FILE_PREFIX raLOG_FILE_DELIM);
+    out.Append(wxString::Format(wxT("%04d"), now.GetYear()));
+    out.Append(wxString::Format(wxT("%02d"), now.GetMonth() + 1));
+    out.Append(wxString::Format(wxT("%02d"), now.GetDay()));
+    out.Append(raLOG_FILE_DELIM);
+    out.Append(wxString::Format(wxT("%02d"), now.GetHour()));
+    out.Append(wxString::Format(wxT("%02d"), now.GetMinute()));
+    out.Append(wxString::Format(wxT("%02d"), now.GetSecond()));
+    out.Append(raLOG_FILE_DELIM);
+    out.Append(wxString::Format(wxT("%lu"), wxGetProcessId()));
+    out.Append(wxT(".") raLOG_FILE_EXTN);
+
+    return out;
+}
+
+void raApp::LogDetailsForDebug()
+{
+    wxString out;
+    wxLogMessage(wxT("Program              : ") RA_APP_FULL_NAME);
+    wxLogMessage(wxT("Date of compilation  : ") __DATE__ __TIME__);
+
+#ifdef __GNUC__
+    out.Empty();
+    out.Append(wxT("Compiler             : GNU C/C++ "));
+    out.Append(wxString::Format(wxT("%d.%d"),__GNUC__, __GNUC_MINOR__));
+    wxLogMessage(out);
+#endif
+
+    out.Empty();
+    out.Append(wxT("Operating System     : "));
+    out.Append(::wxGetOsDescription());
+    if(::wxIsPlatform64Bit() == true)
+    {
+        out.Append(wxT("(64 bit)"));
+    }
+    wxLogMessage(out);
+
+    out.Empty();
+    out.Append(wxT("Endianness           : "));
+    if(::wxIsPlatformLittleEndian() == true)
+    {
+        out.Append(wxT("Little Endian"));
+    }
+    else
+    {
+        out.Append(wxT("Big Endian"));
+    }
+    wxLogMessage(out);
+    wxLogMessage(wxT(""));
+
 }
 
 void raFrame::OnAbout(wxCommandEvent& event)

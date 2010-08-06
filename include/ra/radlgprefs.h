@@ -32,6 +32,10 @@ class raDlgPrefs: public wxDialog
 {
     DECLARE_DYNAMIC_CLASS( raDlgPrefs )
     DECLARE_EVENT_TABLE()
+private:
+    // Disallow copy constructor/assignment operators
+	raDlgPrefs(const raDlgPrefs &);
+    raDlgPrefs & operator=(const raDlgPrefs &);
 
 public:
     raDlgPrefs( );

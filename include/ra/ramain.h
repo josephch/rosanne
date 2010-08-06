@@ -18,10 +18,6 @@
 #define _RAMAIN_H_
 
 //#include "wx/wx.h"
-#include "wx/image.h"
-#include "wx/splitter.h"
-#include "wx/grid.h"
-#include "wx/socket.h"
 
 #include "ra/racommon.h"
 #include "ra/ragamepanel.h"
@@ -47,7 +43,11 @@ enum
 
 #define raSBAR_FIELDS 2
 
-#define raLOG_FILE "ra_gui.log"
+#define raLOG_DIR wxT("log")
+#define raLOG_FILE_PREFIX wxT("rosanne")
+#define raLOG_FILE_EXTN wxT("log")
+#define raLOG_FILE_DELIM wxT("_")
+
 #define raGUI_XRS wxT("gui.xrs")
 
 class raFrame;
@@ -61,11 +61,17 @@ private:
 	wxLog *m_old_logger;
 	raUpdate *m_update;
 	raFrame *m_frame;
+	// Disallow copy constructor/assignment operators
+	//raApp(const raApp &);
+    raApp & operator=(const raApp &);
 public:
 	// Called on application startup
 	virtual bool OnInit();
 	virtual int OnRun();
 	virtual int OnExit();
+
+	static wxString GenerateLogFileName();
+	static void LogDetailsForDebug();
 };
 
 // Declare our main frame class
@@ -96,6 +102,9 @@ private:
 	//raUpdate *m_update;
 	// This class handles events
 	DECLARE_EVENT_TABLE()
+	// Disallow copy constructor/assignment operators
+	raFrame(const raFrame &);
+    raFrame & operator=(const raFrame &);
 };
 
 // Implements raApp& GetApp()

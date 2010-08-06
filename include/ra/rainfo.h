@@ -53,6 +53,10 @@ class raInfo: public wxPanel
 private:
 	DECLARE_EVENT_TABLE()
 
+	// Disallow copy constructor/assignment operators
+	raInfo(const raInfo &);
+    raInfo & operator=(const raInfo &);
+
 	wxButton *m_button;
 	wxStaticText *m_dealno;
 	wxStaticText *m_dealer;

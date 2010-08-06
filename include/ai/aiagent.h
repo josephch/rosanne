@@ -52,6 +52,9 @@ typedef struct RA_AI_EVAL
 class aiAgent
 {
 private:
+	// Disallow copy constructor/assignment operators
+	aiAgent(const aiAgent &);
+    aiAgent & operator=(const aiAgent &);
 	gmEngine m_engine;
 	int m_loc;
 	unsigned long m_trump_cards;
@@ -80,7 +83,7 @@ public:
 	int GetTrump();
 	static int GetTrump(unsigned long hand, int suit);
 	int GetPlay(unsigned long mask);
-	bool GenerateSLProblem(gmEngineData *data, slProblem *problem, int trump, bool *add_trump);
+	bool GenerateSLProblem(gmEngineData *data, slProblem *problem, slPlayed played, int trump, bool *add_trump);
 	//bool GenerateSLSolution(slProblem *problem, slSolution *solution);
 	bool GenerateDeals(gmEngineData *data, unsigned long **deals, int count, int trump = gmSUIT_INVALID);
 	static wxString PrintMoves(aiMove *moves, int move_count);

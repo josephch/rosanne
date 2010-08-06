@@ -5,7 +5,6 @@ wxString gmRand::PrintState()
 {
     wxString out;
     int i;
-    uint32_t seed;
 
     out.Empty();
 

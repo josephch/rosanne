@@ -96,6 +96,10 @@ private:
 	wxBitmap *m_tile;
 	DECLARE_EVENT_TABLE()
 
+	// Disallow copy constructor/assignment operators
+	raGamePanel(const raGamePanel &);
+    raGamePanel & operator=(const raGamePanel &);
+
 	wxBitmap *m_card_faces[gmTOTAL_CARDS];
 	wxBitmap *m_card_backs[raTOTAL_CARD_BACKS];
 	gmEngine m_engine;

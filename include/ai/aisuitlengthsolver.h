@@ -21,23 +21,10 @@
 //#include <stdio.h>
 #include "wx/wx.h"
 
-
-#define slMin(X, Y)  ((X) < (Y) ? (X) : (Y))
-#define slMax(X, Y)  ((X) > (Y) ? (X) : (Y))
-
 #define slLENGTH_MAX 8
 #define slTOTAL_HANDS 4
 #define slTOTAL_SUITS 4
 #define slVACANT -1
-
-
-//#define slLOG_DEBUG_SETPROBLEM 0
-//#define slLOG_DEBUG_SETCELL 0
-//#define slLOG_DEBUG_RECALCCELL_MAX 0
-//#define slLOG_DEBUG_RECALCCELL_MIN 0
-//#define slLOG_DEBUG_GETRANDSOLN 0
-//#define slLOG_DEBUG_SETIMPCELLS 0
-
 
 // Super type for holding suit length for hands
 
@@ -114,6 +101,7 @@ private:
 	inline bool RecalcCellMin(slData *data, int hand, int suit);
 	inline bool RecalcMinForAllCells(slData *data, bool * changed = NULL);
 	inline bool RecalcMaxForAllCells(slData *data);
+	inline int GenerateRandomFill(int min, int max);
 
 public:
 	aiSuitLengthSolver();

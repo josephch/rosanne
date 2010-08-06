@@ -863,7 +863,7 @@ int aiAgent::GetPlay(unsigned long mask)
 // This suit length problem is later on solved to create random deals staisfying
 // the existing constraints for Monte Carlo
 
-bool aiAgent::GenerateSLProblem(gmEngineData *data, slProblem *problem, int trump, bool *add_trump)
+bool aiAgent::GenerateSLProblem(gmEngineData *data, slProblem *problem, slPlayed played, int trump, bool *add_trump)
 {
 	unsigned long cards_played = 0;
 	int i, j;
@@ -875,6 +875,8 @@ bool aiAgent::GenerateSLProblem(gmEngineData *data, slProblem *problem, int trum
 #endif
 
 	wxASSERT(data);
+	wxASSERT(problem);
+	wxASSERT(played);
 
 	*add_trump = false;
 
@@ -896,8 +898,20 @@ bool aiAgent::GenerateSLProblem(gmEngineData *data, slProblem *problem, int trum
 	// Initialize the problem. This will set all slots vacant and would default hand and suit total lengths
 
 	aiSuitLengthSolver::InitializeProblem(problem);
+	aiSuitLengthSolver::InitializePlayed(played);
+
+	// Set the data for played
+
+	for(i = 0; i < gmTOTAL_PLAYERS; i++)
+	{
+	    for(j = 0; j < gmTOTAL_SUITS; j++)
+	    {
+	        played[i][j] = gmUtil::CountBitsSet(data->played_cards[i] & gmUtil::m_suit_mask[j]);
+	    }
+	}
 
 	// Set the hand lengths
+
 	for(i = 0; i < gmTOTAL_PLAYERS; i++)
 	{
 		problem->hand_total_length[i] = 8 - (gmUtil::CountBitsSet(data->played_cards[i]));
@@ -906,6 +920,7 @@ bool aiAgent::GenerateSLProblem(gmEngineData *data, slProblem *problem, int trum
 	}
 
 	// Set suit lengths
+
 	for(i = 0; i < gmTOTAL_SUITS; i++)
 	{
 		problem->suit_total_length[i] = 8 - gmUtil::CountBitsSet(cards_played & gmUtil::m_suit_mask[i]);
@@ -921,6 +936,7 @@ bool aiAgent::GenerateSLProblem(gmEngineData *data, slProblem *problem, int trum
 	{
 	    --(problem->hand_total_length[data->curr_max_bidder]);
 	    --(problem->suit_total_length[trump]);
+	    ++(played[data->curr_max_bidder][trump]);
 	    *add_trump = true;
 
 	}
@@ -939,6 +955,7 @@ bool aiAgent::GenerateSLProblem(gmEngineData *data, slProblem *problem, int trum
 		{
             --(problem->hand_total_length[data->curr_max_bidder]);
             --(problem->suit_total_length[trump]);
+            ++(played[data->curr_max_bidder][trump]);
             *add_trump = true;
 		}
 	}
@@ -957,7 +974,7 @@ bool aiAgent::GenerateSLProblem(gmEngineData *data, slProblem *problem, int trum
 		for(j = 0; j < gmTOTAL_SUITS; j++)
 		{
 			//problem->cells[i][j].max =
-				//gmMin(problem->hand_total_length[i], problem->suit_total_length[j]);
+				//std::min(problem->hand_total_length[i], problem->suit_total_length[j]);
 			if(m_nulls[i] & (1 << j))
 			{
 				//problem->cells[i][j].min = 0;
@@ -1093,8 +1110,11 @@ bool aiAgent::GenerateDeals(gmEngineData *data, unsigned long **deals, int count
 	}
 
 	// Generate the problem
-	memset(&problem, 0, sizeof(problem));
-	if(!GenerateSLProblem(data, &problem, trump, &add_trump))
+
+    // No need to initialize "problem" and "played" as GenerateSLProblem will do this.
+//	aiSuitLengthSolver::InitializeProblem(&problem);
+//	aiSuitLengthSolver::InitializePlayed(played);
+	if(!GenerateSLProblem(data, &problem, played, trump, &add_trump))
 	{
 		wxLogError(wxString::Format(wxT("GetData() failed. %s:%d"),
 			wxT(__FILE__), __LINE__));
@@ -1570,9 +1590,9 @@ bool aiAgent::EstimateTricks(unsigned long *p_hands, int trump, int *eval)
 
 #ifdef raAI_LOG_ESTIMATE_TRICKS
 			wxLogDebug(_("Tricks expected - ") +
-				wxString::Format("%d", gmMin(stronger, gmMax(suit_count[j], suit_count[j + 2]))));
+				wxString::Format("%d", std::min(stronger, std::max(suit_count[j], suit_count[j + 2]))));
 #endif
-			tricks[j] += gmMin(stronger, gmMax(suit_count[j], suit_count[j + 2]));
+			tricks[j] += std::min(stronger, std::max(suit_count[j], suit_count[j + 2]));
 
 			//
 			// Calculating trump advantage
@@ -1588,8 +1608,8 @@ bool aiAgent::EstimateTricks(unsigned long *p_hands, int trump, int *eval)
 					suit_count[k] = 0;
 			}
 
-			trump_adv = gmMax(suit_count[j], suit_count[j + 2])
-				- gmMax(suit_count[!j], suit_count[(!j) + 2]);
+			trump_adv = std::max(suit_count[j], suit_count[j + 2])
+				- std::max(suit_count[!j], suit_count[(!j) + 2]);
 #ifdef raAI_LOG_ESTIMATE_TRICKS
 			wxLogDebug(_("Trump advantage for ") + gmUtil::m_short_teams[j].c_str() + _(" is ") + wxString::Format("%d", trump_adv));
 #endif
@@ -1602,9 +1622,9 @@ bool aiAgent::EstimateTricks(unsigned long *p_hands, int trump, int *eval)
 		{
 #ifdef raAI_LOG_ESTIMATE_TRICKS
 			wxLogDebug(_("Tricks expected - ") +
-				wxString::Format("%d", gmMin(gmMin(suit_count[!j], suit_count[(!j) + 2]), stronger)));
+				wxString::Format("%d", std::min(std::min(suit_count[!j], suit_count[(!j) + 2]), stronger)));
 #endif
-			tricks[j] += gmMin(gmMin(suit_count[!j], suit_count[(!j) + 2]), stronger);
+			tricks[j] += std::min(std::min(suit_count[!j], suit_count[(!j) + 2]), stronger);
 		}
 	}
 	// If either is greater that 8 correct
@@ -2256,7 +2276,7 @@ int aiAgent::Evaluate(gmEngine *node, int alpha, int beta, int depth, bool *ret_
 					wxT(__FILE__), __LINE__));
 				return 0;
 			}
-			beta = gmMin(beta, eval);
+			beta = std::min(beta, eval);
 			node->SetData(&old_node, false);
 			//if beta <= alpha
 			//	return alpha
@@ -2305,7 +2325,7 @@ int aiAgent::Evaluate(gmEngine *node, int alpha, int beta, int depth, bool *ret_
 					wxT(__FILE__), __LINE__));
 				return 0;
 			}
-			alpha = gmMax(alpha, eval);
+			alpha = std::max(alpha, eval);
 			node->SetData(&old_node, false);
 			//if beta <= alpha
 			//    return beta

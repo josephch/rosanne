@@ -88,6 +88,11 @@ public:
 #endif
 
 private:
+
+	// Disallow copy constructor/assignment operators
+	raConfig(const raConfig &);
+    raConfig & operator=(const raConfig &);
+
 	wxConfig *m_config;
 	raConfData m_data;
 

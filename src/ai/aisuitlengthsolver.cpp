@@ -15,9 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-// *******
-// Problem
-// *******
+// What is the suit length problem?
+// ********************************
 //
 // In the following matrix where we have 4 hands (h(1) to h(4)) holding cards from 4 suits (s(1) to s(4)),
 // c(x,y) represents the number of cards beloning to suit (y) held by hand (x)
@@ -32,36 +31,48 @@
 // ----+------+------+------+------
 // h(4)|c(4,1)|c(4,2)|c(4,3)|c(4,4)
 //
-// Suit length problem:
-// --------------------
 //
-// If in the matrix given above, one or more c(x,y) are unknown,
-// and these have to filled in randomly.
+// Given one or more c(x,y) are unknown, the object of the problem is to fill these randomly.
+//
+// Preconditions
+// *************
 //
 // Let sum(h(x)) be (c(n,1) + c(n,2) + c(n,3) + c(n,4)), the sum of cards in hand h(x).
-// Similary let sum(s(y)) be the sum of cards in suit s(y)
+// Similary let sum(s(y)) be the sum of cards in suit s(y).
 // All sum(h(x)) and (s(y)) are known.
 //
-// The c(x,y) which are unknown are called vacant cells.
-//
-// ********
 // Solution
 // ********
 //
-// Each vacant cell c(x,y) will have a maxval(c(x,y)) and minval(c(x,y)).
+// The c(x,y) which are unknown are called vacant cells.
+//
+// Let filled(h(x)) be the sum of cards already filled in previously vacant cells in hand h(x). This will be zero before
+// solving the problem and will increase as the problem gets solved, as solving the problem involves filling vacant cells.
+// Similarly, let filled(s(y)) be the usm of cards already filled in previously vacant cells for suit s(y).
+//
+// Each vacant cell c(x,y) will have a max(c(x,y)) and min(c(x,y)).
 // max(c(x,y)) is the maximum number of cards which can be allocated to the vacant cell c(x,y).
-// Similarly, min(c(x,y)) is the minimum number of cards which can be allocated to the vacant cell c(x,y).
+// Similarly, min(c(x,y)) is the minimum number of cards which should be allocated to the vacant cell c(x,y).
 //
-// MIN(x,y) returns minimum value amongst x and y.
-// MAX(x,y) returns maximum value amongst x and y.
+// Vacant cells, once filled will have min(c(x,y)) = max(c(x,y)) = (suit length for the cell)
 //
-// max(c(x,y)) = MIN(sum(h(x)), sum(s(y)))
+//
+// Let sum_min(h(x)) be the sum of min values for all cells in hand h(x) which have not been filled.
+// let sum_min(s(y)) be the sum of min values for all cells in suit s(y) which have not been filled.
+//
+// Let MIN be a function such that, MIN(x,y) returns minimum value amongst x and y.
+// Let MAX be a function such that, MAX(x,y) returns maximum value amongst x and y.
+//
+// max(c(x,y)) = MIN(
+//                   sum(h(x)) - filled(h(x)) - sum_min(h(x)) + min(c(x,y)),
+//                   sum(s(y)) - filled(s(y)) - sum_min(s(y)) + min(c(x,y))
+//                  )
 //
 // Let sum_max(h(x)) be (max(c(x,1)) + max(c(x,2)) + max(c(x,3)) + max(c(x,4)))
 // and sum_max(s(y)) be (max(c(1,y)) + max(c(2,y)) + max(c(3,y)) + max(c(4,y)))
 //
 // There are totally sum(h(x)) cards to be distributed among c(x, n), n=1 to 4.
-// For c(x,n) where n !=y, the maximum total which can be distributed is sum_max(h(x)) + max(c(x,y)).
+// For cells c(x,n) where n !=y, the maximum total which can be distributed is sum_max(h(x)) + max(c(x,y)).
 // So, c(x,y) should be allocated at least sum(h(x)) - sum_max(h(x)) + max(c(x,y)).
 //
 // min(c(x,y)) = MAX(
@@ -69,19 +80,21 @@
 //                  (sum(s(y)) - sum_max(s(y)) + max(c(x,y)))
 //                  )
 //
-// Algorithm:
-// ----------
+// The following algorithm is then used,
 //
 // for each vacant cell c(x,y):
-//     Get a random(non-linear) i such that min(c(x,y)) <= i <=max(c(x,y))  ----> Refer to "filling vacant slots"
-//     c(x,y) = i
-//     Recalculate h(x), s(y)
-//     Recalculate max(c(i,j)) for i=x and j=1 to 4 and for j=y and i=1 to 4. For the hand and the suit.
-//     Recalculate sum_max for all hands and suits
-//     Recalculate min for all cells
+//     Get a random(non-linear) i such that min(c(x,y)) <= i <=max(c(x,y))  ----> Refer to the section below
+//     Set c(x,y) = i = max(c(x,y)) = min(c(x,y))
+//     Recalculate sum_max for h(x) and s(y).
+//     Recalculate sum_min for h(x) and s(y).
+//     Recalcualte filled for h(x) and s(y).
+//     Recalculate max for all impacted cells. That is, all cells in h(x) and s(y).
+//     Recalculate min for all impacted cells. That is, all cells in h(x) and s(y).
 //
-// Filling vacant slots:
-// ---------------------
+// The last two steps are recursive as change of max for a cell will impact min of other cells and vice versa.
+//
+// Computation of relative probability
+// ***********************************
 //
 // The process of shuffling generates various permutations of cards.
 //
@@ -106,8 +119,7 @@
 // And finally to complicate matters further, we want the generated solution to mirror real-world shuffling.
 // Hence the process of filling vacant slots should consider played cards also while computing relative probability.
 //
-// Algorithm:
-// ----------
+// The algorithm used is as following:
 //
 // Let there be a slot c(x,y) which is vacant.
 // Let a = min(c(x,y)) and b = max(c(x,y)).
@@ -132,6 +144,19 @@
 #include "ai/aisuitlengthsolver.h"
 #include "SFMT.h"
 #include "SFMT-params.h"
+
+//#define slLOG_DEBUG_SETPROBLEM 0
+//#define slLOG_DEBUG_SETCELL 0
+//#define slLOG_DEBUG_RECALCCELL_MAX 0
+//#define slLOG_DEBUG_RECALCCELL_MIN 0
+//#define slLOG_DEBUG_GETRANDSOLN 0
+//#define slLOG_DEBUG_SETIMPCELLS 0
+//#define slLOG_DEBUG_GENRANDFILL 0
+
+// The probability of a hand of 8 cards to get 0 to 8 cards of the same suit
+static const uint32_t SL_SUIT_LEN_PROBS[] = {699230, 2632395, 3582982, 2262936, 707167, 107759, 7347, 183, 1};
+//static const uint32_t SL_SUIT_LEN_TOTAL_PROB = 10000000;
+
 
 aiSuitLengthSolver::aiSuitLengthSolver()
 {
@@ -234,26 +259,32 @@ bool aiSuitLengthSolver::SetProblem(slProblem *problem, slPlayed played)
         }
     }
 
-//    Commented temporarily
-//    for(i = 0; i < slTOTAL_HANDS; i++)
-//    {
-//        if((hand_total_played[i] + m_problem.hand_total_length[i]) != slLENGTH_MAX)
-//        {
-//            wxLogError(wxString::Format(wxT("No of played cards and the cards to be set does not add up to slLENGTH_MAX for hand %d. %s:%d"),
-//                                        i, wxT(__FILE__), __LINE__));
-//            return false;
-//        }
-//    }
-//
-//    for(i = 0; i < slTOTAL_SUITS; i++)
-//    {
-//        if((suit_total_played[i] + m_problem.suit_total_length[i]) != slLENGTH_MAX)
-//        {
-//            wxLogError(wxString::Format(wxT("No of played cards and the cards to be set does not add up to slLENGTH_MAX for suit %d. %s:%d"),
-//                                        i, wxT(__FILE__), __LINE__));
-//            return false;
-//        }
-//    }
+    //wxLogDebug(PrintMatrix(m_played));
+    for(i = 0; i < slTOTAL_HANDS; i++)
+    {
+        if((hand_total_played[i] + m_problem.hand_total_length[i]) != slLENGTH_MAX)
+        {
+            ::wxLogError(wxString::Format(wxT("No of played cards and the cards to be set does not add up to slLENGTH_MAX for hand %d. %s:%d"),
+                                        i, wxT(__FILE__), __LINE__));
+            ::wxLogError(wxString::Format(wxT("hand_total_played[%d] = %d"), i , hand_total_played[i]));
+            ::wxLogError(wxString::Format(wxT("m_problem.hand_total_length[%d] = %d"), i , m_problem.hand_total_length[i]));
+            wxASSERT(false);
+            return false;
+        }
+    }
+
+    for(i = 0; i < slTOTAL_SUITS; i++)
+    {
+        if((suit_total_played[i] + m_problem.suit_total_length[i]) != slLENGTH_MAX)
+        {
+            ::wxLogError(wxString::Format(wxT("No of played cards and the cards to be set does not add up to slLENGTH_MAX for suit %d. %s:%d"),
+                                        i, wxT(__FILE__), __LINE__));
+            ::wxLogError(wxString::Format(wxT("suit_total_played[%d] = %d"), i , suit_total_played[i]));
+            ::wxLogError(wxString::Format(wxT("m_problem.suit_total_length[%d] = %d"), i , m_problem.suit_total_length[i]));
+            wxASSERT(false);
+            return false;
+        }
+    }
 
 	// Copy the status of each cell (which must be zero to slLENGTH_MAX or slVACANT)
 
@@ -344,7 +375,7 @@ bool aiSuitLengthSolver::RecalcCellMax(slData *data, int hand, int suit)
 
     // Compute the new max value
 
-    new_max = slMin(h, s);
+    new_max = std::min(h, s);
     wxASSERT((new_max <= old_max) || (old_max == 0));
 
     data->cells[hand][suit].max = new_max;
@@ -560,7 +591,7 @@ bool aiSuitLengthSolver::RecalcCellMin(slData *data, int hand, int suit)
     }
 
     old_min = data->cells[hand][suit].min;
-    new_min = slMax(i, j);
+    new_min = std::max(i, j);
 
     // The new minimum should be equal to or more than the old minimum
 
@@ -647,6 +678,55 @@ bool aiSuitLengthSolver::RecalcMaxForAllCells(slData *data)
     return true;
 }
 
+// This method picks a value between min and max, both inclusive, to fill a vacant slot.
+// However, the probability of a slot to be filled with min is different from probabilityof a slot to be filled with max.
+// Hence the relative probability is computed and stored in SL_SUIT_LEN_PROBS and this is used
+
+int aiSuitLengthSolver::GenerateRandomFill(int min, int max)
+{
+    wxASSERT(min >= 0);
+    wxASSERT(min < max);
+    wxASSERT(max <= slLENGTH_MAX);
+
+    int i = 0;
+    uint32_t total = 0;
+    uint32_t cumul[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+    uint32_t rand_val = 0;
+
+    for(i = min; i <= max; i++)
+    {
+        total += SL_SUIT_LEN_PROBS[i];
+        cumul[i] = total;
+    }
+
+
+    rand_val = (gen_rand32() % (total + 1));
+
+#ifdef slLOG_DEBUG_GENRANDFILL
+    wxLogDebug(wxString::Format(wxT("min = %d"), min));
+    wxLogDebug(wxString::Format(wxT("max = %d"), max));
+    for(i = min; i <= max; i++)
+    {
+        wxLogDebug(wxString::Format(wxT("cumul[%d] = %u"), i, cumul[i]));
+    }
+    wxLogDebug(wxString::Format(wxT("total = %u"), total));
+    wxLogDebug(wxString::Format(wxT("rand_val = %u"), rand_val));
+#endif
+    for(i = min; i <= max; i++)
+    {
+        if(rand_val <= cumul[i])
+        {
+#ifdef slLOG_DEBUG_GENRANDFILL
+            wxLogDebug(wxString::Format(wxT("GenerateRandomFill returns %d"), i));
+#endif
+            return i;
+        }
+    }
+    wxASSERT_MSG(false, wxT("Control should not reach here"));
+    return -1;
+
+}
+
 bool aiSuitLengthSolver::GenerateRandomSolution(slSolution solution)
 {
 	int i = 0;
@@ -681,7 +761,8 @@ bool aiSuitLengthSolver::GenerateRandomSolution(slSolution solution)
                 }
                 else
                 {
-                    fill = m_working.cells[i][j].min + (gen_rand32() % (m_working.cells[i][j].max - m_working.cells[i][j].min + 1));
+                    //fill = m_working.cells[i][j].min + (gen_rand32() % (m_working.cells[i][j].max - m_working.cells[i][j].min + 1));
+                    fill = GenerateRandomFill(m_working.cells[i][j].min, m_working.cells[i][j].max);
                 }
 #ifdef slLOG_DEBUG_GETRANDSOLN
                 ::wxLogDebug(wxString::Format(wxT("Attempting to fill (%d, %d) with %d"), i, j, fill));

@@ -27,7 +27,10 @@ class raDlgRules: public wxDialog
 {
     DECLARE_DYNAMIC_CLASS( raDlgRules )
     DECLARE_EVENT_TABLE()
-
+private:
+	// Disallow copy constructor/assignment operators
+	raDlgRules(const raDlgRules &);
+    raDlgRules & operator=(const raDlgRules &);
 public:
     raDlgRules( );
     raDlgRules( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style);

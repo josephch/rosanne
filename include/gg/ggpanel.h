@@ -26,6 +26,9 @@ private:
 	bool m_f_invalid;
 	wxRect m_rect_diff, m_rect_invalid;
 	DECLARE_EVENT_TABLE()
+	// Disallow copy constructor/assignment operators
+	ggPanel(const ggPanel &);
+    ggPanel & operator=(const ggPanel &);
 public:
 	ggPanel(const wxWindow* parent);
 	~ggPanel();

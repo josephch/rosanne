@@ -35,6 +35,8 @@ public:
 	int GetCommand();
 private:
 	int m_cmd;
+	// Disallow copy assignment operator
+    raInfoEvent & operator=(const raInfoEvent &);
 
 };
 
@@ -59,6 +61,8 @@ public:
 	int GetBid();
 private:
 	int m_bid;
+	// Disallow copy assignment operator
+    raBidEvent & operator=(const raBidEvent &);
 
 };
 
@@ -82,6 +86,8 @@ public:
 	wxString GetMessage();
 private:
 	wxString m_msg;
+	// Disallow copy assignment operator
+    raUpdateEvent & operator=(const raUpdateEvent &);
 
 };
 

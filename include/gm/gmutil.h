@@ -79,9 +79,6 @@ public:
 
 //#define raGET_CARD_INDEX(crd) ((crd->GetSuit() << 3) + gmUtil::m_value_trans[crd->GetValue()])
 
-#define gmMin(X, Y)  ((X) < (Y) ? (X) : (Y))
-#define gmMax(X, Y)  ((X) > (Y) ? (X) : (Y))
-
 // Calculates the total number of points in a hand
 #define gmTotalPoints(X) ( \
 gmUtil::m_total_points[(gmUtil::m_suit_mask[0] & X) >> gmUtil::m_suit_rs[0]] + \

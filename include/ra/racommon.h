@@ -48,7 +48,7 @@
 #define RA_APP_FULL_VER RA_APP_MAJOR_VER wxT(".") RA_APP_MINOR_VER RA_APP_REL_TYPE RA_APP_REL_TYPE_VER
 
 
-#define RA_APP_FULL_NAME RA_APP_NAME RA_APP_FULL_VER
+#define RA_APP_FULL_NAME RA_APP_NAME wxT(" ") RA_APP_FULL_VER
 
 
 #define ra_APP_URL wxT("http://rosanne.sourceforge.net")

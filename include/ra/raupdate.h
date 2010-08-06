@@ -40,6 +40,9 @@ private:
 	//wxFSFile *m_f;
 	//wxFileSystem *m_fs;
 	int CheckForUpdate(wxString *new_ver = NULL);
+	// Disallow copy constructor/assignment operators
+	raUpdate(const raUpdate &);
+    raUpdate & operator=(const raUpdate &);
 
 };
 

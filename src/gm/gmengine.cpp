@@ -25,12 +25,21 @@
     #include <wx/fileconf.h>
 #endif
 
+//#include "gm/gmengineinit.cpp"
 //
 // Constructor
 //
 
+bool gmEngine::m_init_ok = false;
+gmEngineData gmEngine::m_init;
+
 gmEngine::gmEngine()
 {
+    if(m_init_ok == false)
+    {
+        gmEngine::InitCache();
+        m_init_ok = true;
+    }
 	m_data.ok = Reset(&m_data);
 	m_data.feedback = true;
 
@@ -65,64 +74,86 @@ int gmEngine::GetStatus()
 }
 bool gmEngine::Reset(gmEngineData *data)
 {
+    bool feedback;
+    gmRules rules;
+    feedback = data->feedback;
+    memcpy(&rules, &(data->rules), sizeof(gmRules));
+    memcpy(data, &gmEngine::m_init, sizeof(gmEngineData));
+    data->feedback = feedback;
+    memcpy(&(data->rules), &rules, sizeof(gmRules));
+    return true;
+}
+
+void gmEngine::InitCache()
+{
 	int i, j;
+	memset(&m_init, 0, sizeof(gmEngineData));
+
 	//TODO : Reduce the number of loops
 
-	data->status = gmSTATUS_NOT_STARTED;
-	data->dealer = 0;
+	gmEngine::m_init.status = gmSTATUS_NOT_STARTED;
+	gmEngine::m_init.dealer = 0;
 
 	// Filling m_shuffled with values for all the 32 cards
 	for(i = 0; i < gmTOTAL_CARDS; i++)
-		data->shuffled[i] = i;
+		gmEngine::m_init.shuffled[i] = i;
 
 	// Neither input or output is pending at the start
-	data->input_pending = false;
-	data->output_pending = false;
+	gmEngine::m_init.input_pending = false;
+	gmEngine::m_init.output_pending = false;
 
 	// Reset the hands
 	for(i = 0; i < gmTOTAL_PLAYERS; i++)
-		data->hands[i] = 0;
+		gmEngine::m_init.hands[i] = 0;
 
 	// Resetting variables related to bidding
-	data->first_bid = true;
-	data->curr_max_bid = 0;
-	data->curr_max_bidder = gmPLAYER_INVALID;
-	data->last_bidder = gmPLAYER_INVALID;
+	gmEngine::m_init.first_bid = true;
+	gmEngine::m_init.curr_max_bid = 0;
+	gmEngine::m_init.curr_max_bidder = gmPLAYER_INVALID;
+	gmEngine::m_init.last_bidder = gmPLAYER_INVALID;
 	for(i = 0; i < gmTOTAL_BID_ROUNDS; i++)
 		for(j = 0; j < gmTOTAL_PLAYERS; j++)
-			data->bid_hist[i][j] = false;
-	data->passed_round1 = 0;
+			gmEngine::m_init.bid_hist[i][j] = false;
+	gmEngine::m_init.passed_round1 = 0;
 
 	// Resetting trump suit and card
-	data->trump_card = gmCARD_INVALID;
-	data->trump_suit = gmSUIT_INVALID;
+	gmEngine::m_init.trump_card = gmCARD_INVALID;
+	gmEngine::m_init.trump_suit = gmSUIT_INVALID;
 
 	// Resetting variables related to tricks
 	for(i = 0; i < gmTOTAL_TEAMS; i++)
-		data->pts[i] = 0;
+		gmEngine::m_init.pts[i] = 0;
 
 	for(i = 0; i < gmTOTAL_PLAYERS; i++)
-		data->played_cards[i] = 0;
+		gmEngine::m_init.played_cards[i] = 0;
 
-	data->trick_round = 0;
-	data->should_trump = false;
-	data->should_play_trump_card = false;
-	data->trump_shown = false;
+	gmEngine::m_init.trick_round = 0;
+	gmEngine::m_init.should_trump = false;
+	gmEngine::m_init.should_play_trump_card = false;
+	gmEngine::m_init.trump_shown = false;
 
 	// TODO : Use ResetTrick
 	for(i = 0; i < gmTOTAL_TRICKS; i++)
 	{
 		for(j = 0; j < gmTOTAL_PLAYERS; j++)
-			data->tricks[i].cards[j] = gmCARD_INVALID;
-		data->tricks[i].count = 0;
-		data->tricks[i].lead_loc = gmPLAYER_INVALID;
-		data->tricks[i].lead_suit = gmSUIT_INVALID;
-		data->tricks[i].points = 0;
-		data->tricks[i].trumped = false;
-		data->tricks[i].winner = gmPLAYER_INVALID;
+			gmEngine::m_init.tricks[i].cards[j] = gmCARD_INVALID;
+		gmEngine::m_init.tricks[i].count = 0;
+		gmEngine::m_init.tricks[i].lead_loc = gmPLAYER_INVALID;
+		gmEngine::m_init.tricks[i].lead_suit = gmSUIT_INVALID;
+		gmEngine::m_init.tricks[i].points = 0;
+		gmEngine::m_init.tricks[i].trumped = false;
+		m_init.tricks[i].winner = gmPLAYER_INVALID;
 	}
 
-	return true;
+//    gmEngine::m_init.feedback = true;
+//	gmEngine::m_init.rules.rot_addn = 1;
+//	gmEngine::m_init.rules.min_bid_1 = 14;
+//	gmEngine::m_init.rules.min_bid_2 = 20;
+//	gmEngine::m_init.rules.min_bid_3 = 23;
+//	gmEngine::m_init.rules.waive_rule_4 = false;
+//	gmEngine::m_init.rules.sluff_jacks = true;
+
+	return;
 
 }
 bool gmEngine::Reset()
@@ -131,8 +162,7 @@ bool gmEngine::Reset()
 }
 bool gmEngine::Shuffle()
 {
-	int i = 0, j;
-	int t;
+	int i = 0;
 
 	// If required set the shuffled card as per the
 	// deal read from the test data input file
@@ -464,7 +494,7 @@ bool gmEngine::Continue()
 				// maximum of the current highest bid and the minimum allowed
 				// bid for the round.
 				m_data.in_bid_info.min =
-					gmMax(m_data.rules.min_bid_2, (m_data.curr_max_bid + 1));
+					std::max(m_data.rules.min_bid_2, (m_data.curr_max_bid + 1));
 				m_data.in_bid_info.round = 1;
 
 				SetInput(gmINPUT_BID);
@@ -517,7 +547,7 @@ bool gmEngine::Continue()
 				// maximum of the current highest bid and the minimum allowed
 				// bid for the round.
 				m_data.in_bid_info.min =
-					gmMax(m_data.rules.min_bid_3, (m_data.curr_max_bid + 1));
+					std::max(m_data.rules.min_bid_3, (m_data.curr_max_bid + 1));
 				m_data.in_bid_info.round = 2;
 
 				SetInput(gmINPUT_BID);
