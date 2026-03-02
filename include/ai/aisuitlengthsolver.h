@@ -19,6 +19,7 @@
 //#include <assert.h>
 //#include <memory.h>
 //#include <stdio.h>
+#include "SFMT.h"
 #include "wx/wx.h"
 
 #define slLENGTH_MAX 8
@@ -89,6 +90,7 @@ private:
 	slPlayed m_played;
 	int m_suit_sum_of_min[slTOTAL_SUITS];
 	int m_hand_sum_of_min[slTOTAL_HANDS];
+	sfmt_t m_sfmt;
 	// Disallow copy constructor/assignment operators
 	aiSuitLengthSolver(const aiSuitLengthSolver &);
     aiSuitLengthSolver & operator=(const aiSuitLengthSolver &);

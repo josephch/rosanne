@@ -251,7 +251,7 @@ void raBid::OnButtonClick(wxCommandEvent &event)
 			new_event.SetBid(raGetBidFromId(id));
 			break;
 		}
-		m_game->AddPendingEvent(new_event);
+		wxPostEvent(m_game, new_event);
 	}
 	else
 		wxLogError(wxString::Format(wxT("Game panel not set in raBid. %s:%d"), wxT(__FILE__), __LINE__));

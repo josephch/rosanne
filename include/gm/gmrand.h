@@ -13,7 +13,7 @@
 
 typedef struct tagGM_RAND_STATE
 {
-	uint32_t state_array[N32];
+	uint32_t state_array[SFMT_N32];
 	int idx;
 }gmRandState;
 

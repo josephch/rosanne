@@ -410,7 +410,7 @@ bool raGamePanel::NewDeal()
         // Read the state array
         if(status == true)
         {
-            for(i = 0; i < N32; i++)
+            for(i = 0; i < SFMT_N32; i++)
             {
                 seed_text = wxString::Format(wxT("%s%02d"), raTEXT_SEED, i);
                 if(fcfg.Exists(seed_text))
@@ -612,8 +612,6 @@ bool raGamePanel::ShowLastTrick()
 //
 void raGamePanel::OnSize(wxSizeEvent& event)
 {
-	wxPaintEvent new_event;
-
 	// Set the location of the bid panel
 	//m_bid->SetSize(
 	//	(this->GetClientSize().GetWidth() - m_bid->GetSize().GetWidth()) / 2,

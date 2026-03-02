@@ -214,5 +214,5 @@ void raInfo::OnButtonClick(wxCommandEvent &event)
 
 	raInfoEvent new_event;
 	new_event.SetCommand(m_curr_cmd);
-	m_game->AddPendingEvent(new_event);
+	wxPostEvent(m_game, new_event);
 }

@@ -19,14 +19,13 @@
 
 #include "ai/aisuitlengthsolver.h"
 #include "SFMT.h"
-#include "SFMT-params.h"
-#include "SFMT.c"
 
 int main()
 {
     uint32_t seed = 0;
     int i = 0;
     int j = 0;
+    sfmt_t sfmt;
 
     // Backup existing logger
     wxLog * old_logger;
@@ -34,24 +33,24 @@ int main()
     // Create a new logger to write to standard output
     wxLogStderr *logger=new wxLogStderr(stdout);
     // We do not want time to be printed along with log output
-    wxLog::SetTimestamp(NULL);
+    wxLog::SetTimestamp(wxEmptyString);
     wxLog::SetActiveTarget(logger);
 
     // Seeding the PRNG
-    init_gen_rand(time(0));
-    seed = gen_rand32();
+    sfmt_init_gen_rand(&sfmt, time(0));
+    seed = sfmt_genrand_uint32(&sfmt);
     wxLogMessage(wxString::Format(wxT("Seed - %d"), seed));
     //wxLogMessage(wxString::Format(wxT("RAND_MAX - %d"), RAND_MAX));
     //srand(29089);
     srand(seed);
 
 
-    ::wxLogMessage(wxT("Starting tests"));
+    wxLogMessage(wxT("Starting tests"));
 
     aiSuitLengthSolver solver;
     slProblem problem;
-    slPlayed played;
     slSolution solution;
+    slPlayed played = {{0, 0, 0, 0}, {1, 0, 1, 1}, {0, 0, 0, 0}, {1, 1, 0, 1}};
     aiSuitLengthSolver::InitializeProblem(&problem);
     aiSuitLengthSolver::InitializePlayed(played);
 
@@ -66,7 +65,6 @@ int main()
     problem.suit_total_length[2] = 7;
     problem.suit_total_length[3] = 6;
 
-    played = {{0, 0, 0, 0}, {1, 0, 1, 1}, {0, 0, 0, 0}, {1, 1, 0, 1}};
 
     if(solver.SetProblem(&problem, played) == false)
     {
@@ -83,7 +81,7 @@ int main()
     wxLogMessage(aiSuitLengthSolver::PrintMatrix(solution));
 
 end_test:
-    ::wxLogMessage(wxT("Finished tests"));
+    wxLogMessage(wxT("Finished tests"));
 
     // Restore old logger and delete our custom logger
     wxLog::SetActiveTarget(old_logger);

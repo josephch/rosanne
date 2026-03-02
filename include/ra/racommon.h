@@ -17,6 +17,7 @@
 #ifndef _RACOMMON_H_
 #define _RACOMMON_H_
 
+#include "SFMT.h"
 #include "wx/wxprec.h"
 
 #ifdef __BORLANDC__
@@ -54,7 +55,8 @@
 #define ra_APP_URL wxT("http://rosanne.sourceforge.net")
 
 #define raBID_INVALID -2
-#define raGetRandPlayer() (gen_rand32() % gmTOTAL_PLAYERS)
+extern sfmt_t raSmft;
+#define raGetRandPlayer() (sfmt_genrand_uint32(&raSmft) % gmTOTAL_PLAYERS)
 
 // For testing purposes
 #define raTEST_DATA_FILE wxT("ra_test_data.ini")

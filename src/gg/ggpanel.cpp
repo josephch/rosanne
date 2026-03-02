@@ -79,7 +79,7 @@ bool ggPanel::Paint()
 	wxPaintDC pdc(this);
 	wxMemoryDC mdc;
 
-	if(!pdc.Ok())
+	if (!pdc.IsOk())
 	{
 		wxLogError(wxT("wxcTable::Paint - Paint DC is not OK"));
 		return false;
@@ -140,7 +140,7 @@ bool ggPanel::RefreshScreen()
 }
 bool ggPanel::BlitToBack(wxCoord xdest, wxCoord ydest,
 	wxCoord width, wxCoord height, wxDC* source, wxCoord xsrc,
-	wxCoord ysrc, int logicalFunc, bool useMask,
+	wxCoord ysrc, wxRasterOperationMode logicalFunc, bool useMask,
 	wxCoord xsrcMask, wxCoord ysrcMask)
 {
 	int x, y;
@@ -149,10 +149,10 @@ bool ggPanel::BlitToBack(wxCoord xdest, wxCoord ydest,
 	bdc.SelectObject(*m_back);
 	wdc.SelectObject(*m_work);
 
-	if(!bdc.Ok())
+	if (!bdc.IsOk())
 		return false;
 
-	if(!wdc.Ok())
+	if (!wdc.IsOk())
 		return false;
 
 	if(!bdc.Blit(xdest, ydest, width, height, source, xsrc, ysrc, logicalFunc, useMask, xsrcMask, ysrcMask))
@@ -173,13 +173,13 @@ bool ggPanel::BlitToBack(wxCoord xdest, wxCoord ydest,
 }
 bool ggPanel::BlitToFront(wxCoord xdest, wxCoord ydest,
 	wxCoord width, wxCoord height, wxDC* source, wxCoord xsrc,
-	wxCoord ysrc, int logicalFunc, bool useMask,
+	wxCoord ysrc, wxRasterOperationMode logicalFunc, bool useMask,
 	wxCoord xsrcMask, wxCoord ysrcMask)
 {
 	wxMemoryDC wdc;
 	wdc.SelectObject(*m_work);
 
-	if(!wdc.Ok())
+	if(!wdc.IsOk())
 		return false;
 
 	if(!wdc.Blit(xdest, ydest, width, height, source, xsrc, ysrc, logicalFunc, useMask, xsrcMask, ysrcMask))
@@ -202,10 +202,10 @@ bool ggPanel::DrawTextOnBack(wxString text, wxPoint pt, wxColour colour, wxFont 
 	bdc.SelectObject(*m_back);
 	wdc.SelectObject(*m_work);
 
-	if(!bdc.Ok())
+	if (!bdc.IsOk())
 		return false;
 
-	if(!wdc.Ok())
+	if (!wdc.IsOk())
 		return false;
 
 	// Set the text foreground colour and the font
@@ -237,10 +237,10 @@ bool ggPanel::ClearDifference()
 	bdc.SelectObject(*m_back);
 	wdc.SelectObject(*m_work);
 
-	if(!bdc.Ok())
+	if (!bdc.IsOk())
 		return false;
 
-	if(!wdc.Ok())
+	if (!wdc.IsOk())
 		return false;
 
 	if(!wdc.Blit(m_rect_diff.x, m_rect_diff.y, m_rect_diff.GetWidth(), m_rect_diff.GetHeight(),

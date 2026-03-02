@@ -66,7 +66,7 @@ public:
 	ggCard(int other);
 	~ggCard();
 	wxBitmap * m_face;
-	bool BlitTo(wxDC* dest, wxCoord xdest, wxCoord ydest, int logicalFunc = wxCOPY);
+	bool BlitTo(wxDC *dest, wxCoord xdest, wxCoord ydest, wxRasterOperationMode logicalFunc = wxCOPY);
 	wxBitmap * GetFace();
 	void SelectToDC(wxMemoryDC *mdc);
 	// Disallow copy constructor/assignment operators

@@ -116,7 +116,7 @@ ggCard::~ggCard()
 // Public methods
 //
 
-bool ggCard::BlitTo(wxDC* dest, wxCoord xdest, wxCoord ydest, int logicalFunc)
+bool ggCard::BlitTo(wxDC *dest, wxCoord xdest, wxCoord ydest, wxRasterOperationMode logicalFunc)
 {
 	wxMemoryDC mdc;
 

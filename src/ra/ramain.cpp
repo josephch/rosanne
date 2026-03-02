@@ -36,6 +36,8 @@
 #include "images/bid_history.xpm"
 #include "images/last_trick.xpm"
 
+sfmt_t raSmft;
+
 // Event table for raFrame
 BEGIN_EVENT_TABLE(raFrame, wxFrame)
 	EVT_MENU(raID_ABOUT, raFrame::OnAbout)
@@ -90,11 +92,11 @@ bool raApp::OnInit()
 
 	// Randomizing the PRNG
 
-	init_gen_rand(time(0));
-    wxLogMessage(wxT("SFMT PRNG initiated."));
-    wxLogMessage(wxString::Format(wxT("MEXP = %d"), MEXP));
-    wxLogMessage(wxString::Format(wxT("N32 = %d"), N32));
-    wxLogMessage(wxT(""));
+	sfmt_init_gen_rand(&raSmft, time(0));
+	wxLogMessage(wxT("SFMT PRNG initiated."));
+	wxLogMessage(wxString::Format(wxT("MEXP = %d"), SFMT_MEXP));
+	wxLogMessage(wxString::Format(wxT("N32 = %d"), SFMT_N32));
+	wxLogMessage(wxT(""));
 
 
 	//For usage of sockets or derived classes such as wxFTP in a secondary thread
@@ -522,17 +524,17 @@ raFrame::raFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title)
 		wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER|wxTB_FLAT);
 	tool_bar->SetToolBitmapSize(wxSize(16,16));
 
-	tool_bar->AddTool(raID_NEW_GAME, bmp_new_game, wxT("New Game"));
-	tool_bar->AddTool(raID_EXIT, bmp_exit, wxT("Exit"));
+	tool_bar->AddTool(raID_NEW_GAME, wxT("New Game"), bmp_new_game);
+	tool_bar->AddTool(raID_EXIT, wxT("Exit"), bmp_exit);
 	tool_bar->AddSeparator();
-	tool_bar->AddTool(raID_PREFERENCES, bmp_options, wxT("Preferences"));
-	tool_bar->AddTool(raID_RULES, bmp_rules, wxT("Rules"));
+	tool_bar->AddTool(raID_PREFERENCES, wxT("Preferences"), bmp_options);
+	tool_bar->AddTool(raID_RULES, wxT("Rules"), bmp_rules);
 	tool_bar->AddSeparator();
-	tool_bar->AddTool(raID_BID_HISTORY, bmp_bid_history, wxT("Auction"));
-	tool_bar->AddTool(raID_LAST_TRICK, bmp_last_trick, wxT("Last Trick"));
+	tool_bar->AddTool(raID_BID_HISTORY, wxT("Auction"), bmp_bid_history);
+	tool_bar->AddTool(raID_LAST_TRICK, wxT("Last Trick"), bmp_last_trick);
 	tool_bar->AddSeparator();
-	tool_bar->AddTool(wxID_ANY, bmp_help, wxT("Help"));
-	tool_bar->AddTool(raID_ABOUT, bmp_about, wxT("About"));
+	tool_bar->AddTool(wxID_ANY, wxT("Help"), bmp_help);
+	tool_bar->AddTool(raID_ABOUT, wxT("About"), bmp_about);
 	tool_bar->Realize();
 	this->SetToolBar(tool_bar);
 

@@ -160,7 +160,7 @@ static const uint32_t SL_SUIT_LEN_PROBS[] = {699230, 2632395, 3582982, 2262936, 
 
 aiSuitLengthSolver::aiSuitLengthSolver()
 {
-	return;
+    sfmt_init_gen_rand(&m_sfmt, time(0));
 }
 aiSuitLengthSolver::~aiSuitLengthSolver()
 {
@@ -227,13 +227,13 @@ bool aiSuitLengthSolver::SetProblem(slProblem *problem, slPlayed played)
 
     if(problem == NULL)
     {
-        ::wxLogError(wxString::Format(wxT("Input variable problem for aiSuitLengthSolver::SetProblem is NULL. %s:%d"),
+        wxLogError(wxString::Format(wxT("Input variable problem for aiSuitLengthSolver::SetProblem is NULL. %s:%d"),
                                     wxT(__FILE__), __LINE__));
         return false;
     }
     if(played == NULL)
     {
-        ::wxLogError(wxString::Format(wxT("Input variable played for aiSuitLengthSolver::SetProblem is NULL. %s:%d"),
+        wxLogError(wxString::Format(wxT("Input variable played for aiSuitLengthSolver::SetProblem is NULL. %s:%d"),
                                     wxT(__FILE__), __LINE__));
         return false;
     }
@@ -264,10 +264,10 @@ bool aiSuitLengthSolver::SetProblem(slProblem *problem, slPlayed played)
     {
         if((hand_total_played[i] + m_problem.hand_total_length[i]) != slLENGTH_MAX)
         {
-            ::wxLogError(wxString::Format(wxT("No of played cards and the cards to be set does not add up to slLENGTH_MAX for hand %d. %s:%d"),
+            wxLogError(wxString::Format(wxT("No of played cards and the cards to be set does not add up to slLENGTH_MAX for hand %d. %s:%d"),
                                         i, wxT(__FILE__), __LINE__));
-            ::wxLogError(wxString::Format(wxT("hand_total_played[%d] = %d"), i , hand_total_played[i]));
-            ::wxLogError(wxString::Format(wxT("m_problem.hand_total_length[%d] = %d"), i , m_problem.hand_total_length[i]));
+            wxLogError(wxString::Format(wxT("hand_total_played[%d] = %d"), i , hand_total_played[i]));
+            wxLogError(wxString::Format(wxT("m_problem.hand_total_length[%d] = %d"), i , m_problem.hand_total_length[i]));
             wxASSERT(false);
             return false;
         }
@@ -277,10 +277,10 @@ bool aiSuitLengthSolver::SetProblem(slProblem *problem, slPlayed played)
     {
         if((suit_total_played[i] + m_problem.suit_total_length[i]) != slLENGTH_MAX)
         {
-            ::wxLogError(wxString::Format(wxT("No of played cards and the cards to be set does not add up to slLENGTH_MAX for suit %d. %s:%d"),
+            wxLogError(wxString::Format(wxT("No of played cards and the cards to be set does not add up to slLENGTH_MAX for suit %d. %s:%d"),
                                         i, wxT(__FILE__), __LINE__));
-            ::wxLogError(wxString::Format(wxT("suit_total_played[%d] = %d"), i , suit_total_played[i]));
-            ::wxLogError(wxString::Format(wxT("m_problem.suit_total_length[%d] = %d"), i , m_problem.suit_total_length[i]));
+            wxLogError(wxString::Format(wxT("suit_total_played[%d] = %d"), i , suit_total_played[i]));
+            wxLogError(wxString::Format(wxT("m_problem.suit_total_length[%d] = %d"), i , m_problem.suit_total_length[i]));
             wxASSERT(false);
             return false;
         }
@@ -700,7 +700,7 @@ int aiSuitLengthSolver::GenerateRandomFill(int min, int max)
     }
 
 
-    rand_val = (gen_rand32() % (total + 1));
+    rand_val = (sfmt_genrand_uint32(&m_sfmt) % (total + 1));
 
 #ifdef slLOG_DEBUG_GENRANDFILL
     wxLogDebug(wxString::Format(wxT("min = %d"), min));
@@ -813,7 +813,7 @@ wxString aiSuitLengthSolver::PrintData(slData *data)
 	out.Append(wxT("\n"));
 	if(!data)
 	{
-		::wxLogError(wxString::Format(wxT("Input variable data is null. %s:%d"),
+		wxLogError(wxString::Format(wxT("Input variable data is null. %s:%d"),
 			wxT(__FILE__), __LINE__));
 		return out;
 	}
@@ -928,7 +928,7 @@ wxString aiSuitLengthSolver::PrintMatrix(slMatrix matrix)
 
 	if(!matrix)
 	{
-		::wxLogError(wxString::Format(wxT("Input variable matrix is null. %s:%d"),
+		wxLogError(wxString::Format(wxT("Input variable matrix is null. %s:%d"),
 			wxT(__FILE__), __LINE__));
 		return out;
 	}
