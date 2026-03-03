@@ -67,7 +67,7 @@ private:
 
 	void OnButtonClick(wxCommandEvent &event);
 public:
-	raBid(const wxWindow* parent);
+	raBid(wxWindow* parent);
 	~raBid();
 	bool SetGamePanel(raGamePanel *game_panel);
 	bool SetPassable(bool passable = true);

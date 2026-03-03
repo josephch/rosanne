@@ -22,7 +22,7 @@ BEGIN_EVENT_TABLE(raBid, wxPanel)
 	EVT_BUTTON(raBID_BTN_ID_PASS, raBid::OnButtonClick)
 END_EVENT_TABLE()
 
-raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
+raBid::raBid(wxWindow* parent): wxPanel(parent, wxID_ANY)
 {
 	int i = 0;
 	int j = 0;
@@ -40,6 +40,9 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	m_button_all = NULL;
 	m_button_pass = NULL;
 
+	// Use DC to measure text
+	wxClientDC dc(this);
+
 	// Calculate the best width for the buttons
 	// The best width should be able to contain all bids from 14
 	// to 28 and the strings "All" and "Pass"
@@ -47,14 +50,14 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	best_width = 0;
 	for(i = 0 ; i < raBID_TOTAL_BTNS; i++)
 	{
-		this->GetTextExtent(wxString::Format(wxT("%d"), i + 14),
+		dc.GetTextExtent(wxString::Format(wxT("%d"), i + 14),
 			&temp_width, &temp_height);
 		best_width = std::max(best_width, temp_width);
 	}
 
-	this->GetTextExtent(wxT("All"), &temp_width, &temp_height);
+	dc.GetTextExtent(wxT("All"), &temp_width, &temp_height);
 	best_width = std::max(best_width, temp_width);
-	this->GetTextExtent(wxT("Pass"), &temp_width, &temp_height);
+	dc.GetTextExtent(wxT("Pass"), &temp_width, &temp_height);
 	best_width = std::max(best_width, temp_width);
 
 	wxLogDebug(wxString::Format(wxT("Best width %d"), best_width));
@@ -75,7 +78,7 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 #endif
 
 	m_main_panel->SetBackgroundColour(*wxWHITE);
-	m_main_sizer = new wxGridSizer(0, 0, 0, 0);
+	m_main_sizer = new wxGridSizer(1, 1, 0, 0);
 
 
 	// TODO : Add error checks
@@ -90,13 +93,14 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	m_bold_font.SetWeight(wxFONTWEIGHT_BOLD);
 	m_head_panel->SetFont(m_bold_font);
 
-	m_head_panel_sizer = new wxGridSizer(0, 0, 0, 0);
-	m_head_panel_text = new wxStaticText(m_head_panel, -1, wxT("Enter Bid"));
+	m_head_panel_sizer = new wxGridSizer(1, 1, 0, 0);
+	m_head_panel_text = new wxStaticText(m_head_panel, wxID_ANY, wxT("Enter Bid"));
 	m_head_panel_sizer->Add(m_head_panel_text, 0,
 		wxALIGN_CENTER_HORIZONTAL| wxALIGN_CENTER_VERTICAL|wxALL, 2);
 
 	m_head_panel->SetSizer(m_head_panel_sizer);
 
+	// ===== Bid buttons grid =====
 	m_bidbtn_panel = new wxPanel(m_main_panel);
 	//m_bidbtn_panel->SetWindowStyle(wxSUNKEN_BORDER);
 	m_bidbtn_panel_sizer = new wxGridSizer(5, 3, 0, 0);
@@ -113,7 +117,10 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 				wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND|wxALL, 1);
 			//m_buttons[(i * raBID_BTN_COLS) + j]->SetSize(10, 20);
 			//m_buttons[(i * raBID_BTN_COLS) + j]->SetWindowStyle(wxNO_BORDER);
-			m_buttons[(i * raBID_BTN_COLS) + j]->SetEventHandler(this->GetEventHandler());
+
+			// Modern event binding
+			m_buttons[(i * raBID_BTN_COLS) + j]->Bind(wxEVT_BUTTON,
+								 &raBid::OnButtonClick, this);
 		}
 	}
 
@@ -134,8 +141,9 @@ raBid::raBid(const wxWindow* parent): wxPanel((wxWindow*)parent)
 	//m_button_all->SetWindowStyle(wxNO_BORDER);
 	//m_button_pass->SetWindowStyle(wxNO_BORDER);
 
-	m_button_all->SetEventHandler(this->GetEventHandler());
-	m_button_pass->SetEventHandler(this->GetEventHandler());
+	// Bind events
+	m_button_all->Bind(wxEVT_BUTTON, &raBid::OnButtonClick, this);
+	m_button_pass->Bind(wxEVT_BUTTON, &raBid::OnButtonClick, this);
 
 	m_btns_panel_sizer->Add(m_button_all, 0,
 		wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND|wxALL, 1);

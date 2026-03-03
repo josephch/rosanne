@@ -27,6 +27,7 @@
 #include "ra/radlgabout.h"
 #include "ra/radlgprefs.h"
 #include "ra/radlgrules.h"
+#include "wx/splitter.h"
 
 
 enum
