@@ -638,7 +638,6 @@ void raGamePanel::OnSize(wxSizeEvent& event)
 bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 {
 	int i, j, x, y, wt, ht, wb, hb;
-	wxMemoryDC mdc;
 	wxString loc_text;
 	int text_width, text_height;
 	int horz_pnl_relief = 0, vert_pnl_relief = 0;
@@ -656,6 +655,7 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 	// If there is a valid tile, draw the tile all over the place
 	if(m_tile)
 	{
+		wxMemoryDC mdc;
 		// Obtain the dimensions of the tile
 		wt = m_tile->GetWidth();
 		ht = m_tile->GetHeight();
@@ -694,7 +694,6 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 	for(i = 0; i < gmTOTAL_PLAYERS; i++)
 		m_hand_rects[i] = wxRect(0, 0, 0, 0);
 
-	mdc.SetFont(m_font_bold);
 	//
 	// Draw the location text at the bottom
 	//
@@ -702,7 +701,7 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 	i = (m_hand_rot * (gmTOTAL_PLAYERS - 1)) % 4;
 
 	loc_text = gmUtil::m_long_locs[i];
-	mdc.GetTextExtent(loc_text, &text_width, &text_height);
+	GetTextExtent(m_font_bold, loc_text, &text_width, &text_height);
 	x = (wb - text_width) / 2;
 	y = hb - text_height;
 	DrawTextOnBack(loc_text, wxPoint(x + 1, y + 1), *wxBLACK, m_font_bold);
@@ -717,7 +716,7 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 	i = ((m_hand_rot * (gmTOTAL_PLAYERS - 1)) + 1) % 4;
 
 	loc_text = gmUtil::m_long_locs[i];
-	mdc.GetTextExtent(loc_text, &text_width, &text_height);
+	GetTextExtent(m_font_bold, loc_text, &text_width, &text_height);
 	x = 0;
 	y = (hb - text_height) / 2;
 	DrawTextOnBack(loc_text, wxPoint(x + 1, y + 1), *wxBLACK, m_font_bold);
@@ -732,7 +731,7 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 	i = ((m_hand_rot * (gmTOTAL_PLAYERS - 1)) + 2) % 4;
 
 	loc_text = gmUtil::m_long_locs[i];
-	mdc.GetTextExtent(loc_text, &text_width, &text_height);
+	GetTextExtent(m_font_bold, loc_text, &text_width, &text_height);
 	x = (wb - text_width) / 2;
 	y = 0;
 	DrawTextOnBack(loc_text, wxPoint(x + 1, y + 1), *wxBLACK, m_font_bold);
@@ -747,7 +746,7 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 	i = ((m_hand_rot * (gmTOTAL_PLAYERS - 1)) + 3) % 4;
 
 	loc_text = gmUtil::m_long_locs[i];
-	mdc.GetTextExtent(loc_text, &text_width, &text_height);
+	GetTextExtent(m_font_bold, loc_text, &text_width, &text_height);
 	x = wb - text_width;
 	y = (hb - text_height) / 2;
 	DrawTextOnBack(loc_text, wxPoint(x + 1, y + 1), *wxBLACK, m_font_bold);
@@ -835,6 +834,7 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 		i = m_engine.GetTrickNextToPlay();
 		if(i != gmPLAYER_INVALID)
 		{
+			wxMemoryDC mdc;
 			switch(i)
 			{
 			case 0:
@@ -879,8 +879,7 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 
 	// Draw the text for the trump
 	loc_text = wxT("Trump");
-	mdc.GetTextExtent(loc_text, &text_width, &text_height);
-	mdc.GetTextExtent(loc_text, &text_width, &text_height);
+	GetTextExtent(m_font_bold, loc_text, &text_width, &text_height);
 	x = raCARD_PANEL_RELIEF + ((GG_CARD_WIDTH - text_width) / 2);
 	y = 0;
 	DrawTextOnBack(loc_text, wxPoint(x + 1, y + 1), *wxBLACK, m_font_bold);
@@ -904,10 +903,10 @@ bool raGamePanel::RedrawBack(raBackDrawInfo *info)
 
 				u = 0;
 				v = 0;
-
+				wxMemoryDC mdc;
 				mdc.SetFont(m_font_bold);
 
-				mdc.GetTextExtent(bubb_text, &u, &v);
+				GetTextExtent(m_font_bold, bubb_text, &u, &v);
 
 				// TODO : Remove hard coding of the relief
 

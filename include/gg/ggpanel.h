@@ -46,7 +46,12 @@ public:
 		wxCoord xsrcMask = -1, wxCoord ysrcMask = -1);
 	bool DrawTextOnBack(wxString text, wxPoint pt, wxColour colour = wxNullColour, wxFont font = wxNullFont);
 	bool ClearDifference();
-	//bool DrawBack();
+	// bool DrawBack();
+	void GetTextExtent(wxFont font, const wxString &string,
+					   wxCoord *x, wxCoord *y,
+					   wxCoord *descent = NULL,
+					   wxCoord *externalLeading = NULL,
+					   const wxFont *theFont = NULL);
 };
 
 #endif

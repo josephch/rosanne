@@ -253,3 +253,14 @@ bool ggPanel::ClearDifference()
 
 	return true;
 }
+
+void ggPanel::GetTextExtent(wxFont font, const wxString &string,
+							wxCoord *x, wxCoord *y,
+							wxCoord *descent,
+							wxCoord *externalLeading,
+							const wxFont *theFont)
+{
+	wxClientDC mdc(this);
+	mdc.SetFont(font);
+	mdc.GetTextExtent(string, x, y, descent, externalLeading, theFont);
+}
