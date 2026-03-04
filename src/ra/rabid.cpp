@@ -114,7 +114,7 @@ raBid::raBid(wxWindow* parent): wxPanel(parent, wxID_ANY)
 				wxString::Format(wxT("%d"), (i * raBID_BTN_COLS) + j + 14),
 				wxDefaultPosition, wxSize(best_width, -1));
 			m_bidbtn_panel_sizer->Add(m_buttons[(i * raBID_BTN_COLS) + j], 0,
-				wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND|wxALL, 1);
+				wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 1);
 			//m_buttons[(i * raBID_BTN_COLS) + j]->SetSize(10, 20);
 			//m_buttons[(i * raBID_BTN_COLS) + j]->SetWindowStyle(wxNO_BORDER);
 
@@ -146,9 +146,9 @@ raBid::raBid(wxWindow* parent): wxPanel(parent, wxID_ANY)
 	m_button_pass->Bind(wxEVT_BUTTON, &raBid::OnButtonClick, this);
 
 	m_btns_panel_sizer->Add(m_button_all, 0,
-		wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND|wxALL, 1);
+		wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 1);
 	m_btns_panel_sizer->Add(m_button_pass, 0,
-		wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND|wxALL, 1);
+		wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 1);
 
 	m_btns_panel->SetSizer(m_btns_panel_sizer);
 	m_btns_panel_sizer->Fit(m_btns_panel);
