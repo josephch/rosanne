@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="rosanne" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/rosanne" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="`wx-config --cflags`" />
+					<Add directory="include" />
+					<Add directory="SFMT" />
+				</Compiler>
+				<Linker>
+					<Add option="`wx-config --libs`" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="SFMT/SFMT-params.h" />
+		<Unit filename="SFMT/SFMT.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="SFMT/SFMT.h" />
+		<Unit filename="include/ai/aiagent.h" />
+		<Unit filename="include/ai/aisuitlengthsolver.h" />
+		<Unit filename="include/gg/ggcard.h" />
+		<Unit filename="include/gg/ggpanel.h" />
+		<Unit filename="include/gm/gmengine.h" />
+		<Unit filename="include/gm/gmrand.h" />
+		<Unit filename="include/gm/gmutil.h" />
+		<Unit filename="include/ra/ra.h" />
+		<Unit filename="include/ra/rabid.h" />
+		<Unit filename="include/ra/racommon.h" />
+		<Unit filename="include/ra/raconfig.h" />
+		<Unit filename="include/ra/radlgabout.h" />
+		<Unit filename="include/ra/radlgprefs.h" />
+		<Unit filename="include/ra/radlgrules.h" />
+		<Unit filename="include/ra/raevents.h" />
+		<Unit filename="include/ra/ragamepanel.h" />
+		<Unit filename="include/ra/rainfo.h" />
+		<Unit filename="include/ra/ramain.h" />
+		<Unit filename="include/ra/raplayer.h" />
+		<Unit filename="include/ra/raupdate.h" />
+		<Unit filename="src/ai/aiagent.cpp" />
+		<Unit filename="src/ai/aisuitlengthsolver.cpp" />
+		<Unit filename="src/gg/ggcard.cpp" />
+		<Unit filename="src/gg/ggpanel.cpp" />
+		<Unit filename="src/gm/gmengine.cpp" />
+		<Unit filename="src/gm/gmrand.cpp" />
+		<Unit filename="src/gm/gmutil.cpp" />
+		<Unit filename="src/ra/rabid.cpp" />
+		<Unit filename="src/ra/raconfig.cpp" />
+		<Unit filename="src/ra/radlgabout.cpp" />
+		<Unit filename="src/ra/radlgprefs.cpp" />
+		<Unit filename="src/ra/radlgrules.cpp" />
+		<Unit filename="src/ra/raevents.cpp" />
+		<Unit filename="src/ra/ragamepanel.cpp" />
+		<Unit filename="src/ra/rainfo.cpp" />
+		<Unit filename="src/ra/ramain.cpp" />
+		<Unit filename="src/ra/raplayer.cpp" />
+		<Unit filename="src/ra/raupdate.cpp" />
+		<Unit filename="xrs/cards/cards.xrc" />
+		<Unit filename="xrs/gui/gui.xrc" />
+		<Extensions />
+	</Project>
+</CodeBlocks_project_file>
