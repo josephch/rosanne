@@ -45,6 +45,14 @@ bool ggPanel::Size()
 
 	GetClientSize(&x, &y);
 
+	wxLogInfo("ggPanel::Size: x %d y %d\n", x, y);
+
+	if(!x || !y)
+	{
+		wxLogError("return as invalid size\n");
+		return false;
+	}
+
 	if(m_work)
 		delete m_work;
 
