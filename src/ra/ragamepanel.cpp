@@ -17,7 +17,9 @@
 
 #include "ra/ragamepanel.h"
 #include "wx/sstream.h"
+#ifdef raREAD_SEED_FROM_FILE
 #include "gm/gmrand.h"
+#endif
 
 #include "images/red_arrow_top.xpm"
 #include "images/red_arrow_bottom.xpm"
@@ -448,6 +450,8 @@ bool raGamePanel::NewDeal()
             gmRand::SetState(&rand_state);
         }
 	}
+
+	wxLogMessage(gmRand::PrintState());
 #endif
 
 #ifdef raREAD_DEALER_FROM_FILE
@@ -483,9 +487,6 @@ bool raGamePanel::NewDeal()
 		}
 	}
 #endif
-
-	wxLogMessage(gmRand::PrintState());
-
 
 	// Save the dealer information lest it gets reset
 	// while resetting the rule engine
