@@ -60,6 +60,7 @@ bool raApp::OnInit()
 {
 	raConfig *config;
 	raConfData conf_data;
+#ifdef LOG_TO_FILE
 	wxString log_file = raApp::GenerateLogFileName();
 
 	// Open the log file for writing
@@ -79,7 +80,12 @@ bool raApp::OnInit()
 
 	wxLog::SetActiveTarget(m_logger);
 	wxLogDebug(wxT("Logging opened."));
-
+#else
+	wxLog *logger = new wxLogStream(&std::cout);
+	m_old_logger = wxLog::GetActiveTarget();
+	wxLog::SetActiveTarget(logger);
+#endif
+	wxLogDebug(wxT("Logging opened."));
 	// Log details such as operating system, architecture etc which if required can be used later on
 	// for debugging
 
@@ -199,7 +205,9 @@ int raApp::OnExit()
 
 	wxLog::SetActiveTarget(m_old_logger);
 	delete m_logger;
+#ifdef LOG_TO_FILE
 	fclose(m_logfile);
+#endif
 
 	return 0;
 }
