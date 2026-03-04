@@ -143,7 +143,7 @@ wxString gmUtil::PrintLong(unsigned long cards)
 	//wxLogDebug(wxString::Format("%s%s", m_suits[highest / 8], m_values[highest % 8]));
 	for(i = 0; i < 32; i++)
 	{
-		if(cards & (1 << i))
+		if(cards & (1u << i))
 			out = out + m_suits[i / 8] + m_values[i % 8] + _(",");
 	}
 	if(!out.IsEmpty())
@@ -174,7 +174,7 @@ wxString gmUtil::PrintHands(unsigned long *hands)
 		out = wxString::Format(wxT("%s - "), m_suits[i].c_str());
 		for(j = 7; j >= 0; j--)
 		{
-			if(temp & (1 << j))
+			if(temp & (1u << j))
 				out = out + m_values[j % 8] + _(",");
 		}
 
@@ -196,7 +196,7 @@ wxString gmUtil::PrintHands(unsigned long *hands)
 		//for(j = 0; j < 8; j++)
 		for(j = 7; j >= 0; j--)
 		{
-			if(temp & (1 << j))
+			if(temp & (1u << j))
 				out = out + m_values[j % 8] + _(",");
 		}
 
@@ -207,7 +207,7 @@ wxString gmUtil::PrintHands(unsigned long *hands)
 		//for(j = 0; j < 8; j++)
 		for(j = 7; j >= 0; j--)
 		{
-			if(temp & (1 << j))
+			if(temp & (1u << j))
 				out = out + m_values[j % 8] + _(",");
 		}
 
@@ -230,7 +230,7 @@ wxString gmUtil::PrintHands(unsigned long *hands)
 		//for(j = 0; j < 8; j++)
 		for(j = 7; j >= 0; j--)
 		{
-			if(temp & (1 << j))
+			if(temp & (1u << j))
 				out = out + m_values[j % 8] + _(",");
 		}
 
