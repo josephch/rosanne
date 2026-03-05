@@ -45,11 +45,11 @@ bool ggPanel::Size()
 
 	GetClientSize(&x, &y);
 
-	wxLogInfo("ggPanel::Size: x %d y %d\n", x, y);
+	wxLogInfo("ggPanel::%s:%d x %d y %d\n", __FUNCTION__, __LINE__, x, y);
 
 	if(!x || !y)
 	{
-		wxLogError("return as invalid size\n");
+		wxLogError("ggPanel::%s:%d return as invalid size x %d y %d\n", __FUNCTION__, __LINE__, x, y);
 		return false;
 	}
 
