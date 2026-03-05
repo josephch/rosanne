@@ -2446,6 +2446,7 @@ bool raGamePanel::UpdateDrawAndRefresh(bool update, raBackDrawInfo *info)
 		wxLogError(wxString::Format(wxT("RefreshScreen failed. %s:%d"), wxT(__FILE__), __LINE__));
 		return false;
 	}
+	this->Refresh();
 	this->Update();
 	return true;
 }
