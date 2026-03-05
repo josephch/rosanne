@@ -172,6 +172,7 @@ bool raApp::OnInit()
 }
 int raApp::OnRun()
 {
+#ifdef ROSANNE_ENABLE_UPDATE
 	// Check for updates
 	m_update = NULL;
 	m_update = new raUpdate();
@@ -186,7 +187,7 @@ int raApp::OnRun()
 		wxMessageBox(wxT("Failed to create the thread which checks for updates!"));
 	}
 	m_update->Run();
-
+#endif
 	wxApp::OnRun();
 	return 0;
 }

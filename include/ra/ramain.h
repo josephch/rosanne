@@ -60,7 +60,9 @@ private:
 	FILE *m_logfile;
 	wxLogStderr *m_logger;
 	wxLog *m_old_logger;
+#ifdef ROSANNE_ENABLE_UPDATE
 	raUpdate *m_update;
+#endif
 	raFrame *m_frame;
 	// Disallow copy constructor/assignment operators
 	//raApp(const raApp &);
