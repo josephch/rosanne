@@ -169,8 +169,6 @@ raBid::raBid(wxWindow* parent): wxPanel(parent, wxID_ANY)
 	this->SetSizer(m_main_sizer);
 	m_main_sizer->Fit(this);
 
-	this->GetEventHandler()->Connect(raBID_BTN_ID_START, raBID_BTN_ID_START + raBID_TOTAL_BTNS - 1,
-		wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(raBid::OnButtonClick));
 }
 
 raBid::~raBid()
