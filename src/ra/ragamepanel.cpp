@@ -2712,7 +2712,6 @@ bool raGamePanel::OnCardClick(wxPoint pt)
 	int ret_val;
 	int card;
 	int loc;
-	int status;
 	//unsigned long hands[gmTOTAL_PLAYERS];
 	//unsigned long opp_hands;
 	//int i;
@@ -2731,9 +2730,6 @@ bool raGamePanel::OnCardClick(wxPoint pt)
 					wxT(__FILE__), __LINE__));
 				return false;
 			}
-
-			// Save the status of the rule engine
-			status = m_engine.GetStatus();
 
 			// Obtain the hand inside which the click was received
 			loc = GetHandAtPos(pt);

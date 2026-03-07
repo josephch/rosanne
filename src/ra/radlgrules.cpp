@@ -46,8 +46,8 @@ raDlgRules::raDlgRules( )
 raDlgRules::raDlgRules( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
 	SetParent(parent);
-    if (!wxXmlResource::Get()->LoadDialog(this, GetParent(), _T("raDlgRules")))
-        wxLogError(wxT("Missing wxXmlResource::Get()->Load() in OnInit()?"));
+	if(!wxXmlResource::Get()->LoadDialog(this, GetParent(), _T("raDlgRules")))
+		wxLogError(wxT("Missing wxXmlResource::Get()->Load() in OnInit()?"));
 	if (GetSizer())
 	{
 		GetSizer()->SetSizeHints(this);

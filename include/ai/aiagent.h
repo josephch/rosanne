@@ -85,7 +85,7 @@ public:
 	int GetPlay(unsigned long mask);
 	bool GenerateSLProblem(gmEngineData *data, slProblem *problem, slPlayed played, int trump, bool *add_trump);
 	//bool GenerateSLSolution(slProblem *problem, slSolution *solution);
-	bool GenerateDeals(gmEngineData *data, unsigned long **deals, int count, int trump = gmSUIT_INVALID);
+	bool GenerateDeals(gmEngineData *data, unsigned long deals[][gmTOTAL_PLAYERS], int count, int trump = gmSUIT_INVALID);
 	static wxString PrintMoves(aiMove *moves, int move_count);
 	bool PostPlayUpdate(gmEngineData *data, int card = gmCARD_INVALID);
 	bool CheckAssumptions(gmEngineData *data);

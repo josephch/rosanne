@@ -47,7 +47,7 @@ bool aiAgent::GetBid(unsigned long cards, int *bid, int *trump, int min, bool fo
 {
 	int i, k;
 	int initial;
-	int *undealt;
+	int undealt[32];
 	int eval[2];
 	int trump_count;		// Counter, used to loop through different trump options
 	int sample;				// Counter, used to loop though different samples
@@ -74,8 +74,6 @@ bool aiAgent::GetBid(unsigned long cards, int *bid, int *trump, int min, bool fo
 #ifdef raAI_LOG_GETBID
 	wxLogDebug(wxString::Format("initial is %d", initial));
 #endif
-	undealt = new int[32 - initial];
-
 	//
 	//Dealing the rest of the cards
 	//
@@ -185,8 +183,6 @@ bool aiAgent::GetBid(unsigned long cards, int *bid, int *trump, int min, bool fo
 	/*for(i = 0; i < 4; i++)
 	delete data[i];
 	delete data;*/
-
-	delete undealt;
 
 	// If the suggested bid is less than
 	// the minimum bid suggested, return pass
@@ -326,7 +322,7 @@ int aiAgent::GetPlay(unsigned long mask)
 	gmEngine rule_engine;
 	//slProblem problem;
 	//slSolution solution;
-	unsigned long **deal_hands = NULL;
+	unsigned long deal_hands[30][gmTOTAL_PLAYERS];
 	int i, j, k;
 	aiEval evals[gmTOTAL_VALUES];
 	//aiEval evals_trump[gmTOTAL_SUITS][gmTOTAL_VALUES];
@@ -370,26 +366,7 @@ int aiAgent::GetPlay(unsigned long mask)
 	//if((data.trump_shown) || (gmUtil::CountBitsSet(m_trump_cards) == 1))
 	//	trump_known = true;
 
-	// Create the array to hold the random deals
-	deal_hands = new unsigned long *[30];
-	if(!deal_hands)
-	{
-		wxLogError(wxString::Format(wxT("Memory allocation failed. %s:%d"),
-			wxT(__FILE__), __LINE__));
-		return -2;
-	}
 	memset(deal_hands, 0, sizeof(deal_hands));
-	for(i = 0; i < 30; i++)
-	{
-		deal_hands[i] = new unsigned long[gmTOTAL_PLAYERS];
-		if(!deal_hands[i])
-		{
-			wxLogError(wxString::Format(wxT("Memory allocation failed. %s:%d"),
-				wxT(__FILE__), __LINE__));
-			return -2;
-		}
-		memset(deal_hands[i], 0, sizeof(unsigned long));
-	}
 
 	//
 	// Generate deals and moves, play each and find the best move
@@ -842,15 +819,6 @@ int aiAgent::GetPlay(unsigned long mask)
 
 	}
 
-	// Free the memory allocated to hold the random deals
-	for(i = 0; i < 30; i++)
-	{
-		delete[] deal_hands[i];
-		deal_hands[i] = NULL;
-	}
-	delete[] deal_hands;
-	deal_hands = NULL;
-
 	wxASSERT((best_play == -1) || ((best_play > gmCARD_INVALID) && (best_play < gmTOTAL_CARDS)));
 
 #ifdef raAI_LOG_GET_PLAY
@@ -1046,7 +1014,7 @@ bool aiAgent::GenerateSLProblem(gmEngineData *data, slProblem *problem, slPlayed
 //
 //	return true;
 //}
-bool aiAgent::GenerateDeals(gmEngineData *data, unsigned long **deals, int count, int trump)
+bool aiAgent::GenerateDeals(gmEngineData *data, unsigned long deals[][gmTOTAL_PLAYERS], int count, int trump)
 {
 	int i, j, k, l;
 	slProblem problem;

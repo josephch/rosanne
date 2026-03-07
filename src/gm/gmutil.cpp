@@ -319,8 +319,8 @@ unsigned long gmUtil::CountBitsSet(unsigned long v)
 
 unsigned long gmUtil::HighestBitSet(unsigned long v)
 {
-	register unsigned long t, tt; // temporaries
-	if (tt = v >> 16)
+	unsigned long t, tt; // temporaries
+	if((tt = (v >> 16)))
 	{
 		return (t = v >> 24) ? 24 + LogTable256[t] : 16 + LogTable256[tt & 0xFF];
 	}
