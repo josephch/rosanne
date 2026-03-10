@@ -36,7 +36,6 @@ wxrc cards.xrc -o cards.xrs
 
 ```
 cd include/images
-cp main_icon_16.xpm main_icon_32.xpm
 cp ../../xrs/gui/gui.xrc .
 wxrc gui.xrc -o gui.xrs
 ```
