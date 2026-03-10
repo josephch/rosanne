@@ -155,6 +155,8 @@ private:
 	// Saved auction history
 	wxString m_bid_history;
 
+	int m_ai_delay{0};
+
 	// Bitmaps to be loaded from xpms
 
 	wxBitmap *m_bmp_green_arrow_bottom;

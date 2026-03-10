@@ -546,6 +546,7 @@ bool raGamePanel::ReloadFromConfig()
 	m_play_card_on = conf_data.prefs_data.play_card_on;
 	m_auto_play =conf_data.prefs_data.auto_play_single;
 	m_show_bidbubbles = conf_data.prefs_data.show_bid_bubbles;
+	m_ai_delay = conf_data.prefs_data.ai_delay;
 
 	UpdateDrawAndRefresh();
 
@@ -1902,6 +1903,7 @@ bool raGamePanel::Continue()
 				{
 					m_info->SetInstruction(wxString::Format(wxT("%s is thinking..."),
 						gmUtil::m_long_locs[in_trick_info.player].c_str()));
+					wxMilliSleep(m_ai_delay);
 
 					// Begin the busy state
 					if(!::wxIsBusy())

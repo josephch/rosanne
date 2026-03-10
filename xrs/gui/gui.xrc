@@ -334,6 +334,45 @@
 					</object>
 				</object>
 			</object>
+			<object class="sizeritem">  
+				<option>0</option>  
+				<flag>wxALL|wxEXPAND</flag>  
+				<border>5</border>  
+				<object class="wxStaticBoxSizer">  
+					<orient>wxVERTICAL</orient>  
+					<label>AI Player</label>  
+					<object class="sizeritem">  
+						<option>1</option>  
+						<flag>wxEXPAND</flag>  
+						<border>5</border>  
+						<object class="wxBoxSizer">  
+							<orient>wxHORIZONTAL</orient>  
+							<object class="sizeritem">  
+								<option>0</option>  
+								<flag>wxALL</flag>  
+								<border>5</border>  
+								<object class="wxStaticText" name="m_staticText_aidelay">  
+									<label>Delay between moves : </label>  
+								</object>  
+							</object>  
+							<object class="sizeritem">  
+								<option>0</option>  
+								<flag>wxALL</flag>  
+								<border>5</border>  
+								<object class="wxComboBox" name="m_radlgprefs_aidelay">  
+									<value>None</value>  
+									<content>  
+										<item>None</item>  
+										<item>Short (0.5s)</item>  
+										<item>Medium (1s)</item>  
+										<item>Long (2s)</item>  
+									</content>  
+								</object>  
+							</object>  
+						</object>  
+					</object>  
+				</object>  
+			</object>
 			<object class="sizeritem">
 				<option>0</option>
 				<flag>wxALIGN_RIGHT</flag>

@@ -44,6 +44,11 @@ raDlgPrefs::raDlgPrefs( )
 {
 }
 
+#define raPREFS_AI_DELAY_NONE 0
+#define raPREFS_AI_DELAY_SHORT 1
+#define raPREFS_AI_DELAY_MEDIUM 2
+#define raPREFS_AI_DELAY_LONG 3
+
 raDlgPrefs::raDlgPrefs( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
     SetParent(parent);
@@ -100,7 +105,27 @@ void raDlgPrefs::OnInitDialog( wxInitDialogEvent& event )
 	check_bidbubbles = XRCCTRL(*this, "m_radlgprefs_showbidbubb", wxCheckBox);
 	check_bidbubbles->SetValue(conf_data.prefs_data.show_bid_bubbles);
 
-    event.Skip();
+	wxComboBox *combo_aidelay;
+	combo_aidelay = XRCCTRL(*this, "m_radlgprefs_aidelay", wxComboBox);
+	switch(conf_data.prefs_data.ai_delay)
+	{
+	case raCONFIG_PREFS_AI_DELAY_NONE:
+		combo_aidelay->SetSelection(raPREFS_AI_DELAY_NONE);
+		break;
+	case raCONFIG_PREFS_AI_DELAY_SHORT:
+		combo_aidelay->SetSelection(raPREFS_AI_DELAY_SHORT);
+		break;
+	case raCONFIG_PREFS_AI_DELAY_MEDIUM:
+		combo_aidelay->SetSelection(raPREFS_AI_DELAY_MEDIUM);
+		break;
+	case raCONFIG_PREFS_AI_DELAY_LONG:
+		combo_aidelay->SetSelection(raPREFS_AI_DELAY_LONG);
+		break;
+	default:
+		wxLogError(wxString::Format(wxT("Unexpected value. %s:%d"), wxT(__FILE__), __LINE__));
+		break;
+	}
+	event.Skip();
 }
 
 void raDlgPrefs::OnPrefsBtnApplyClick( wxCommandEvent& event )
@@ -144,6 +169,27 @@ void raDlgPrefs::OnPrefsBtnApplyClick( wxCommandEvent& event )
 	new_conf.prefs_data.auto_play_single = check_autoplay->GetValue();
 	check_bidbubbles = XRCCTRL(*this, "m_radlgprefs_showbidbubb", wxCheckBox);
 	new_conf.prefs_data.show_bid_bubbles = check_bidbubbles->GetValue();
+
+	wxComboBox *combo_aidelay;
+	combo_aidelay = XRCCTRL(*this, "m_radlgprefs_aidelay", wxComboBox);
+	switch(combo_aidelay->GetSelection())
+	{
+	case raPREFS_AI_DELAY_NONE:
+		new_conf.prefs_data.ai_delay = raCONFIG_PREFS_AI_DELAY_NONE;
+		break;
+	case raPREFS_AI_DELAY_SHORT:
+		new_conf.prefs_data.ai_delay = raCONFIG_PREFS_AI_DELAY_SHORT;
+		break;
+	case raPREFS_AI_DELAY_MEDIUM:
+		new_conf.prefs_data.ai_delay = raCONFIG_PREFS_AI_DELAY_MEDIUM;
+		break;
+	case raPREFS_AI_DELAY_LONG:
+		new_conf.prefs_data.ai_delay = raCONFIG_PREFS_AI_DELAY_LONG;
+		break;
+	default:
+		wxLogError(wxString::Format(wxT("Unexpected value. %s:%d %d"), wxT(__FILE__), __LINE__, combo_aidelay->GetSelection()));
+		break;
+	}
 
 	raConfig::GetInstance()->SetData(&new_conf);
     event.Skip();

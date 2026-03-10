@@ -35,11 +35,17 @@
 #define raCONFPATH_PREFS_CARDBACK wxT("preferences/cardback")
 #define raCONFPATH_PREFS_AUTOPLAYSINGLE wxT("preferences/autoplaysingle")
 #define raCONFPATH_PREFS_BIDBUBBLES wxT("preferences/bidbubbles")
+#define raCONFPATH_PREFS_AIDELAY wxT("preferences/aidelay")
 
 #define raCONFIG_PREFS_PLAYCARDON_SCLICK 0
 #define raCONFIG_PREFS_PLAYCARDON_DCLICK 1
 #define raCONFIG_PREFS_CARDBACK_BLUE 0
 #define raCONFIG_PREFS_CARDBACK_RED 1
+
+#define raCONFIG_PREFS_AI_DELAY_NONE 0
+#define raCONFIG_PREFS_AI_DELAY_SHORT 500
+#define raCONFIG_PREFS_AI_DELAY_MEDIUM 1000
+#define raCONFIG_PREFS_AI_DELAY_LONG 2000
 
 typedef struct tag_RA_CONF_APP_DATA
 {
@@ -64,6 +70,7 @@ typedef struct tag_RA_CONF_PREFS_DATA
 	int card_back;
 	bool auto_play_single;
 	bool show_bid_bubbles;
+	int ai_delay;
 } raConfPrefsData;
 
 typedef struct tag_RA_CONF_DATA
