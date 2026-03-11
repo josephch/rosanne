@@ -266,7 +266,10 @@
 								<border>5</border>
 								<object class="wxComboBox" name="m_radlgprefs_playcardon">
 									<value>Single-click</value>
-									<content />
+									<content>
+										<item>Single-click</item>
+										<item>Double-click</item>
+									</content>
 								</object>
 							</object>
 						</object>
@@ -327,7 +330,10 @@
 								<border>5</border>
 								<object class="wxComboBox" name="m_radlgprefs_cardback">
 									<value>Blue</value>
-									<content />
+									<content>
+										<item>Blue</item>
+										<item>Red</item>
+									</content>
 								</object>
 							</object>
 						</object>
