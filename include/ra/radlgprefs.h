@@ -21,6 +21,7 @@
 //#pragma interface "radlgprefs.h"
 //#endif
 
+#include "wx/dialog.h"
 #include "wx/xrc/xmlres.h"
 
 #define raPREFS_PLAYCARDON_SCLICK 0

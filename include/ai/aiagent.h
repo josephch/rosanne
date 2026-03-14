@@ -22,7 +22,6 @@
 #include "ai/aisuitlengthsolver.h"
 #include "gm/gmutil.h"
 
-#define aiBID_SAMPLE 100
 #define aiPLAY_SAMPLES 30
 #define aiMAX_MOVES 20
 #define aiGENMV_NOTRUMP 1
@@ -61,8 +60,6 @@ private:
 	unsigned long m_notrump_suspects;
 	unsigned long m_nulls[gmTOTAL_PLAYERS];
 	unsigned long m_mb_null_susp;
-	bool EstimateTricks(unsigned long *p_hands, int trump, int *eval);
-	bool EstimatePoints(unsigned long *hands, int trump, int trick_count, int *eval);
 	bool GenerateMoves(gmEngine *node, aiMove *moves, int *count, int type = aiGENMV_ALL);
 	bool OrderMoves(gmEngine *node, aiMove *moves, int count);
 	bool RankMove(gmEngineData *data, aiMove *move);

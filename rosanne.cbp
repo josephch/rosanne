@@ -52,6 +52,8 @@
 		<Unit filename="include/ra/raplayer.h" />
 		<Unit filename="include/ra/raupdate.h" />
 		<Unit filename="src/ai/aiagent.cpp" />
+		<Unit filename="src/ai/aibid.cpp" />
+		<Unit filename="src/ai/aibid.h" />
 		<Unit filename="src/ai/aisuitlengthsolver.cpp" />
 		<Unit filename="src/gg/ggcard.cpp" />
 		<Unit filename="src/gg/ggpanel.cpp" />

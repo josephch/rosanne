@@ -63,18 +63,6 @@ enum{
 	raGAME_ORIENT_MIXED
 };
 
-// TODO : If raHandCard is no longer used, remove
-typedef struct tagRA_HAND_CARD
-{
-	//int suit;
-	//int value;
-	int index;
-	int x;
-	int y;
-	int width;
-	int height;
-}raHandCard, *praHandCard;
-
 typedef struct tagRA_HAND
 {
 	unsigned long cards;
