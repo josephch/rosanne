@@ -209,6 +209,9 @@ bool aiBid_GetBid(unsigned long cards, int *bid, int *trump, int min, bool force
 	//Dealing the rest of the cards
 	//
 
+	sfmt_t sfmt;
+	sfmt_init_gen_rand(&sfmt, time(0));
+
 	for(sample = 0; sample < aiBID_SAMPLE; sample++)
 	{
 		// Get the rest of the cards into undealt
@@ -218,7 +221,7 @@ bool aiBid_GetBid(unsigned long cards, int *bid, int *trump, int min, bool force
 				undealt[k++] = i;
 
 		//Shuffle the undealt
-		gmUtil::ShuffleArray(undealt, 32 - initial);
+		gmUtil::ShuffleArray(undealt, 32 - initial, &sfmt);
 
 		//Initialize the hands
 		memset(hands, 0, sizeof(hands));

@@ -28,6 +28,8 @@
 #include "wx/wx.h"
 #endif
 
+#include "SFMT.h"
+
 #define SPACES20 _("                    ")
 
 #define gmTOTAL_CARDS 32
@@ -58,6 +60,7 @@ class gmUtil
 public:
 	static int m_value_trans[];
 	static void ShuffleArray(int *array, unsigned long n);
+	static void ShuffleArray(int *array, unsigned long n, sfmt_t *sfmt);
 	static wxString PrintLong(unsigned long cards);
 	static wxString PrintHands(unsigned long *hands);
 	static wxString m_suits[];

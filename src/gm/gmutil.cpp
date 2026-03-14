@@ -120,11 +120,16 @@ void gmUtil::ShuffleArray(int *array, unsigned long n)
 {
 	sfmt_t sfmt;
 	sfmt_init_gen_rand(&sfmt, time(0));
+	ShuffleArray(array, n, &sfmt);
+}
+
+void gmUtil::ShuffleArray(int *array, unsigned long n, sfmt_t *sfmt)
+{
 	if (n > 1) {
-		unsigned long i;
-		for (i = n - 1; i >= 1; i--) {
-		    // TODO : Non linear distribution. To be corrected.
-			unsigned long j = ((unsigned long)sfmt_genrand_uint32(&sfmt)) % (i + 1);
+		for(size_t i = n - 1; i >= 1; i--)
+		{
+			// TODO : Non linear distribution. To be corrected.
+			size_t j = ((size_t)sfmt_genrand_uint32(sfmt)) % (i + 1);
 			int t = array[j];
 			array[j] = array[i];
 			array[i] = t;
