@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="rosanne-unittests" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/ai-rosanne" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="`wx-config --cflags`" />
+					<Add option="-DSFMT_MEXP=19937" />
+					<Add directory="include" />
+					<Add directory="SFMT" />
+				</Compiler>
+				<Linker>
+					<Add option="`wx-config --libs`" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="SFMT/SFMT-params.h" />
+		<Unit filename="SFMT/SFMT.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="SFMT/SFMT.h" />
+		<Unit filename="src/ai/aibid.cpp" />
+		<Unit filename="src/ai/aibid.h" />
+		<Unit filename="src/ai/aitest.cpp" />
+		<Unit filename="src/gm/gmutil.cpp" />
+		<Extensions />
+	</Project>
+</CodeBlocks_project_file>
