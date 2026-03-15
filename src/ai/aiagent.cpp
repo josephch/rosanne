@@ -104,7 +104,7 @@ bool aiAgent::SetRuleEngineData(gmEngineData *data)
 int aiAgent::GetTrump()
 {
 	int bid;
-	int trump;
+	int trump = gmCARD_INVALID;
 	unsigned long hands[gmTOTAL_PLAYERS];
 	//int ret_val = gmCARD_INVALID;
 
@@ -370,7 +370,6 @@ int aiAgent::GetPlay(unsigned long mask)
 		gmUtil::SetStatusText(wxT(""), raSBARPOS_GEN);
 
 		best_eval = (double)aiNEG_INFTY;
-		best_eval_trump = (double)aiNEG_INFTY;
 		best_play = gmCARD_INVALID;
 		//best_play_trump = gmCARD_INVALID;
 
@@ -611,7 +610,6 @@ int aiAgent::GetPlay(unsigned long mask)
 		gmUtil::SetStatusText(wxT(""), raSBARPOS_GEN);
 
 		best_eval = (double)aiNEG_INFTY;
-		best_eval_trump = (double)aiNEG_INFTY;
 		best_play = gmCARD_INVALID;
 		//best_play_trump = gmCARD_INVALID;
 #ifdef raAI_LOG_GET_PLAY
@@ -2140,7 +2138,6 @@ bool aiAgent::MakeMoveAndEval(gmEngine *node, aiMove *move, int depth, int *eval
 	}
 
 	eval_ret = false;
-	temp = aiNEG_INFTY;
 	temp = Evaluate(node, aiNEG_INFTY, aiPOS_INFTY, depth, &eval_ret);
 	wxASSERT(temp != aiNEG_INFTY);
 	if(!eval_ret)

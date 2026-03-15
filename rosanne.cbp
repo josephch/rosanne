@@ -38,7 +38,6 @@
 		<Unit filename="include/gm/gmengine.h" />
 		<Unit filename="include/gm/gmrand.h" />
 		<Unit filename="include/gm/gmutil.h" />
-		<Unit filename="include/ra/ra.h" />
 		<Unit filename="include/ra/rabid.h" />
 		<Unit filename="include/ra/racommon.h" />
 		<Unit filename="include/ra/raconfig.h" />

@@ -186,15 +186,7 @@ bool aiBid_GetBid(unsigned long cards, int *bid, int *trump, int min, bool force
 	unsigned long hands[4];
 	int temp_trump;
 
-	//raAIGameState state;
-
-	//data = new int[4][29];
-	/*for(i = 0; i < 4; i++)
-	{
-	data[i] = new int[aiBID_SAMPLE];
-	memset(data[i], 0, aiBID_SAMPLE * sizeof(int));
-	}*/
-	memset(data, 0, 4 * 29 * sizeof(int));
+	memset(data, 0, sizeof(data));
 
 #ifdef raAI_LOG_GETBID
 	wxLogDebug(gmUtil::PrintLong(cards));
@@ -237,7 +229,7 @@ bool aiBid_GetBid(unsigned long cards, int *bid, int *trump, int min, bool force
 			hands[i / 8] |= 1u << undealt[k++];
 
 #ifdef raAI_LOG_GETBID
-		wxLogDebug("#############################");
+		wxLogDebug("##############sample %d###############", sample);
 		wxLogDebug(gmUtil::PrintHands(hands));
 #endif
 
@@ -294,17 +286,20 @@ bool aiBid_GetBid(unsigned long cards, int *bid, int *trump, int min, bool force
 	// figuring out which is the best bid
 	*bid = 0;
 	*trump = -1;
-	for(i = 0; i < 4; i++)
+	for(size_t suit = 0; suit < 4; suit++)
 	{
 		sample = 0;
 		for(k = 28; k >= 0; k--)
 		{
-			sample += data[i][k];
+			sample += data[suit][k];
 			// TODO : 70 might be an aggressive value fix it accordingly
 			if((((double)(sample) / aiBID_SAMPLE) >= 0.67) && (k > *bid))
 			{
 				*bid = k;
-				*trump = i;
+				*trump = suit;
+#ifdef raAI_LOG_GETBID
+				fprintf(stderr, "####%s:%d update bid %d trump %s (%zu)\n", __FUNCTION__, __LINE__, *bid, gmUtil::m_suits[suit].ToUTF8().data(), suit);
+#endif
 			}
 		}
 	}
@@ -331,5 +326,8 @@ bool aiBid_GetBid(unsigned long cards, int *bid, int *trump, int min, bool force
 			*trump = -1;
 		}
 	}
+#ifdef raAI_LOG_GETBID
+	fprintf(stderr, "####%s:%d cards 0x%lx [%s] bid %d trump %s\n", __FUNCTION__, __LINE__, cards, gmUtil::PrintLong(cards).ToUTF8().data(), *bid, (*trump > 0) ? gmUtil::m_suits[*trump].ToUTF8().data() : "Invalid");
+#endif
 	return true;
 }

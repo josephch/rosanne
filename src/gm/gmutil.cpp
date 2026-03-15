@@ -20,7 +20,6 @@
 
 #include "gm/gmutil.h"
 #include "SFMT.h"
-#include "SFMT-params.h"
 
 //int gmUtil::m_value_trans[] = {5, -1, -1, -1, -1, -1, 0, 1, 6, 4, 7, 2, 3};
 int gmUtil::m_value_trans[] = {6, 7, 11, 12, 9, 0, 8, 10};

@@ -22,6 +22,7 @@
 //#endif
 
 #include "wx/xrc/xmlres.h"
+#include "wx/dialog.h"
 
 class raDlgAbout: public wxDialog
 {
