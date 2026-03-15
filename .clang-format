@@ -1,0 +1,35 @@
+BasedOnStyle: LLVM
+
+# Indentation
+UseTab: Always
+IndentWidth: 4
+TabWidth: 4
+ContinuationIndentWidth: 4
+
+# Braces
+BreakBeforeBraces: Allman
+AllowShortBlocksOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Inline
+
+# Spaces
+SpaceBeforeParens: false 
+SpacesInParentheses: false
+SpaceBeforeCtorInitializerColon: false
+
+# Pointer alignment
+PointerAlignment: Right
+
+# Line wrapping
+ColumnLimit: 0
+
+# Constructor initializer formatting
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+BreakConstructorInitializers: BeforeColon
+
+# Misc
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 1
+SortIncludes: false
+

@@ -1,0 +1,7 @@
+Checks: '-*,bugprone-assert-side-effect,misc-assert-side-effect'
+CheckOptions:
+  - key:             bugprone-assert-side-effect.AssertMacros
+    value:           assert,wxASSERT
+  - key:             misc-assert-side-effect.AssertMacros
+    value:           assert,wxASSERT
+
