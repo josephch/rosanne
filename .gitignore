@@ -1,0 +1,13 @@
+.cache/
+bin/
+build/
+cards.xrs
+gui.xrs
+include/images/gui.xrc
+include/images/gui.xrs
+obj/
+rosanne-unittests.layout
+rosanne-unittests.depend
+rosanne.depend
+rosanne.layout
+compile_commands.json
