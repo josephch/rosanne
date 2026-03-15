@@ -1857,6 +1857,12 @@ bool raGamePanel::Continue()
 						wxT(__FILE__), __LINE__));
 				}
 
+				bool bAiPlayer = (m_players[in_trick_info.player].GetType() == raPLAYER_TYPE_AI);
+				if(bAiPlayer)
+				{
+					wxMilliSleep(m_ai_delay);
+				}
+
 				// After applying the mask to the hand held by the player
 				// if only one card can be played, play the same
 				// without hesitation
@@ -1881,7 +1887,6 @@ bool raGamePanel::Continue()
 							gmUtil::m_values[gmGetValue(card)].c_str()
 							));
 					}
-
 					// End the busy state
 					if(::wxIsBusy())
 						EndBusyState();
@@ -1899,11 +1904,10 @@ bool raGamePanel::Continue()
 				}
 
 				// If the player to play the next card is AI,
-				if(m_players[in_trick_info.player].GetType() == raPLAYER_TYPE_AI)
+				if(bAiPlayer)
 				{
 					m_info->SetInstruction(wxString::Format(wxT("%s is thinking..."),
 						gmUtil::m_long_locs[in_trick_info.player].c_str()));
-					wxMilliSleep(m_ai_delay);
 
 					// Begin the busy state
 					if(!::wxIsBusy())
