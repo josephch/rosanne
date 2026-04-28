@@ -42,7 +42,7 @@
 #define RA_APP_MAJOR_VER wxT("1")
 #define RA_APP_MINOR_VER wxT("0")
 #define RA_APP_REL_TYPE wxT("b")
-#define RA_APP_REL_TYPE_VER wxT("1")
+#define RA_APP_REL_TYPE_VER wxT("3-unofficial")
 #define RA_APP_NAME wxT("Rosanne")
 #define RA_APP_AUTHOR wxT("Vipin Cherian")
 

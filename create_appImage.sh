@@ -1,6 +1,5 @@
 #!/bin/sh
 
-mkdir Rosanne.AppDir -p
 mkdir -p Rosanne.AppDir/usr/share/images
 cp include/images/main_icon_32.xpm Rosanne.AppDir/
 

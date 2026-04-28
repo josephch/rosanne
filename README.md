@@ -4,7 +4,12 @@
 Rosanne implements 28 card game as a desktop application using C++ and wxWidgets.
 Original source code is available at https://sourceforge.net/projects/rosanne/
 
-## Build Instructions
+## Running appImage
+
+Download appImage file from releases
+Add executable permission to the appImage file and double click to run.
+
+## Build from source
 
 ### Requirements
 
@@ -27,7 +32,7 @@ Build after opening project in Code::Blocks
 
 rosanne requires cards.xrs and gui.xrs in the working directory.
 
-### Running rosanne
+### Steps before running the built binary
 ```
 cd xrs/cards/
 unzip cards.zip
