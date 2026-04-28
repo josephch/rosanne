@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Rosanne
+Comment=Twenty-eight(28) card game
+Exec=rosanne
+Icon=main_icon_32
+Terminal=false
+X-MultipleArgs=false
+Categories=Game;GTK;
+StartupNotify=true

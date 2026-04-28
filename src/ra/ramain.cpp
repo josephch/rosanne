@@ -113,20 +113,30 @@ bool raApp::OnInit()
 	wxXmlResource::Get()->InitAllHandlers();
 	wxFileSystem::AddHandler(new wxZipFSHandler);
 
-
-	if(!wxFile::Exists(raGUI_XRS))
+	const char *appdir = getenv("APPDIR");
+	wxString raGuiXrs;
+	if(appdir)
 	{
-		::wxMessageBox(wxString::Format(wxT("Compiled resource file \"%s\" does not exist."), raGUI_XRS),
-			wxT("Fatal Error!"), wxICON_ERROR);
+		raGuiXrs = wxString(appdir) + wxFileName::GetPathSeparator() + raGUI_XRS;
+	}
+	else
+	{
+		raGuiXrs = raGUI_XRS;
+	}
+
+	if(!wxFile::Exists(raGuiXrs))
+	{
+		::wxMessageBox(wxString::Format(wxT("Compiled resource file \"%s\" does not exist."), raGuiXrs),
+					   wxT("Fatal Error!"), wxICON_ERROR);
 		wxLog::SetActiveTarget(m_old_logger);
 		delete m_logger;
 		fclose(m_logfile);
 		return false;
 	}
 
-	if(!wxXmlResource::Get()->Load(raGUI_XRS))
+	if(!wxXmlResource::Get()->Load(raGuiXrs))
 	{
-		wxLogError(wxString::Format(wxT("Failed to load xrs %s. %s:%d"), raGUI_XRS,  wxT(__FILE__), __LINE__));
+		wxLogError(wxString::Format(wxT("Failed to load xrs %s. %s:%d"), raGuiXrs, wxT(__FILE__), __LINE__));
 		wxLog::SetActiveTarget(m_old_logger);
 		delete m_logger;
 		fclose(m_logfile);

@@ -41,9 +41,19 @@ ggCard::ggCard()
 			wxImage::AddHandler(new wxXPMHandler);
 
 			wxXmlResource::Get()->InitAllHandlers();
-			if(!wxXmlResource::Get()->Load(GG_CARD_XRS))
+			const char *appdir = getenv("APPDIR");
+			wxString ggCardXrs;
+			if(appdir)
 			{
-				wxLogError(wxString::Format(wxT("Failed to load xrs %s. %s:%d"),GG_CARD_XRS,  wxT(__FILE__), __LINE__));
+				ggCardXrs = wxString(appdir) + wxFileName::GetPathSeparator() + GG_CARD_XRS;
+			}
+			else
+			{
+				ggCardXrs = GG_CARD_XRS;
+			}
+			if(!wxXmlResource::Get()->Load(ggCardXrs))
+			{
+				wxLogError(wxString::Format(wxT("Failed to load xrs %s. %s:%d"), ggCardXrs, wxT(__FILE__), __LINE__));
 				return;
 			}
 			s_mask_bmp = wxXmlResource::Get()->LoadBitmap(wxT("mask"));
