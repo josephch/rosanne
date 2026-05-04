@@ -9,7 +9,7 @@ Original source code is available at https://sourceforge.net/projects/rosanne/
 Download appImage file from releases
 Add executable permission to the appImage file and double click to run.
 
-## Build from source
+## Build from source (Development)
 
 ### Requirements
 
@@ -26,13 +26,23 @@ git submodule init
 git submodule update
 ```
 
+### Build using cmake
+```
+mkdir cmake-build
+cd cmake-build
+cmake ../
+make
+```
+
 ### Build using Code::Blocks
 
 Build after opening project in Code::Blocks
 
-rosanne requires cards.xrs and gui.xrs in the working directory.
+### Running app
 
-### Steps before running the built binary
+#### Steps before running the built binary
+
+rosanne requires cards.xrs and gui.xrs in the working directory.
 ```
 cd xrs/cards/
 unzip cards.zip
