@@ -7,6 +7,9 @@ Original source code is available at https://sourceforge.net/projects/rosanne/
 ## Running appImage
 
 Download appImage file from releases
+
+[![Download for Linux](https://img.shields.io/badge/Download-Linux%20AppImage-blue.svg?style=for-the-badge&logo=linux)](https://github.com/josephch/rosanne/releases/download/v1.0b3-unofficial/Rosanne-x86_64.AppImage)
+
 Add executable permission to the appImage file and double click to run.
 
 ## Build from source (Development)
